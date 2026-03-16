@@ -19,7 +19,9 @@ public class SpriteRenderer implements Renderer
     public void render(Graphics2D g2d, Transform transform) {
         g2d.drawImage(
                 Objects.requireNonNull(image),
-                (int) transform.getPosition().x(), (int) transform.getPosition().y(), null
+                (int) transform.getPosition().x(), (int) transform.getPosition().y(),
+                (int) transform.getScale().x(), (int) transform.getScale().y(),
+                null
         );
     }
 
