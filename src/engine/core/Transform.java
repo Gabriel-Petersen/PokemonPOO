@@ -23,6 +23,13 @@ public class Transform
         this.position.set(position);
     }
 
+    public void setScale(double x, double y) {
+        scale.set(x, y);
+    }
+    public void setScale(Vec2d scale) {
+        this.scale.set(scale);
+    }
+
     public double distanceSqrt(Transform other)
     {
         double dx = this.getPosition().x() - other.getPosition().x();
@@ -33,5 +40,4 @@ public class Transform
 
     public Vec2d getPosition() { return position; }
     public Vec2d getScale() { return scale; }
-    public double getRotation() { return rotation; }
 }

@@ -1,11 +1,11 @@
 package engine.rendering;
 
+import engine.core.GamePanel;
 import engine.core.Transform;
 import engine.assets.AssetManager;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Objects;
 
 public class SpriteRenderer implements Renderer
 {
@@ -16,13 +16,20 @@ public class SpriteRenderer implements Renderer
     }
 
     @Override
-    public void render(Graphics2D g2d, Transform transform) {
-        g2d.drawImage(
-                Objects.requireNonNull(image),
-                (int) transform.getPosition().x(), (int) transform.getPosition().y(),
-                (int) transform.getScale().x(), (int) transform.getScale().y(),
-                null
-        );
+    public void render(Graphics2D g2d, Transform transform)
+    {
+        var backup = g2d.getTransform();
+
+        g2d.translate(transform.getPosition().x(), transform.getPosition().y());
+        g2d.rotate(Math.toRadians(transform.rotation));
+        g2d.scale(transform.getScale().x(), transform.getScale().y());
+
+        g2d.drawImage(image,
+                -image.getWidth()/2,
+                -image.getHeight()/2,
+                null);
+
+        g2d.setTransform(backup);
     }
 
     public void setImage(BufferedImage image) { this.image = image; }
