@@ -2,10 +2,10 @@ package engine.assets;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.net.URL;
+import java.util.*;
 
 public class AssetManager
 {
@@ -29,5 +29,32 @@ public class AssetManager
             }
         }
         return sprites.get(path);
+    }
+
+    public static BufferedImage[] getSpritesFromFolder(String folderPath) {
+        try {
+            URL url = AssetManager.class.getResource("/assets/" + folderPath);
+            if (url == null) throw new IOException("Diretório não encontrado: " + folderPath);
+
+            File directory = new File(url.toURI());
+            File[] files = directory.listFiles((dir, name) ->
+                    name.toLowerCase().endsWith(".png") || name.toLowerCase().endsWith(".jpg")
+            );
+
+            if (files == null) return new BufferedImage[0];
+
+            Arrays.sort(files, Comparator.comparing(File::getName));
+
+            BufferedImage[] sprites = new BufferedImage[files.length];
+            for (int i = 0; i < files.length; i++) {
+                sprites[i] = getSprite(folderPath + "/" + files[i].getName());
+            }
+
+            return sprites;
+        }
+        catch (Exception e) {
+            System.err.println("Erro ao listar pasta de sprites: " + e.getMessage());
+            return new BufferedImage[0];
+        }
     }
 }

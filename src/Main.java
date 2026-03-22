@@ -26,8 +26,8 @@ public class Main
         Square quadrado = new Square(10, 10, 100, Color.red, 0);
         gamePanel.addElement(quadrado);
 
-        Player monster = new Player();
-        gamePanel.addElement(monster);
+        Player player = new Player();
+        gamePanel.addElement(player);
 
         new Thread(() -> {
             do

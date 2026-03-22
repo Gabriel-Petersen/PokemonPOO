@@ -1,9 +1,11 @@
 package engine.animation;
 
+import engine.assets.AssetManager;
 import engine.core.GamePanel;
 import engine.lifecycle.Updatable;
 import engine.rendering.SpriteRenderer;
 
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +27,19 @@ public class Animator
             System.err.println("Animação de nome " + anim.getName() + " já existe. Sobrepondo animação antiga");
         if (currentAnim == null)
             play(anim.getName());
+    }
+
+    public void addAnimation(String name, int fps, boolean loop, BufferedImage... frames) {
+        this.addAnimation(new Animation(name, fps, loop, frames));
+    }
+
+    public void addAnimation(String name, int fps, boolean loop, String folderPath)
+    {
+        var frames = AssetManager.getSpritesFromFolder(folderPath);
+        if (frames.length > 0)
+            this.addAnimation(new Animation(name, fps, loop, frames));
+        else
+            System.err.println("Aviso: Pasta " + folderPath + " está vazia ou não existe.");
     }
 
     public void play(String name)

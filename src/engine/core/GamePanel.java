@@ -6,6 +6,7 @@ import engine.lifecycle.Updatable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,9 @@ public class GamePanel extends JPanel
     private final List<Updatable> toAddUp = new ArrayList<>();
     private final List<Updatable> toRemoveUp = new ArrayList<>();
 
+    private final Camera cam = new Camera();
+    private final AffineTransform camView = new AffineTransform();
+
     public GamePanel()
     {
         addKeyListener(Input.keyListener);
@@ -35,10 +39,21 @@ public class GamePanel extends JPanel
     {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        if (g2d == null) throw new RuntimeException("Graphics at GamePanel is not a Graphics2D");
+
+        AffineTransform original = g2d.getTransform();
+
+        camView.setTransform(original);
+        camView.translate((double) getWidth() / 2, (double) getHeight() / 2);
+        camView.scale(cam.getZoom(), cam.getZoom());
+        camView.translate(-cam.getPosition().x(), -cam.getPosition().y());
+
+        g2d.setTransform(camView);
 
         for (var r : scene)
             r.draw(g2d);
+
+
+        g2d.setTransform(original);
     }
 
     public void updateAll()
@@ -83,4 +98,5 @@ public class GamePanel extends JPanel
     public static GamePanel getInstance() {
         return INSTANCE;
     }
+    public static Camera getCamera() { return INSTANCE.cam; }
 }

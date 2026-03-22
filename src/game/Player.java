@@ -2,7 +2,6 @@ package game;
 
 import java.awt.event.KeyEvent;
 
-import engine.animation.Animation;
 import engine.animation.Animator;
 import engine.assets.AssetManager;
 import engine.core.GameObject;
@@ -14,46 +13,46 @@ import engine.rendering.SpriteRenderer;
 
 public class Player extends GameObject 
 {
+    protected enum LastLookDir {
+        UP('U'), DOWN('D'), LEFT('L'), RIGHT('R');
+
+        private final char c;
+        LastLookDir(char c) { this.c = c; }
+        public char c() { return c; }
+    }
+
+    private LastLookDir lastLookDir = LastLookDir.DOWN;
 	private Animator animator;
 	private final MutableVec2d speedVec = new MutableVec2d();
-	@Override
-	public void setup() {
-		renderer = createSwingRenderer();
-		
-		transform.setScale(3, 3);
-		
-		animator = new Animator((SpriteRenderer) renderer);
-		var idleD = AssetManager.getSprite("player_sheet_data/sprite_01.png");
-		var idleU = AssetManager.getSprite("player_sheet_data/sprite_04.png");
-		var idleR = AssetManager.getSprite("player_sheet_data/sprite_10.png");
-		var idleL = AssetManager.getSprite("player_sheet_data/sprite_07.png");
-		
-		animator.addAnimation(new Animation("idleD", 10, true, idleD));
-		animator.addAnimation(new Animation("idleU", 10, true, idleU));
-		animator.addAnimation(new Animation("idleR", 10, true, idleR));
-		animator.addAnimation(new Animation("idleL", 10, true, idleL));
-		
-		animator.addAnimation(new Animation("wk_r", 10, true, 
-				AssetManager.getSprite("player_sheet_data/sprite_09.png"),
-				idleR,
-				AssetManager.getSprite("player_sheet_data/sprite_11.png")
-		));
-		animator.addAnimation(new Animation("wk_l", 10, true, 
-				AssetManager.getSprite("player_sheet_data/sprite_06.png"),
-				idleL,
-				AssetManager.getSprite("player_sheet_data/sprite_08.png")
-		));
-		animator.addAnimation(new Animation("wk_u", 10, true, 
-				AssetManager.getSprite("player_sheet_data/sprite_03.png"),
-				idleU,
-				AssetManager.getSprite("player_sheet_data/sprite_05.png")
-		));
-		animator.addAnimation(new Animation("wk_d", 10, true, 
-				AssetManager.getSprite("player_sheet_data/sprite_00.png"),
-				idleD,
-				AssetManager.getSprite("player_sheet_data/sprite_02.png")
-		));
-	}
+
+    @Override
+    public void setup() {
+        renderer = createSwingRenderer();
+        transform.setScale(3, 3);
+        animator = new Animator((SpriteRenderer) renderer);
+
+        animator.addAnimation(
+                "idleD", 1, true,
+                AssetManager.getSprite("player_sheet/walk_down/sprite_01.png")
+        );
+        animator.addAnimation(
+                "idleU", 1, true,
+                AssetManager.getSprite("player_sheet/walk_up/sprite_04.png")
+        );
+        animator.addAnimation(
+                "idleR", 1, true,
+                AssetManager.getSprite("player_sheet/walk_right/sprite_10.png")
+        );
+        animator.addAnimation(
+                "idleL", 1, true,
+                AssetManager.getSprite("player_sheet/walk_left/sprite_07.png")
+        );
+
+        animator.addAnimation("wk_d", 10, true, "player_sheet/walk_down");
+        animator.addAnimation("wk_u", 10, true, "player_sheet/walk_up");
+        animator.addAnimation("wk_r", 10, true, "player_sheet/walk_right");
+        animator.addAnimation("wk_l", 10, true, "player_sheet/walk_left");
+    }
 
 	@Override
     public void update()
@@ -71,24 +70,30 @@ public class Player extends GameObject
             
             if (speedVec.y < 0) {
             	animator.play("wk_u");
+                lastLookDir = LastLookDir.UP;
             } else if (speedVec.y > 0) {
             	animator.play("wk_d");
+                lastLookDir = LastLookDir.DOWN;
             } else if (speedVec.x > 0) {
             	animator.play("wk_r");
+                lastLookDir = LastLookDir.RIGHT;
             } else if (speedVec.x < 0) {
             	animator.play("wk_l");
+                lastLookDir = LastLookDir.LEFT;
             }
             
-            animator.getCurrentAnim().setFrameDurationMillis(speed == 6 ? 30 : 60);
+            animator.getCurrentAnim().setFrameDurationMillis(speed == 6 ? 40 : 60);
         }
         else
         {
-        	animator.play("idleD");
+        	animator.play("idle" + lastLookDir.c());
         }
+
+        GamePanel.getCamera().lookAt(transform.getPosition());
     }
 
 	@Override
 	protected Renderer createSwingRenderer() {
-		return new SpriteRenderer("player_sheet_data/sprite_01.png");
+		return new SpriteRenderer("player_sheet/walk_down/sprite_01.png");
 	}
 }
