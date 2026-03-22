@@ -1,12 +1,13 @@
 package engine.animation;
 
+import engine.core.GamePanel;
 import engine.lifecycle.Updatable;
 import engine.rendering.SpriteRenderer;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Animator implements Updatable
+public class Animator
 {
     private final Map<String, Animation> animations = new HashMap<>();
     private Animation currentAnim;
@@ -15,6 +16,8 @@ public class Animator implements Updatable
     private final SpriteRenderer targetRenderer;
 
     public Animator(SpriteRenderer renderer) { this.targetRenderer = renderer; }
+    
+    public Animation getCurrentAnim() { return currentAnim; }
 
     public void addAnimation(Animation anim)
     {
@@ -33,7 +36,6 @@ public class Animator implements Updatable
         updateRenderer();
     }
 
-    @Override
     public void update()
     {
         if (currentAnim == null) return;
@@ -59,6 +61,4 @@ public class Animator implements Updatable
     private void updateRenderer() {
         targetRenderer.setImage(currentAnim.getFrames()[currentFrameIndex]);
     }
-
-    @Override public void setup() {}
 }

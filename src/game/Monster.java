@@ -20,7 +20,6 @@ public class Monster extends GameObject
     @Override
     public void setup() {
         renderer = createSwingRenderer();
-        transform.setScale(1, 1);
     }
 
     @Override

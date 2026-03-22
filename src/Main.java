@@ -1,10 +1,11 @@
+import java.awt.Color;
+
+import javax.swing.JFrame;
+
 import engine.core.GamePanel;
 import engine.input.Input;
 import engine.primitives.Square;
-import game.Monster;
-
-import javax.swing.*;
-import java.awt.*;
+import game.Player;
 
 public class Main
 {
@@ -25,18 +26,18 @@ public class Main
         Square quadrado = new Square(10, 10, 100, Color.red, 0);
         gamePanel.addElement(quadrado);
 
-        Monster monster = new Monster();
+        Player monster = new Player();
         gamePanel.addElement(monster);
 
         new Thread(() -> {
-            while(true)
+            do
             {
                 gamePanel.updateAll();
                 gamePanel.repaint();
                 Input.endFrame();
 
                 try { Thread.sleep(16); } catch (Exception ignored) {}
-            }
+            } while (true);
         }).start();
     }
 }
