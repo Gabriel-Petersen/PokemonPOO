@@ -19,6 +19,7 @@ public abstract class GameObject extends Renderable implements Updatable
     @Override
     public final void draw(Graphics2D g2d)
     {
+        if (!isVisible) return;
         if (renderer != null)
             renderer.render(g2d, transform);
         else

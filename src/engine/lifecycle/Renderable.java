@@ -9,7 +9,8 @@ public abstract class Renderable implements Comparable<Renderable>, EngineElemen
 {
     private static short globalCounter = 0;
     private final short id;
-    private byte layer;
+    protected byte layer;
+    protected boolean isVisible = true;
 
     protected Renderable() { id = Renderable.globalCounter++; }
 
@@ -28,4 +29,7 @@ public abstract class Renderable implements Comparable<Renderable>, EngineElemen
             return Integer.compare(id, o.id);
         return Integer.compare(layer, o.layer);
     }
+
+    public void setVisible(boolean visible) { isVisible = visible; }
+    public boolean isVisible() { return isVisible; }
 }

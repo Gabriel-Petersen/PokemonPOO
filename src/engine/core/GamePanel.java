@@ -3,6 +3,7 @@ package engine.core;
 import engine.input.Input;
 import engine.lifecycle.Renderable;
 import engine.lifecycle.Updatable;
+import engine.ui.core.UiElement;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +17,7 @@ public class GamePanel extends JPanel
 {
     private static final GamePanel INSTANCE = new GamePanel();
     private final Set<Renderable> scene = new TreeSet<>();
+    private final Set<UiElement> uiElements = new TreeSet<>();
     private final List<Updatable> logics = new ArrayList<>();
 
     private final List<Renderable> toAddRend = new ArrayList<>();
@@ -29,6 +31,8 @@ public class GamePanel extends JPanel
     public GamePanel()
     {
         addKeyListener(Input.keyListener);
+        addMouseListener(Input.mouseListener);
+        addMouseMotionListener(Input.mouseListener);
         setFocusable(true);
         requestFocusInWindow();
         setPreferredSize(new Dimension(1120, 630)); // resolução 16x9
@@ -52,8 +56,10 @@ public class GamePanel extends JPanel
         for (var r : scene)
             r.draw(g2d);
 
-
         g2d.setTransform(original);
+
+        for (var r : uiElements)
+            r.draw(g2d);
     }
 
     public void updateAll()
@@ -64,16 +70,30 @@ public class GamePanel extends JPanel
             up.onDestroy();
             logics.remove(up);
         }
-        scene.addAll(toAddRend);
+
+        for (Renderable rd : toAddRend) if (!(rd instanceof UiElement)) scene.add(rd);
+
         for (Updatable up : toAddUp)
+        {
+            if (up instanceof UiElement uiEl)
+            {
+                if (uiEl.getParent() == null)
+                    uiElements.add(uiEl);
+                else continue;
+            }
             up.setup();
+        }
         logics.addAll(toAddUp);
+
         toRemoveRend.clear();
         toRemoveUp.clear();
         toAddRend.clear();
         toAddUp.clear();
 
-        for (var up : logics) up.update();
+        for (var up : logics) {
+            if (up instanceof UiElement uiEl && uiEl.getParent() != null) continue;
+            up.update();
+        }
     }
 
     public void addRenderable(Renderable r) { toAddRend.add(r); }
