@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class UiText extends UiElement {
     private String text;
-    private Color color = Color.WHITE;
+    private Color color = Color.BLACK;
     private Font font = new Font("Arial", Font.PLAIN, 18);
 
     public UiText(String text) {

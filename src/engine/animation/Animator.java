@@ -14,11 +14,10 @@ public class Animator
     private final Map<String, Animation> animations = new HashMap<>();
     private Animation currentAnim;
     private int currentFrameIndex;
-    private long timer;
+    private double elapsed;
     private final SpriteRenderer targetRenderer;
 
     public Animator(SpriteRenderer renderer) { this.targetRenderer = renderer; }
-    
     public Animation getCurrentAnim() { return currentAnim; }
 
     public void addAnimation(Animation anim)
@@ -47,18 +46,18 @@ public class Animator
         if (currentAnim != null && currentAnim.getName().equals(name)) return;
         currentAnim = animations.get(name);
         currentFrameIndex = 0;
-        timer = System.currentTimeMillis();
         updateRenderer();
     }
 
     public void update()
     {
         if (currentAnim == null) return;
+        elapsed += GamePanel.getInstance().getDeltaTime();
+        double duration = currentAnim.getFrameDurationMillis() / 1000.0;
 
-        if (System.currentTimeMillis() - timer >= currentAnim.getFrameDurationMillis())
-        {
+        if (elapsed >= duration) {
             advanceFrame();
-            timer = System.currentTimeMillis();
+            elapsed -= duration;
         }
     }
 
@@ -73,6 +72,8 @@ public class Animator
         updateRenderer();
     }
 
+    public int getCurrentAnimSize() { return currentAnim.getFrames().length; }
+    public int getCurrentFrameIndex() { return currentFrameIndex; }
     private void updateRenderer() {
         targetRenderer.setImage(currentAnim.getFrames()[currentFrameIndex]);
     }

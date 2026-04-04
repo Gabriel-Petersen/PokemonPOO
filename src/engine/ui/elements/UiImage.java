@@ -14,12 +14,12 @@ public class UiImage extends UiElement
     public UiImage(BufferedImage sprite) {
         image = sprite;
     }
-
     public UiImage(String spritePath) {
         image = AssetManager.getSprite(spritePath);
     }
 
-    public UiImage(int sizeX, int sizeY, Color color) {
+    public UiImage(int sizeX, int sizeY, Color color)
+    {
         image = null;
         transform.setScale(sizeX, sizeY);
         this.color = color;

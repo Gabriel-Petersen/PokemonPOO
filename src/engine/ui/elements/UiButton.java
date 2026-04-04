@@ -9,16 +9,15 @@ import java.awt.*;
 public class UiButton extends UiElement implements OnMouseClickListener, OnMouseEnterListener, OnMouseExitListener
 {
     private final Runnable onClickAction;
-    private Color mainColor = Color.WHITE;
+    private Color mainColor;
     private Color backgroundColor = Color.DARK_GRAY;
     private Color foregroundColor = Color.WHITE;
 
     public UiButton(String text, Runnable onClick)
     {
         this.onClickAction = onClick;
-        UiText label = new UiText(text);
-        this.addChild(label);
-        label.getTransform().setPosition(10, 25);
+        this.addChild(new UiText(text));
+        mainColor = foregroundColor;
     }
 
     public UiButton(Runnable onClick) { this.onClickAction = onClick; }

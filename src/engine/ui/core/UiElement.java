@@ -1,6 +1,7 @@
 package engine.ui.core;
 
 import engine.core.GameObject;
+import engine.core.GamePanel;
 import engine.input.Input;
 import engine.math.vectors.MutableVec2d;
 import engine.math.vectors.Vec2d;
@@ -25,6 +26,8 @@ public abstract class UiElement extends GameObject
 
     private final Rectangle2D bounds = new Rectangle2D.Double();
 
+    protected UiElement() { transform = new UiTransform(); }
+
     protected Rectangle2D getBounds()
     {
         Vec2d pos = getGlobalPosition();
@@ -38,6 +41,8 @@ public abstract class UiElement extends GameObject
 
         return bounds;
     }
+
+    public UiTransform getUiTransform() { return (UiTransform) transform; }
 
     @Override
     protected final Renderer createSwingRenderer() {
@@ -64,8 +69,20 @@ public abstract class UiElement extends GameObject
     {
         AffineTransform oldTransform = g2d.getTransform();
 
-        g2d.translate(transform.getPosition().x(), transform.getPosition().y());
+        Vec2d parentSize = (getParent() == null)
+                ? new MutableVec2d(GamePanel.getInstance().getWidth(), GamePanel.getInstance().getHeight())
+                : getParent().getTransform().getScale();
+
+        Vec2d anchoredPos = getUiTransform().getAnchor().calculate(
+                transform.getScale(),
+                transform.getPosition(),
+                parentSize
+        );
+
+        g2d.translate(anchoredPos.x(), anchoredPos.y());
+
         drawSelf(g2d);
+
         for (UiElement el : child)
             el.draw(g2d);
 
@@ -74,13 +91,26 @@ public abstract class UiElement extends GameObject
 
     protected abstract void drawSelf(Graphics2D g2d);
 
+    public Vec2d getLocalAnchoredPosition()
+    {
+        Vec2d parentSize = (getParent() == null)
+                ? new MutableVec2d(GamePanel.getInstance().getWidth(), GamePanel.getInstance().getHeight())
+                : getParent().getTransform().getScale();
+
+        return getUiTransform().getAnchor().calculate(
+                transform.getScale(),
+                transform.getPosition(),
+                parentSize
+        );
+    }
+
     public Vec2d getGlobalPosition()
     {
-        if (parent == null) return transform.getPosition();
-        Vec2d pPos = parent.getGlobalPosition();
-        Vec2d myPos = transform.getPosition();
+        Vec2d localPos = getLocalAnchoredPosition();
+        if (parent == null) return localPos;
 
-        return new MutableVec2d(pPos.x() + myPos.x(), pPos.y() + myPos.y());
+        Vec2d pPos = parent.getGlobalPosition();
+        return new MutableVec2d(pPos.x() + localPos.x(), pPos.y() + localPos.y());
     }
 
     public void removeChild(UiElement element) { child.remove(element); }

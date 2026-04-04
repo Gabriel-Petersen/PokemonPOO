@@ -1,5 +1,6 @@
 package engine.core;
 
+import engine.events.EventScheduler;
 import engine.input.Input;
 import engine.lifecycle.Renderable;
 import engine.lifecycle.Updatable;
@@ -27,6 +28,10 @@ public class GamePanel extends JPanel
 
     private final Camera cam = new Camera();
     private final AffineTransform camView = new AffineTransform();
+
+    private final List<EventScheduler> eventSchedulers = new ArrayList<>();
+
+    private double deltaTime = 0;
 
     public GamePanel()
     {
@@ -62,8 +67,17 @@ public class GamePanel extends JPanel
             r.draw(g2d);
     }
 
-    public void updateAll()
+    public void updateAll(double deltaTime)
     {
+        this.deltaTime = deltaTime;
+        if (isAnySchedulerResolving())
+        {
+            for (var scheduler : eventSchedulers)
+                if (scheduler.isResolving())
+                    scheduler.update(deltaTime);
+            return;
+        }
+
         for (Renderable rd : toRemoveRend)
             scene.remove(rd);
         for (Updatable up : toRemoveUp) {
@@ -96,6 +110,15 @@ public class GamePanel extends JPanel
         }
     }
 
+    private boolean isAnySchedulerResolving()
+    {
+        for (var scheduler : eventSchedulers)
+            if (scheduler.isResolving())
+                return true;
+
+        return false;
+    }
+
     public void addRenderable(Renderable r) { toAddRend.add(r); }
     public void removeRenderable(Renderable r) { toRemoveRend.add(r); }
 
@@ -115,8 +138,9 @@ public class GamePanel extends JPanel
             toRemoveRend.add(rd);
     }
 
-    public static GamePanel getInstance() {
-        return INSTANCE;
-    }
+    public void addScheduler(EventScheduler scheduler) { eventSchedulers.add(scheduler); }
+    public double getDeltaTime() { return deltaTime; }
+
+    public static GamePanel getInstance() { return INSTANCE; }
     public static Camera getCamera() { return INSTANCE.cam; }
 }

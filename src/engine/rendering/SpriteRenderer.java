@@ -1,6 +1,5 @@
 package engine.rendering;
 
-import engine.core.GamePanel;
 import engine.core.Transform;
 import engine.assets.AssetManager;
 

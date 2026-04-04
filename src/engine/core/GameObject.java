@@ -8,7 +8,7 @@ import java.awt.*;
 
 public abstract class GameObject extends Renderable implements Updatable
 {
-    protected final Transform transform = new Transform();
+    protected Transform transform = new Transform();
     protected Renderer renderer;
 
     public Transform getTransform() { return transform; }
