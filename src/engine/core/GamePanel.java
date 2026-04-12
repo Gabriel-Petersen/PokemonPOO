@@ -5,14 +5,13 @@ import engine.input.Input;
 import engine.lifecycle.Renderable;
 import engine.lifecycle.Updatable;
 import engine.ui.core.UiElement;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.swing.*;
 
 public class GamePanel extends JPanel
 {
@@ -33,7 +32,7 @@ public class GamePanel extends JPanel
 
     private double deltaTime = 0;
 
-    public GamePanel()
+    private GamePanel()
     {
         addKeyListener(Input.keyListener);
         addMouseListener(Input.mouseListener);
