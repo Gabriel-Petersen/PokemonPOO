@@ -1,3 +1,5 @@
+package execs;
+
 import java.awt.Color;
 
 import javax.swing.JFrame;
@@ -36,15 +38,6 @@ public class Main
         Player player = new Player();
         gamePanel.addElement(player);
 
-        /*
-        var rd = new Random();
-        UiButton botao = new UiButton("Meu Botão", () ->
-                quadrado.getTransform().setPosition(100 * rd.nextDouble() - 50, 100 * rd.nextDouble() - 50)
-                // randomiza a position do quadrado
-        );
-        botao.getTransform().setScale(100, 100);
-        gamePanel.addElement(botao);
-        */
         setupLaboratorio();
 
         new Thread(() -> {
