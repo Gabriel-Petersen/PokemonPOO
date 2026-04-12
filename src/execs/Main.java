@@ -57,7 +57,9 @@ public class Main
         }).start();
     }
 
-    public static void setupLaboratorio() {
+    public static void setupLaboratorio() 
+    {
+        System.out.println("Iniciando laboratorio");
         GamePanel gamePanel = GamePanel.getInstance();
         EventScheduler battleScheduler = new EventScheduler();
 
