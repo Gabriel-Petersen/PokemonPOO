@@ -2,7 +2,6 @@ package engine.animation;
 
 import engine.assets.AssetManager;
 import engine.core.GamePanel;
-import engine.lifecycle.Updatable;
 import engine.rendering.SpriteRenderer;
 
 import java.awt.image.BufferedImage;
