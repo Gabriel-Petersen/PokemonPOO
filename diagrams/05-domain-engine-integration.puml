@@ -1,0 +1,106 @@
+@startuml domain_engine_integration
+skinparam style strictuml
+skinparam packageStyle rectangle
+
+package "application.battle" {
+    interface PlayerActionPort {
+        +submit(action: CombatAction) void
+    }
+
+    class BattleController {
+        +start(battle: Battle) void
+        +submit(action: CombatAction) void
+        +update(deltaTime: double) void
+        +isPresentationBusy() boolean
+    }
+
+    class BattlePresenter {
+        +presentTurn(resolution: TurnResolution) void
+        +presentMessage(message: String) void
+    }
+
+    class BattleViewModel {
+        +refreshFrom(battle: Battle) void
+        +getPlayerName() String
+        +getOpponentName() String
+        +getPlayerHpRatio() double
+        +getOpponentHpRatio() double
+        +isInputLocked() boolean
+    }
+
+    class InputActionMapper {
+        +toMoveAction(moveSlot: int) CombatAction
+        +toItemAction(itemId: String, targetIndex: int) CombatAction
+        +toSwitchAction(targetIndex: int) CombatAction
+        +toRunAction() CombatAction
+    }
+}
+
+package "integration.visual" {
+    class PlayerPokemonView <<GameObjectAdapter>> {
+        +bind(viewModel: BattleViewModel) void
+        +syncFromViewModel() void
+    }
+
+    class OpponentPokemonView <<GameObjectAdapter>> {
+        +bind(viewModel: BattleViewModel) void
+        +syncFromViewModel() void
+    }
+
+    class BattleHudView <<UiAdapter>> {
+        +bind(viewModel: BattleViewModel, actionPort: PlayerActionPort) void
+        +showMessage(message: String) void
+        +updateWidgets() void
+    }
+
+    class EventQueuePresenterAdapter {
+        +enqueueTurnPresentation(resolution: TurnResolution) void
+        +enqueueMessage(message: String) void
+        +isResolving() boolean
+    }
+}
+
+package "domain (external)" {
+    class Battle <<external>>
+    class CombatAction <<external>>
+    class TurnResolution <<external>>
+}
+
+package "engine (external)" {
+    class GameObject <<external>>
+    class UiElement <<external>>
+    class GamePanel <<external>>
+    class EventScheduler <<external>>
+}
+
+PlayerActionPort <|.. BattleController
+
+BattleController --> BattlePresenter
+BattleController --> BattleViewModel
+BattleController --> InputActionMapper
+BattleController ..> Battle
+BattleController ..> CombatAction
+
+InputActionMapper ..> CombatAction
+BattlePresenter --> EventQueuePresenterAdapter
+BattlePresenter ..> TurnResolution
+BattleViewModel ..> Battle
+
+PlayerPokemonView --|> GameObject
+OpponentPokemonView --|> GameObject
+BattleHudView --|> UiElement
+
+PlayerPokemonView ..> BattleViewModel
+OpponentPokemonView ..> BattleViewModel
+BattleHudView ..> BattleViewModel
+BattleHudView ..> PlayerActionPort
+
+EventQueuePresenterAdapter ..> EventScheduler
+EventQueuePresenterAdapter ..> GamePanel
+
+note bottom of BattleViewModel
+Domain classes do not depend on GameObject or UiElement.
+Visual adapters read BattleViewModel and mirror logical state.
+end note
+
+@enduml

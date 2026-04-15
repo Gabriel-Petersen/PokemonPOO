@@ -1,0 +1,97 @@
+@startuml exploration_encounter
+skinparam style strictuml
+skinparam packageStyle rectangle
+
+package "domain.exploration" {
+    class ExplorationState {
+        +getPlayerTrainer() PlayerTrainer
+        +getCurrentZone() EncounterZone
+        +getStepCounter() int
+        +incrementStep() void
+        +resetStepCounter() void
+    }
+
+    class EncounterZone {
+        +getId() String
+        +getName() String
+        +contains(tileX: int, tileY: int) boolean
+        +getEncounterTable() EncounterTable
+    }
+
+    class EncounterTable {
+        +getEntries() List~EncounterEntry~
+        +rollEntry(rng: RandomSource) EncounterEntry
+        +rollLevel(entry: EncounterEntry, rng: RandomSource) int
+    }
+
+    class EncounterEntry {
+        +getSpecies() Species
+        +getMinLevel() int
+        +getMaxLevel() int
+        +getWeight() int
+    }
+
+    interface RandomSource {
+        +nextInt(bound: int) int
+        +nextDouble() double
+    }
+
+    class EncounterService {
+        +canStartEncounter(state: ExplorationState) boolean
+        +rollEncounter(state: ExplorationState, rng: RandomSource) EncounterResult
+        +buildWildTrainer(entry: EncounterEntry, level: int) WildTrainer
+    }
+
+    class EncounterResult {
+        +hasEncounter() boolean
+        +getEntry() EncounterEntry
+        +getWildTrainer() WildTrainer
+    }
+
+    class BattleFactory {
+        +createWildBattle(player: PlayerTrainer, wild: WildTrainer) Battle
+    }
+
+    class ExplorationFlow {
+        +updateStep(state: ExplorationState, rng: RandomSource) ExplorationStepResult
+    }
+
+    class ExplorationStepResult {
+        +hasStartedBattle() boolean
+        +getBattle() Battle
+    }
+}
+
+package "domain.shared" {
+    class Species <<external>>
+    class PlayerTrainer <<external>>
+    class WildTrainer <<external>>
+    class Battle <<external>>
+}
+
+ExplorationState --> PlayerTrainer
+ExplorationState --> EncounterZone
+
+EncounterZone *-- EncounterTable
+EncounterTable *-- "1..*" EncounterEntry
+EncounterEntry --> Species
+
+EncounterService --> EncounterResult
+EncounterService ..> EncounterTable
+EncounterService ..> RandomSource
+EncounterService ..> WildTrainer
+
+EncounterResult --> EncounterEntry
+EncounterResult --> WildTrainer
+
+ExplorationFlow --> EncounterService
+ExplorationFlow --> BattleFactory
+ExplorationFlow --> ExplorationStepResult
+
+BattleFactory --> Battle
+BattleFactory --> PlayerTrainer
+BattleFactory --> WildTrainer
+
+ExplorationStepResult --> Battle
+
+@enduml

@@ -1,0 +1,162 @@
+@startuml creatures_moves_status
+skinparam style strictuml
+skinparam packageStyle rectangle
+
+package "domain.creature" {
+    class Pokemon {
+        +getId() String
+        +getNickname() String
+        +getLevel() int
+        +getSpecies() Species
+        +getCurrentStats() Stats
+        +getCurrentHp() int
+        +canBattle() boolean
+        +receiveDamage(amount: int) void
+        +heal(amount: int) void
+        +applyStatus(effect: StatusEffect) void
+        +learnMove(slot: int, move: Move) boolean
+        +levelUp() void
+    }
+
+    class Species {
+        +getDexNumber() int
+        +getName() String
+        +getPrimaryType() ElementType
+        +getSecondaryType() ElementType
+        +getBaseStats() Stats
+        +getLearnset() List~Move~
+    }
+
+    class Stats {
+        +getHp() int
+        +getAttack() int
+        +getDefense() int
+        +getSpecialAttack() int
+        +getSpecialDefense() int
+        +getSpeed() int
+    }
+
+    class EvolutionRule {
+        +canEvolve(pokemon: Pokemon) boolean
+        +evolve(pokemon: Pokemon) Species
+    }
+
+    class MoveSet {
+        +getMoves() List~Move~
+        +getMove(slot: int) Move
+        +setMove(slot: int, move: Move) boolean
+    }
+}
+
+package "domain.move" {
+    abstract class Move {
+        +getName() String
+        +getPower() int
+        +getAccuracy() double
+        +getPriority() int
+        +canUse(user: Pokemon, target: Pokemon) boolean
+        +execute(user: Pokemon, target: Pokemon, context: MoveExecutionContext) MoveResult
+    }
+
+    class DamageMove {
+        +getType() ElementType
+        +getCategory() MoveCategory
+        +execute(user: Pokemon, target: Pokemon, context: MoveExecutionContext) MoveResult
+    }
+
+    class StatusMove {
+        +getEffectFactory() StatusEffectFactory
+        +execute(user: Pokemon, target: Pokemon, context: MoveExecutionContext) MoveResult
+    }
+
+    class MoveExecutionContext {
+        +getBattleContext() BattleContext
+        +isCriticalHit() boolean
+        +getRandomRoll() double
+    }
+
+    class MoveResult {
+        +isHit() boolean
+        +getDamageApplied() int
+        +getMessages() List~String~
+    }
+
+    enum ElementType {
+        NORMAL
+        FIRE
+        WATER
+        GRASS
+        ELECTRIC
+        ICE
+        FIGHTING
+        POISON
+    }
+
+    enum MoveCategory {
+        PHYSICAL
+        SPECIAL
+        STATUS
+    }
+}
+
+package "domain.status" {
+    interface StatusEffect {
+        +getId() String
+        +onApply(target: Pokemon) void
+        +onTurnStart(target: Pokemon, context: BattleContext) void
+        +onTurnEnd(target: Pokemon, context: BattleContext) void
+        +isExpired() boolean
+    }
+
+    interface StatusEffectFactory {
+        +create(source: Pokemon, target: Pokemon) StatusEffect
+    }
+
+    class PersistentStatusEffect {
+        +getId() String
+        +onApply(target: Pokemon) void
+        +onTurnStart(target: Pokemon, context: BattleContext) void
+        +onTurnEnd(target: Pokemon, context: BattleContext) void
+        +isExpired() boolean
+    }
+
+    class VolatileStatusEffect {
+        +getId() String
+        +onApply(target: Pokemon) void
+        +onTurnStart(target: Pokemon, context: BattleContext) void
+        +onTurnEnd(target: Pokemon, context: BattleContext) void
+        +isExpired() boolean
+    }
+}
+
+package "domain.shared" {
+    class BattleContext <<external>>
+}
+
+Pokemon o-- Species
+Pokemon *-- Stats : currentStats
+Pokemon *-- MoveSet
+Pokemon *-- "0..*" StatusEffect : active effects
+
+Species o-- Stats : baseStats
+Species o-- "0..1" EvolutionRule
+
+MoveSet o-- "0..4" Move
+
+Move <|-- DamageMove
+Move <|-- StatusMove
+
+StatusEffect <|.. PersistentStatusEffect
+StatusEffect <|.. VolatileStatusEffect
+
+StatusMove ..> StatusEffectFactory
+StatusEffectFactory ..> StatusEffect
+
+Move ..> MoveExecutionContext
+Move --> MoveResult
+MoveExecutionContext ..> BattleContext
+DamageMove --> ElementType
+DamageMove --> MoveCategory
+Species --> ElementType
+
+@enduml

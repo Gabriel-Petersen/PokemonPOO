@@ -1,0 +1,125 @@
+@startuml items_inventory_capture
+skinparam style strictuml
+skinparam packageStyle rectangle
+
+package "domain.items" {
+    abstract class Item {
+        +getId() String
+        +getName() String
+        +isUsableInBattle() boolean
+        +canUse(target: Pokemon, context: ItemUseContext) boolean
+        +use(target: Pokemon, context: ItemUseContext) ItemUseResult
+    }
+
+    abstract class HealingItem {
+        +isUsableInBattle() boolean
+        +canUse(target: Pokemon, context: ItemUseContext) boolean
+        +use(target: Pokemon, context: ItemUseContext) ItemUseResult
+    }
+
+    class HpHealItem {
+        +getHealAmount() int
+        +use(target: Pokemon, context: ItemUseContext) ItemUseResult
+    }
+
+    class StatusHealItem {
+        +getCuredStatusIds() List~String~
+        +use(target: Pokemon, context: ItemUseContext) ItemUseResult
+    }
+
+    class CaptureItem {
+        +getCaptureModifier() double
+        +isUsableInBattle() boolean
+        +canUse(target: Pokemon, context: ItemUseContext) boolean
+        +use(target: Pokemon, context: ItemUseContext) ItemUseResult
+    }
+
+    class Inventory {
+        +getItemCount(itemId: String) int
+        +has(itemId: String, amount: int) boolean
+        +add(item: Item, amount: int) void
+        +consume(itemId: String, amount: int) boolean
+        +getStacks() List~ItemStack~
+    }
+
+    class ItemStack {
+        +getItem() Item
+        +getAmount() int
+        +increase(amount: int) void
+        +decrease(amount: int) void
+    }
+
+    class ItemUseContext {
+        +getActor() Trainer
+        +getBattleContext() BattleContext
+    }
+
+    class ItemUseResult {
+        +isConsumed() boolean
+        +getMessages() List~String~
+    }
+}
+
+package "domain.capture" {
+    interface CaptureRule {
+        +canAttempt(context: BattleContext, actor: Trainer, target: Pokemon) boolean
+        +computeChance(item: CaptureItem, target: Pokemon, context: BattleContext) double
+    }
+
+    class StandardCaptureRule {
+        +canAttempt(context: BattleContext, actor: Trainer, target: Pokemon) boolean
+        +computeChance(item: CaptureItem, target: Pokemon, context: BattleContext) double
+    }
+
+    class CaptureService {
+        +canAttemptCapture(context: BattleContext, actor: Trainer, target: Pokemon) boolean
+        +tryCapture(item: CaptureItem, target: Pokemon, context: BattleContext) CaptureResult
+    }
+
+    class CaptureResult {
+        +isCaptured() boolean
+        +getShakeCount() int
+        +getMessage() String
+    }
+}
+
+package "domain.shared" {
+    class Trainer <<external>>
+    class WildTrainer <<external>>
+    class Pokemon <<external>>
+    class BattleContext <<external>>
+    class ItemAction <<external>>
+    class CaptureAction <<external>>
+}
+
+Item <|-- HealingItem
+HealingItem <|-- HpHealItem
+HealingItem <|-- StatusHealItem
+Item <|-- CaptureItem
+
+Inventory *-- ItemStack
+ItemStack --> Item
+Trainer *-- Inventory
+
+ItemUseContext ..> Trainer
+ItemUseContext ..> BattleContext
+
+CaptureRule <|.. StandardCaptureRule
+CaptureService --> CaptureRule
+CaptureService --> CaptureResult
+CaptureService ..> WildTrainer : validate opponent type
+CaptureService ..> CaptureItem
+CaptureService ..> Pokemon
+CaptureService ..> BattleContext
+
+ItemAction --> Inventory : consume item
+ItemAction --> Item : execute use
+CaptureAction --> CaptureService
+CaptureAction --> CaptureItem
+
+note right of CaptureService
+Capture is allowed only when the opponent
+is a WildTrainer with one Pokemon.
+end note
+
+@enduml

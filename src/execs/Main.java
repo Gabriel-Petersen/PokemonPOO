@@ -1,9 +1,5 @@
 package execs;
 
-import java.awt.Color;
-
-import javax.swing.JFrame;
-
 import engine.core.GamePanel;
 import engine.events.*;
 import engine.input.Input;
@@ -13,6 +9,8 @@ import engine.ui.elements.UiButton;
 import engine.ui.elements.UiProgressBar;
 import engine.ui.elements.UiText;
 import game.Player;
+import java.awt.Color;
+import javax.swing.JFrame;
 
 public class Main
 {
@@ -52,7 +50,7 @@ public class Main
                 gamePanel.repaint();
                 Input.endFrame();
 
-                try { Thread.sleep(16); } catch (Exception ignored) {}
+                try { Thread.sleep(16); } catch (InterruptedException ignored) {}
             } while (true);
         }).start();
     }

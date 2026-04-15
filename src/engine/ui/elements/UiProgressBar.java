@@ -1,7 +1,6 @@
 package engine.ui.elements;
 
 import engine.ui.core.UiElement;
-
 import java.awt.*;
 
 public class UiProgressBar extends UiElement
@@ -38,23 +37,19 @@ public class UiProgressBar extends UiElement
 
         switch (direction)
         {
-            case LEFT2RIGHT:
-                fillW = (int) (totalW * clampedProgress);
-                break;
+            case LEFT2RIGHT -> fillW = (int) (totalW * clampedProgress);
 
-            case RIGHT2LEFT:
+            case RIGHT2LEFT -> {
                 fillW = (int) (totalW * clampedProgress);
                 fillX = posX + (totalW - fillW);
-                break;
+            }
 
-            case UP2DOWN:
-                fillH = (int) (totalH * clampedProgress);
-                break;
+            case UP2DOWN -> fillH = (int) (totalH * clampedProgress);
 
-            case DOWN2UP:
+            case DOWN2UP -> {
                 fillH = (int) (totalH * clampedProgress);
                 fillY = posY + (totalH - fillH);
-                break;
+            }
         }
 
         g2d.setColor(fillColor);

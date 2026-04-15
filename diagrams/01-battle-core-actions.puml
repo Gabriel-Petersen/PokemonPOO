@@ -1,0 +1,148 @@
+@startuml combat
+skinparam style strictuml
+skinparam packageStyle rectangle
+
+package "domain.battle" {
+    interface Trainer {
+        +getDisplayName() String
+        +getTeam() Team
+        +isWild() boolean
+        +selectAction(context: BattleContext) CombatAction
+    }
+
+    class PlayerTrainer {
+        -displayName: String
+        -team: Team
+        -wild: boolean
+        +selectAction(context: BattleContext) CombatAction
+    }
+
+    class NpcTrainer {
+        -displayName: String
+        -team: Team
+        -wild: boolean
+        +selectAction(context: BattleContext) CombatAction
+    }
+
+    class WildTrainer {
+        -displayName: String
+        -team: Team
+        -wild: boolean
+        +selectAction(context: BattleContext) CombatAction
+    }
+
+    class Team {
+        -members: List<Pokemon>
+        -activeIndex: int
+        +getActiveMember() Pokemon
+        +hasAvailableMember() boolean
+        +switchActive(index: int) boolean
+    }
+
+    class Battle {
+        -player: Trainer
+        -opponent: Trainer
+        -context: BattleContext
+        -finished: boolean
+        -winner: Trainer
+        +start() void
+        +runTurn() void
+        +isFinished() boolean
+    }
+
+    class BattleContext {
+        -turnNumber: int
+        -player: Trainer
+        -opponent: Trainer
+        +canCapture(actor: Trainer, target: Pokemon) boolean
+        +isValidAction(actor: Trainer, action: CombatAction) boolean
+    }
+
+    abstract class CombatAction {
+        -actor: Trainer
+        +getPriority() int
+        +execute(context: BattleContext) ActionResult
+    }
+
+    class MoveAction {
+        -user: Pokemon
+        -target: Pokemon
+        -move: Move
+        +getPriority() int
+        +execute(context: BattleContext) ActionResult
+    }
+
+    class ItemAction {
+        -target: Pokemon
+        -item: Item
+        +getPriority() int
+        +execute(context: BattleContext) ActionResult
+    }
+
+    class SwitchAction {
+        -targetIndex: int
+        +getPriority() int
+        +execute(context: BattleContext) ActionResult
+    }
+
+    class FleeAction {
+        +getPriority() int
+        +execute(context: BattleContext) ActionResult
+    }
+
+    class CaptureAction {
+        -target: Pokemon
+        +getPriority() int
+        +execute(context: BattleContext) ActionResult
+    }
+
+    enum ActionResult {
+        SUCCESS
+        FAILED
+        INVALID_ACTION
+        MISSED
+        FLED
+        CAPTURED
+    }
+}
+
+package "domain.shared" {
+    class Pokemon <<external>>
+    class Move <<external>>
+    class Item <<external>>
+}
+
+Trainer <|.. PlayerTrainer
+Trainer <|.. NpcTrainer
+Trainer <|.. WildTrainer
+
+Trainer *-- Team
+Team "1" o-- "1..6" Pokemon
+
+Battle *-- BattleContext
+Battle --> Trainer : request action from
+Battle ..> CombatAction : compare priority and execute
+
+CombatAction <|-- MoveAction
+CombatAction <|-- ItemAction
+CombatAction <|-- SwitchAction
+CombatAction <|-- FleeAction
+CombatAction <|-- CaptureAction
+
+CombatAction --> Trainer : actor
+MoveAction --> Pokemon : user/target
+MoveAction --> Move
+ItemAction --> Pokemon : target
+ItemAction --> Item
+SwitchAction --> Team : choose active member
+CaptureAction --> Pokemon : capture target
+
+BattleContext --> Trainer
+BattleContext ..> Pokemon
+
+note right of WildTrainer
+WildTrainer models a wild encounter as
+a trainer with one Pokemon in team.
+end note
+
+@enduml

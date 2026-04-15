@@ -1,7 +1,6 @@
 package engine.events;
 
 import engine.core.GamePanel;
-
 import java.util.LinkedList;
 import java.util.Queue;
 
