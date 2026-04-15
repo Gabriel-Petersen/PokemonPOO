@@ -1,9 +1,8 @@
 package engine.primitives;
 
 import engine.core.GameObject;
-import engine.rendering.ShapeFactory;
 import engine.rendering.Renderer;
-
+import engine.rendering.ShapeFactory;
 import java.awt.*;
 
 public class Square extends GameObject
@@ -21,7 +20,7 @@ public class Square extends GameObject
     }
 
     @Override
-    protected Renderer createSwingRenderer() {
+    protected final Renderer createSwingRenderer() {
         return ShapeFactory.createRect(size, size, color);
     }
 

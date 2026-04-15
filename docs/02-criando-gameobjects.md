@@ -423,4 +423,4 @@ Para criar um novo `GameObject`:
 
 Quanto mais prática você tiver criando GameObjects, mais natural fica pensar em "como quebrar meu jogo em pequenas partes que herdam de GameObject".
 
-Veja o exemplo `SimplePatrol` em `examples.GameObjects` para uma implementação didática completa.
+Veja o exemplo `GameObjectExamples` em `examples.GameObjectExamples` para uma implementação didática completa.

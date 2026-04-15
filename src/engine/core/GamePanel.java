@@ -88,6 +88,7 @@ public class GamePanel extends JPanel
 
         for (Updatable up : toAddUp)
         {
+            if (up == null) continue;
             if (up instanceof UiElement uiEl)
             {
                 if (uiEl.getParent() == null)
