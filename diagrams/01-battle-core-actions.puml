@@ -1,37 +1,63 @@
 @startuml combat
 skinparam style strictuml
 skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #64748B
+    FontColor #0F172A
+}
+
+skinparam class<<abstract>> {
+    BackgroundColor #FFF7ED
+    BorderColor #C2410C
+    FontColor #9A3412
+}
+
+skinparam class<<interface>> {
+    BackgroundColor #ECFEFF
+    BorderColor #0F766E
+    FontColor #115E59
+}
+
+skinparam class<<enum>> {
+    BackgroundColor #EEF2FF
+    BorderColor #4338CA
+    FontColor #312E81
+}
 
 package "domain.battle" {
-    interface Trainer {
+    interface Trainer <<interface>> #ECFEFF {
         +getDisplayName() String
         +getTeam() Team
         +isWild() boolean
         +selectAction(context: BattleContext) CombatAction
     }
 
-    class PlayerTrainer {
+    class PlayerTrainer #F8FAFC {
         -displayName: String
         -team: Team
         -wild: boolean
         +selectAction(context: BattleContext) CombatAction
     }
 
-    class NpcTrainer {
+    class NpcTrainer #F8FAFC {
         -displayName: String
         -team: Team
         -wild: boolean
         +selectAction(context: BattleContext) CombatAction
     }
 
-    class WildTrainer {
+    class WildTrainer #F8FAFC {
         -displayName: String
         -team: Team
         -wild: boolean
         +selectAction(context: BattleContext) CombatAction
     }
 
-    class Team {
+    class Team #F8FAFC {
         -members: List<Pokemon>
         -activeIndex: int
         +getActiveMember() Pokemon
@@ -39,7 +65,7 @@ package "domain.battle" {
         +switchActive(index: int) boolean
     }
 
-    class Battle {
+    class Battle #F8FAFC {
         -player: Trainer
         -opponent: Trainer
         -context: BattleContext
@@ -50,7 +76,7 @@ package "domain.battle" {
         +isFinished() boolean
     }
 
-    class BattleContext {
+    class BattleContext #F8FAFC {
         -turnNumber: int
         -player: Trainer
         -opponent: Trainer
@@ -58,13 +84,13 @@ package "domain.battle" {
         +isValidAction(actor: Trainer, action: CombatAction) boolean
     }
 
-    abstract class CombatAction {
+    abstract class CombatAction <<abstract>> #FFF7ED {
         -actor: Trainer
         +getPriority() int
         +execute(context: BattleContext) ActionResult
     }
 
-    class MoveAction {
+    class MoveAction #F8FAFC {
         -user: Pokemon
         -target: Pokemon
         -move: Move
@@ -72,31 +98,25 @@ package "domain.battle" {
         +execute(context: BattleContext) ActionResult
     }
 
-    class ItemAction {
+    class ItemAction #F8FAFC {
         -target: Pokemon
         -item: Item
         +getPriority() int
         +execute(context: BattleContext) ActionResult
     }
 
-    class SwitchAction {
+    class SwitchAction #F8FAFC {
         -targetIndex: int
         +getPriority() int
         +execute(context: BattleContext) ActionResult
     }
 
-    class FleeAction {
+    class FleeAction #F8FAFC {
         +getPriority() int
         +execute(context: BattleContext) ActionResult
     }
 
-    class CaptureAction {
-        -target: Pokemon
-        +getPriority() int
-        +execute(context: BattleContext) ActionResult
-    }
-
-    enum ActionResult {
+    enum ActionResult <<enum>> #EEF2FF {
         SUCCESS
         FAILED
         INVALID_ACTION
@@ -107,9 +127,9 @@ package "domain.battle" {
 }
 
 package "domain.shared" {
-    class Pokemon <<external>>
-    class Move <<external>>
-    class Item <<external>>
+    class Pokemon #F8FAFC
+    class Move #F8FAFC
+    class Item #F8FAFC
 }
 
 Trainer <|.. PlayerTrainer
@@ -127,7 +147,6 @@ CombatAction <|-- MoveAction
 CombatAction <|-- ItemAction
 CombatAction <|-- SwitchAction
 CombatAction <|-- FleeAction
-CombatAction <|-- CaptureAction
 
 CombatAction --> Trainer : actor
 MoveAction --> Pokemon : user/target
@@ -135,7 +154,6 @@ MoveAction --> Move
 ItemAction --> Pokemon : target
 ItemAction --> Item
 SwitchAction --> Team : choose active member
-CaptureAction --> Pokemon : capture target
 
 BattleContext --> Trainer
 BattleContext ..> Pokemon

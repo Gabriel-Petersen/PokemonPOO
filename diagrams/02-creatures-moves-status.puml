@@ -1,87 +1,109 @@
 @startuml creatures_moves_status
 skinparam style strictuml
 skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #64748B
+    FontColor #0F172A
+}
+
+skinparam class<<abstract>> {
+    BackgroundColor #FFF7ED
+    BorderColor #C2410C
+    FontColor #9A3412
+}
+
+skinparam class<<interface>> {
+    BackgroundColor #ECFEFF
+    BorderColor #0F766E
+    FontColor #115E59
+}
+
+skinparam class<<enum>> {
+    BackgroundColor #EEF2FF
+    BorderColor #4338CA
+    FontColor #312E81
+}
 
 package "domain.creature" {
-    class Pokemon {
-        +getId() String
-        +getNickname() String
-        +getLevel() int
-        +getSpecies() Species
-        +getCurrentStats() Stats
-        +getCurrentHp() int
-        +canBattle() boolean
-        +receiveDamage(amount: int) void
-        +heal(amount: int) void
-        +applyStatus(effect: StatusEffect) void
-        +learnMove(slot: int, move: Move) boolean
+    class Pokemon #F8FAFC {
+        -id: Integer
+        -nickname: String
+        -level: Integer
+        -currentHp: Integer
+        -specie: Species
+        -currentStats: Stats
+        -moves: List<Move>
+        -statusEffects: List<StatusEffect>
+        +isAlive() Boolean
+        +receiveDamage(amount: Integer) Integer
+        +heal(amount: Integer) Integer
+        +applyStatus(effect: StatusEffect, context: BattleContext) Boolean
+        +replaceMove(slot: Integer, move: Move) Boolean
+        +getEffectiveStats(context: BattleContext) Stats
+        +getEffectiveStat(stat: StatType, context: BattleContext) Integer
+        +resolveStatusAtTurnStart(context: BattleContext) void
+        +resolveStatusAtTurnEnd(context: BattleContext) void
         +levelUp() void
     }
 
-    class Species {
-        +getDexNumber() int
-        +getName() String
-        +getPrimaryType() ElementType
-        +getSecondaryType() ElementType
-        +getBaseStats() Stats
-        +getLearnset() List~Move~
+    class Species #F8FAFC {
+        -dexNumber: Integer
+        -name: String
+        -primaryType: ElementType
+        -secondaryType: ElementType
+        -baseStats: Stats
+        -movePool: Map<Integer, Move>
+        +resolveMovesForLevel(level: Integer) List<Move>
+        +hasType(type: ElementType) Boolean
     }
 
-    class Stats {
-        +getHp() int
-        +getAttack() int
-        +getDefense() int
-        +getSpecialAttack() int
-        +getSpecialDefense() int
-        +getSpeed() int
-    }
-
-    class EvolutionRule {
-        +canEvolve(pokemon: Pokemon) boolean
-        +evolve(pokemon: Pokemon) Species
-    }
-
-    class MoveSet {
-        +getMoves() List~Move~
-        +getMove(slot: int) Move
-        +setMove(slot: int, move: Move) boolean
+    class Stats #F8FAFC {
+        -hp: Integer
+        -attack: Integer
+        -defense: Integer
+        -specialAttack: Integer
+        -specialDefense: Integer
+        -speed: Integer
+        +scaleForLevel(level: Integer) Stats
+        +getValue(stat: StatType) Integer
+        +withValue(stat: StatType, value: Integer) Stats
     }
 }
 
 package "domain.move" {
-    abstract class Move {
-        +getName() String
-        +getPower() int
-        +getAccuracy() double
-        +getPriority() int
-        +canUse(user: Pokemon, target: Pokemon) boolean
-        +execute(user: Pokemon, target: Pokemon, context: MoveExecutionContext) MoveResult
+    abstract class Move <<abstract>> #FFF7ED {
+        -name: String
+        -power: Integer
+        -accuracy: Double
+        -priority: Integer
+        -elementType: ElementType
+        +canUse(context: BattleContext) Boolean
+        +execute(context: BattleContext) MoveResult
     }
 
-    class DamageMove {
-        +getType() ElementType
-        +getCategory() MoveCategory
-        +execute(user: Pokemon, target: Pokemon, context: MoveExecutionContext) MoveResult
+    class DamageMove #F8FAFC {
+        -category: MoveCategory
+        +execute(context: BattleContext) MoveResult
     }
 
-    class StatusMove {
-        +getEffectFactory() StatusEffectFactory
-        +execute(user: Pokemon, target: Pokemon, context: MoveExecutionContext) MoveResult
+    class StatusMove #F8FAFC {
+        -effect: StatusEffect
+        +execute(context: BattleContext) MoveResult
     }
 
-    class MoveExecutionContext {
-        +getBattleContext() BattleContext
-        +isCriticalHit() boolean
-        +getRandomRoll() double
+    class MoveResult #F8FAFC {
+        -hit: Boolean
+        -damageApplied: Integer
+        -statusApplied: Boolean
+        -messages: List<String>
+        +merge(other: MoveResult) MoveResult
     }
 
-    class MoveResult {
-        +isHit() boolean
-        +getDamageApplied() int
-        +getMessages() List~String~
-    }
-
-    enum ElementType {
+    enum ElementType <<enum>> #EEF2FF {
         NORMAL
         FIRE
         WATER
@@ -90,73 +112,96 @@ package "domain.move" {
         ICE
         FIGHTING
         POISON
+        +getWeakness() Set<ElementType>
     }
 
-    enum MoveCategory {
+    enum MoveCategory <<enum>> #EEF2FF {
         PHYSICAL
         SPECIAL
         STATUS
     }
+
+    enum StatType <<enum>> #EEF2FF {
+        HP
+        ATTACK
+        DEFENSE
+        SPECIAL_ATTACK
+        SPECIAL_DEFENSE
+        SPEED
+    }
 }
 
 package "domain.status" {
-    interface StatusEffect {
-        +getId() String
-        +onApply(target: Pokemon) void
-        +onTurnStart(target: Pokemon, context: BattleContext) void
-        +onTurnEnd(target: Pokemon, context: BattleContext) void
-        +isExpired() boolean
+    interface StatModifier <<functional, interface>> #ECFEFF {
+        +apply(baseValue: Integer, context: BattleContext) Integer
     }
 
-    interface StatusEffectFactory {
-        +create(source: Pokemon, target: Pokemon) StatusEffect
+    class StatModifierRule #F8FAFC {
+        -targetStat: StatType
+        -modifier: StatModifier
+        +applyOn(baseStats: Stats, context: BattleContext) Stats
     }
 
-    class PersistentStatusEffect {
-        +getId() String
-        +onApply(target: Pokemon) void
+    interface StatusEffect <<interface>> #ECFEFF {
+        +onApply(target: Pokemon, context: BattleContext) void
         +onTurnStart(target: Pokemon, context: BattleContext) void
         +onTurnEnd(target: Pokemon, context: BattleContext) void
-        +isExpired() boolean
+        +getStatModifierRules() List<StatModifierRule>
+        +isExpired() Boolean
     }
 
-    class VolatileStatusEffect {
-        +getId() String
-        +onApply(target: Pokemon) void
+    class PersistentStatusEffect #F8FAFC {
+        -active: Boolean
+        -modifiers: List<StatModifierRule>
+        +onApply(target: Pokemon, context: BattleContext) void
         +onTurnStart(target: Pokemon, context: BattleContext) void
         +onTurnEnd(target: Pokemon, context: BattleContext) void
-        +isExpired() boolean
+        +getStatModifierRules() List<StatModifierRule>
+        +isExpired() Boolean
+    }
+
+    class VolatileStatusEffect #F8FAFC {
+        -remainingTurns: Integer
+        -modifiers: List<StatModifierRule>
+        +onApply(target: Pokemon, context: BattleContext) void
+        +onTurnStart(target: Pokemon, context: BattleContext) void
+        +onTurnEnd(target: Pokemon, context: BattleContext) void
+        +getStatModifierRules() List<StatModifierRule>
+        +isExpired() Boolean
     }
 }
 
 package "domain.shared" {
-    class BattleContext <<external>>
+    class BattleContext #F8FAFC
 }
 
 Pokemon o-- Species
 Pokemon *-- Stats : currentStats
-Pokemon *-- MoveSet
+Pokemon o-- "0..4" Move : moves
 Pokemon *-- "0..*" StatusEffect : active effects
 
 Species o-- Stats : baseStats
-Species o-- "0..1" EvolutionRule
-
-MoveSet o-- "0..4" Move
+Species o-- "0..*" Move : movePool values
 
 Move <|-- DamageMove
 Move <|-- StatusMove
 
 StatusEffect <|.. PersistentStatusEffect
 StatusEffect <|.. VolatileStatusEffect
+StatModifierRule --> StatModifier
+StatModifierRule --> StatType
+Pokemon ..> StatModifierRule : consumes active rules
 
-StatusMove ..> StatusEffectFactory
-StatusEffectFactory ..> StatusEffect
-
-Move ..> MoveExecutionContext
 Move --> MoveResult
-MoveExecutionContext ..> BattleContext
+Move ..> BattleContext
 DamageMove --> ElementType
 DamageMove --> MoveCategory
 Species --> ElementType
+Stats --> StatType
+
+note right of StatusEffect
+Status effect implementations can instantiate
+StatModifier lambdas and register them as rules.
+end note
 
 @enduml

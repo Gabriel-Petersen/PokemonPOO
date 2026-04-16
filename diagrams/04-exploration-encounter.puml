@@ -1,97 +1,146 @@
 @startuml exploration_encounter
 skinparam style strictuml
 skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #64748B
+    FontColor #0F172A
+}
+
+skinparam class<<abstract>> {
+    BackgroundColor #FFF7ED
+    BorderColor #C2410C
+    FontColor #9A3412
+}
+
+skinparam class<<interface>> {
+    BackgroundColor #ECFEFF
+    BorderColor #0F766E
+    FontColor #115E59
+}
+
+skinparam class<<enum>> {
+    BackgroundColor #EEF2FF
+    BorderColor #4338CA
+    FontColor #312E81
+}
 
 package "domain.exploration" {
-    class ExplorationState {
-        +getPlayerTrainer() PlayerTrainer
-        +getCurrentZone() EncounterZone
-        +getStepCounter() int
-        +incrementStep() void
-        +resetStepCounter() void
+    enum EncounterKind <<enum>> #EEF2FF {
+        WILD
+        NPC
     }
 
-    class EncounterZone {
-        +getId() String
-        +getName() String
-        +contains(tileX: int, tileY: int) boolean
-        +getEncounterTable() EncounterTable
+    class EncounterZone #F8FAFC {
+        -name: String
+        -isCaptureArea: Boolean
+        -rollIntervalSeconds: Double
+        -wildTrigger: WildEncounterTrigger
+        -npcTriggers: List<NpcEncounterTrigger>
+        +contains(tileX: Integer, tileY: Integer) Boolean
+        +supportsWildEncounter() Boolean
+        +supportsNpcEncounter() Boolean
     }
 
-    class EncounterTable {
-        +getEntries() List~EncounterEntry~
-        +rollEntry(rng: RandomSource) EncounterEntry
-        +rollLevel(entry: EncounterEntry, rng: RandomSource) int
+    class EncounterTable #F8FAFC {
+        -entries: List<EncounterEntry>
+        +rollWildEntry() EncounterEntry
+        +hasEntries() Boolean
     }
 
-    class EncounterEntry {
-        +getSpecies() Species
-        +getMinLevel() int
-        +getMaxLevel() int
-        +getWeight() int
+    class EncounterEntry #F8FAFC {
+        -species: Species
+        -minLevel: Integer
+        -maxLevel: Integer
+        -encounterChance: Double
+        +matchesRoll(roll: Double) Boolean
+        +rollLevel() Integer
     }
 
-    interface RandomSource {
-        +nextInt(bound: int) int
-        +nextDouble() double
+    interface EncounterTrigger <<interface>> #ECFEFF {
+        +canTrigger(player: PlayerTrainer, context: ExplorationContext) Boolean
+        +createBattle(player: PlayerTrainer) Battle
+        +getKind() EncounterKind
     }
 
-    class EncounterService {
-        +canStartEncounter(state: ExplorationState) boolean
-        +rollEncounter(state: ExplorationState, rng: RandomSource) EncounterResult
-        +buildWildTrainer(entry: EncounterEntry, level: int) WildTrainer
+    class WildEncounterTrigger #F8FAFC {
+        -table: EncounterTable
+        -wildTrainer: WildTrainer
+        -rollIntervalSeconds: Double
+        -elapsedSeconds: Double
+        -timerActive: Boolean
+        +canTrigger(player: PlayerTrainer, context: ExplorationContext) Boolean
+        +createBattle(player: PlayerTrainer) Battle
+        +getKind() EncounterKind
+        +accumulate(deltaTime: Double) void
+        +shouldRoll() Boolean
+        +stopTimer() void
+        +resumeTimer() void
     }
 
-    class EncounterResult {
-        +hasEncounter() boolean
-        +getEntry() EncounterEntry
-        +getWildTrainer() WildTrainer
+    class NpcEncounterTrigger #F8FAFC {
+        -trainer: NpcTrainer
+        -engaged: Boolean
+        +canTrigger(player: PlayerTrainer, context: ExplorationContext) Boolean
+        +createBattle(player: PlayerTrainer) Battle
+        +getKind() EncounterKind
     }
 
-    class BattleFactory {
-        +createWildBattle(player: PlayerTrainer, wild: WildTrainer) Battle
+    class ExplorationContext #F8FAFC {
+        -tileX: Integer
+        -tileY: Integer
+        -deltaTime: Double
+        -isMoving: Boolean
+        +isInside(zone: EncounterZone) Boolean
     }
 
-    class ExplorationFlow {
-        +updateStep(state: ExplorationState, rng: RandomSource) ExplorationStepResult
-    }
-
-    class ExplorationStepResult {
-        +hasStartedBattle() boolean
-        +getBattle() Battle
+    class EncounterService #F8FAFC {
+        -currentZone: EncounterZone
+        -battleRunning: Boolean
+        +update(player: PlayerTrainer, context: ExplorationContext) Battle
+        +startEncounterBattle(trigger: EncounterTrigger, player: PlayerTrainer) Battle
+        +pauseEncounterTimers() void
+        +resumeEncounterTimers() void
     }
 }
 
 package "domain.shared" {
-    class Species <<external>>
-    class PlayerTrainer <<external>>
-    class WildTrainer <<external>>
-    class Battle <<external>>
+    class Species #F8FAFC
+    class PlayerTrainer #F8FAFC
+    class NpcTrainer #F8FAFC
+    class WildTrainer #F8FAFC
+    class Battle #F8FAFC
 }
 
-ExplorationState --> PlayerTrainer
-ExplorationState --> EncounterZone
-
 EncounterZone *-- EncounterTable
+EncounterZone *-- WildEncounterTrigger
+EncounterZone o-- "0..*" NpcEncounterTrigger
 EncounterTable *-- "1..*" EncounterEntry
 EncounterEntry --> Species
 
-EncounterService --> EncounterResult
-EncounterService ..> EncounterTable
-EncounterService ..> RandomSource
-EncounterService ..> WildTrainer
+EncounterTrigger <|.. WildEncounterTrigger
+EncounterTrigger <|.. NpcEncounterTrigger
 
-EncounterResult --> EncounterEntry
-EncounterResult --> WildTrainer
+WildEncounterTrigger --> EncounterTable
+WildEncounterTrigger --> WildTrainer
+NpcEncounterTrigger --> NpcTrainer
 
-ExplorationFlow --> EncounterService
-ExplorationFlow --> BattleFactory
-ExplorationFlow --> ExplorationStepResult
+EncounterService --> EncounterZone
+EncounterService --> EncounterTrigger
+EncounterService --> ExplorationContext
+EncounterService --> Battle
 
-BattleFactory --> Battle
-BattleFactory --> PlayerTrainer
-BattleFactory --> WildTrainer
+EncounterTrigger --> EncounterKind
 
-ExplorationStepResult --> Battle
+note right of EncounterService
+If player is inside a capture area,
+the wild timer keeps accumulating and
+rolls encounter chance every interval,
+even while standing still.
+When battle starts, timer pauses.
+end note
 
 @enduml

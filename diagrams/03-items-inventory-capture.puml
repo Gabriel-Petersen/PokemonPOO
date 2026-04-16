@@ -1,95 +1,91 @@
 @startuml items_inventory_capture
 skinparam style strictuml
 skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
 
-package "domain.items" {
-    abstract class Item {
-        +getId() String
-        +getName() String
-        +isUsableInBattle() boolean
-        +canUse(target: Pokemon, context: ItemUseContext) boolean
-        +use(target: Pokemon, context: ItemUseContext) ItemUseResult
-    }
-
-    abstract class HealingItem {
-        +isUsableInBattle() boolean
-        +canUse(target: Pokemon, context: ItemUseContext) boolean
-        +use(target: Pokemon, context: ItemUseContext) ItemUseResult
-    }
-
-    class HpHealItem {
-        +getHealAmount() int
-        +use(target: Pokemon, context: ItemUseContext) ItemUseResult
-    }
-
-    class StatusHealItem {
-        +getCuredStatusIds() List~String~
-        +use(target: Pokemon, context: ItemUseContext) ItemUseResult
-    }
-
-    class CaptureItem {
-        +getCaptureModifier() double
-        +isUsableInBattle() boolean
-        +canUse(target: Pokemon, context: ItemUseContext) boolean
-        +use(target: Pokemon, context: ItemUseContext) ItemUseResult
-    }
-
-    class Inventory {
-        +getItemCount(itemId: String) int
-        +has(itemId: String, amount: int) boolean
-        +add(item: Item, amount: int) void
-        +consume(itemId: String, amount: int) boolean
-        +getStacks() List~ItemStack~
-    }
-
-    class ItemStack {
-        +getItem() Item
-        +getAmount() int
-        +increase(amount: int) void
-        +decrease(amount: int) void
-    }
-
-    class ItemUseContext {
-        +getActor() Trainer
-        +getBattleContext() BattleContext
-    }
-
-    class ItemUseResult {
-        +isConsumed() boolean
-        +getMessages() List~String~
-    }
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #64748B
+    FontColor #0F172A
 }
 
-package "domain.capture" {
-    interface CaptureRule {
-        +canAttempt(context: BattleContext, actor: Trainer, target: Pokemon) boolean
-        +computeChance(item: CaptureItem, target: Pokemon, context: BattleContext) double
+skinparam class<<abstract>> {
+    BackgroundColor #FFF7ED
+    BorderColor #C2410C
+    FontColor #9A3412
+}
+
+skinparam class<<interface>> {
+    BackgroundColor #ECFEFF
+    BorderColor #0F766E
+    FontColor #115E59
+}
+
+skinparam class<<enum>> {
+    BackgroundColor #EEF2FF
+    BorderColor #4338CA
+    FontColor #312E81
+}
+
+package "domain.items" {
+    abstract class Item <<abstract>> #FFF7ED {
+        -name: String
+        -description: String
+        -battleUsable: Boolean
+        -buyPrice: Integer
+        -sellPrice: Integer
+        +canUse(target: Pokemon) Boolean
+        +use(target: Pokemon) ActionResult
     }
 
-    class StandardCaptureRule {
-        +canAttempt(context: BattleContext, actor: Trainer, target: Pokemon) boolean
-        +computeChance(item: CaptureItem, target: Pokemon, context: BattleContext) double
+    abstract class HealingItem <<abstract>> #FFF7ED {
+        -healAmount: Integer
+        +canUse(target: Pokemon) Boolean
+        +use(target: Pokemon) ActionResult
     }
 
-    class CaptureService {
-        +canAttemptCapture(context: BattleContext, actor: Trainer, target: Pokemon) boolean
-        +tryCapture(item: CaptureItem, target: Pokemon, context: BattleContext) CaptureResult
+    class HpHealItem #F8FAFC {
+        +use(target: Pokemon) ActionResult
     }
 
-    class CaptureResult {
-        +isCaptured() boolean
-        +getShakeCount() int
-        +getMessage() String
+    class StatusHealItem #F8FAFC {
+        -curedStatusNames: Set<String>
+        +canUse(target: Pokemon) Boolean
+        +use(target: Pokemon) ActionResult
+    }
+
+    class CaptureItem #F8FAFC {
+        -captureModifier: Double
+        +canUse(target: Pokemon) Boolean
+        +computeCatchChance(target: Pokemon) Double
+        +use(target: Pokemon) ActionResult
+    }
+
+    class Inventory #F8FAFC {
+        -stacks: List<ItemStack>
+        +count(item: Item) Integer
+        +has(item: Item, amount: Integer) Boolean
+        +add(item: Item, amount: Integer) void
+        +consume(item: Item, amount: Integer) Boolean
+    }
+
+    class ItemStack #F8FAFC {
+        -item: Item
+        -amount: Integer
+        +increase(amount: Integer) void
+        +decrease(amount: Integer) void
+        +canConsume(amount: Integer) Boolean
     }
 }
 
 package "domain.shared" {
-    class Trainer <<external>>
-    class WildTrainer <<external>>
-    class Pokemon <<external>>
-    class BattleContext <<external>>
-    class ItemAction <<external>>
-    class CaptureAction <<external>>
+    class Trainer #F8FAFC
+    class WildTrainer #F8FAFC
+    class Pokemon #F8FAFC
+    class BattleContext #F8FAFC
+    class ItemAction #F8FAFC
+    enum ActionResult <<enum>> #EEF2FF
 }
 
 Item <|-- HealingItem
@@ -101,25 +97,17 @@ Inventory *-- ItemStack
 ItemStack --> Item
 Trainer *-- Inventory
 
-ItemUseContext ..> Trainer
-ItemUseContext ..> BattleContext
-
-CaptureRule <|.. StandardCaptureRule
-CaptureService --> CaptureRule
-CaptureService --> CaptureResult
-CaptureService ..> WildTrainer : validate opponent type
-CaptureService ..> CaptureItem
-CaptureService ..> Pokemon
-CaptureService ..> BattleContext
-
 ItemAction --> Inventory : consume item
 ItemAction --> Item : execute use
-CaptureAction --> CaptureService
-CaptureAction --> CaptureItem
+ItemAction --> Pokemon : target
+CaptureItem ..> BattleContext : reads current battle context
+CaptureItem ..> WildTrainer : only capturable in wild battle
+CaptureItem --> Pokemon : capture target
 
-note right of CaptureService
-Capture is allowed only when the opponent
-is a WildTrainer with one Pokemon.
+note right of CaptureItem
+Capture is an ItemAction:
+the CaptureItem itself validates battle context
+and computes capture chance.
 end note
 
 @enduml
