@@ -29,20 +29,13 @@ skinparam class<<enum>> {
 }
 
 package "domain.exploration" {
-    enum EncounterKind <<enum>> #EEF2FF {
-        WILD
-        NPC
-    }
-
     class EncounterZone #F8FAFC {
         -name: String
         -isCaptureArea: Boolean
         -rollIntervalSeconds: Double
-        -wildTrigger: WildEncounterTrigger
-        -npcTriggers: List<NpcEncounterTrigger>
+        -table: EncounterTable
         +contains(tileX: Integer, tileY: Integer) Boolean
         +supportsWildEncounter() Boolean
-        +supportsNpcEncounter() Boolean
     }
 
     class EncounterTable #F8FAFC {
@@ -60,86 +53,66 @@ package "domain.exploration" {
         +rollLevel() Integer
     }
 
-    interface EncounterTrigger <<interface>> #ECFEFF {
-        +canTrigger(player: PlayerTrainer, context: ExplorationContext) Boolean
-        +createBattle(player: PlayerTrainer) Battle
-        +getKind() EncounterKind
-    }
-
-    class WildEncounterTrigger #F8FAFC {
-        -table: EncounterTable
-        -wildTrainer: WildTrainer
-        -rollIntervalSeconds: Double
+    class WildEncounterService #F8FAFC {
+        -currentZone: EncounterZone
         -elapsedSeconds: Double
         -timerActive: Boolean
-        +canTrigger(player: PlayerTrainer, context: ExplorationContext) Boolean
-        +createBattle(player: PlayerTrainer) Battle
-        +getKind() EncounterKind
-        +accumulate(deltaTime: Double) void
-        +shouldRoll() Boolean
+        +update(player: Player, zone: EncounterZone, deltaTime: Double) Battle
+        +rollEncounter(zone: EncounterZone) EncounterEntry
+        +startWildBattle(player: Player, entry: EncounterEntry) Battle
         +stopTimer() void
         +resumeTimer() void
-    }
-
-    class NpcEncounterTrigger #F8FAFC {
-        -trainer: NpcTrainer
-        -engaged: Boolean
-        +canTrigger(player: PlayerTrainer, context: ExplorationContext) Boolean
-        +createBattle(player: PlayerTrainer) Battle
-        +getKind() EncounterKind
-    }
-
-    class ExplorationContext #F8FAFC {
-        -tileX: Integer
-        -tileY: Integer
-        -deltaTime: Double
-        -isMoving: Boolean
-        +isInside(zone: EncounterZone) Boolean
+        +resetTimer() void
     }
 
     class EncounterService #F8FAFC {
-        -currentZone: EncounterZone
         -battleRunning: Boolean
-        +update(player: PlayerTrainer, context: ExplorationContext) Battle
-        +startEncounterBattle(trigger: EncounterTrigger, player: PlayerTrainer) Battle
+        -wildService: WildEncounterService
+        +updateWildEncounter(player: Player, zone: EncounterZone, deltaTime: Double) Battle
+        +startNpcBattle(player: Player, opponent: NpcTrainer) Battle
         +pauseEncounterTimers() void
         +resumeEncounterTimers() void
     }
 }
 
 package "domain.shared" {
+    interface Interactable <<interface>> #ECFEFF {
+        +onInteract(player: Player) void
+    }
+
     class Species #F8FAFC
-    class PlayerTrainer #F8FAFC
+    class Player #F8FAFC
     class NpcTrainer #F8FAFC
     class WildTrainer #F8FAFC
     class Battle #F8FAFC
 }
 
 EncounterZone *-- EncounterTable
-EncounterZone *-- WildEncounterTrigger
-EncounterZone o-- "0..*" NpcEncounterTrigger
 EncounterTable *-- "1..*" EncounterEntry
 EncounterEntry --> Species
 
-EncounterTrigger <|.. WildEncounterTrigger
-EncounterTrigger <|.. NpcEncounterTrigger
+WildEncounterService --> EncounterZone
+WildEncounterService --> EncounterTable
+WildEncounterService --> EncounterEntry
+WildEncounterService ..> WildTrainer
 
-WildEncounterTrigger --> EncounterTable
-WildEncounterTrigger --> WildTrainer
-NpcEncounterTrigger --> NpcTrainer
-
-EncounterService --> EncounterZone
-EncounterService --> EncounterTrigger
-EncounterService --> ExplorationContext
+EncounterService --> WildEncounterService
+EncounterService --> NpcTrainer : onInteract(player)
 EncounterService --> Battle
 
-EncounterTrigger --> EncounterKind
+Interactable <|.. NpcTrainer
 
 note right of EncounterService
-If player is inside a capture area,
-the wild timer keeps accumulating and
-rolls encounter chance every interval,
-even while standing still.
+NPC battle start is abstract here.
+Interaction validation (distance/button/click)
+is performed outside domain by NPC GameObject
+or interaction layer before calling startNpcBattle.
+end note
+
+note right of WildEncounterService
+Wild encounter is concrete:
+while player is in capture area, timer accumulates
+and rolls chance every interval, even standing still.
 When battle starts, timer pauses.
 end note
 

@@ -33,8 +33,7 @@ package "domain.items" {
         -name: String
         -description: String
         -battleUsable: Boolean
-        -buyPrice: Integer
-        -sellPrice: Integer
+        -basePrice: Integer
         +canUse(target: Pokemon) Boolean
         +use(target: Pokemon) ActionResult
     }
@@ -79,9 +78,37 @@ package "domain.items" {
     }
 }
 
+package "domain.commerce" {
+    interface Seller <<interface>> #ECFEFF {
+        +listItemsForSale() List<Item>
+    }
+
+    class NpcSeller #F8FAFC {
+        -displayName: String
+        -catalog: List<Item>
+        -unlimitedStock: Boolean
+        +listItemsForSale() List<Item>
+    }
+
+    class ShopService #F8FAFC {
+        -priceAdjustment: Double
+        -buyMultiplier: Double
+        -sellMultiplier: Double
+        +buyItem(player: Player, seller: Seller, item: Item, amount: Integer) ActionResult
+        +sellItem(player: Player, seller: Seller, item: Item, amount: Integer) ActionResult
+        +calculatePrice(item: Item, adjustment: Double) Integer
+    }
+}
+
 package "domain.shared" {
+    interface Interactable <<interface>> #ECFEFF {
+        +onInteract(player: Player) void
+    }
+
     class Trainer #F8FAFC
     class WildTrainer #F8FAFC
+    class NpcTrainer #F8FAFC
+    class Player #F8FAFC
     class Pokemon #F8FAFC
     class BattleContext #F8FAFC
     class ItemAction #F8FAFC
@@ -97,6 +124,16 @@ Inventory *-- ItemStack
 ItemStack --> Item
 Trainer *-- Inventory
 
+Interactable <|-- Seller
+Interactable <|.. NpcTrainer
+
+Seller <|.. NpcSeller
+NpcSeller o-- "1..*" Item : catalog
+ShopService --> Seller
+ShopService --> Item
+ShopService --> Inventory
+ShopService --> Player
+
 ItemAction --> Inventory : consume item
 ItemAction --> Item : execute use
 ItemAction --> Pokemon : target
@@ -108,6 +145,21 @@ note right of CaptureItem
 Capture is an ItemAction:
 the CaptureItem itself validates battle context
 and computes capture chance.
+end note
+
+note right of ShopService
+Commerce rules:
+- price = basePrice * (1 + adjustment)
+- For buying: adjustment = 0.10
+- For selling: adjustment = -0.10
+Seller keeps unlimited stock for listed items.
+end note
+
+note right of NpcSeller
+NpcSeller and NpcTrainer are disjoint roles.
+An NPC cannot be both at the same time.
+Interaction entry is similar (approach + interact input),
+but seller flow opens shop and trainer flow starts battle.
 end note
 
 @enduml

@@ -34,7 +34,7 @@ package "domain.creature" {
         -nickname: String
         -level: Integer
         -currentHp: Integer
-        -specie: Species
+        -species: Species
         -currentStats: Stats
         -moves: List<Move>
         -statusEffects: List<StatusEffect>

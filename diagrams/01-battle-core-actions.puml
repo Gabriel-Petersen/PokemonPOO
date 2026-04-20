@@ -32,61 +32,61 @@ package "domain.battle" {
     interface Trainer <<interface>> #ECFEFF {
         +getDisplayName() String
         +getTeam() Team
-        +isWild() boolean
+        +isWild() Boolean
         +selectAction(context: BattleContext) CombatAction
     }
 
-    class PlayerTrainer #F8FAFC {
+    class Player #F8FAFC {
         -displayName: String
         -team: Team
-        -wild: boolean
+        -wild: Boolean
         +selectAction(context: BattleContext) CombatAction
     }
 
     class NpcTrainer #F8FAFC {
         -displayName: String
         -team: Team
-        -wild: boolean
+        -wild: Boolean
         +selectAction(context: BattleContext) CombatAction
     }
 
     class WildTrainer #F8FAFC {
         -displayName: String
         -team: Team
-        -wild: boolean
+        -wild: Boolean
         +selectAction(context: BattleContext) CombatAction
     }
 
     class Team #F8FAFC {
         -members: List<Pokemon>
-        -activeIndex: int
+        -activeIndex: Integer
         +getActiveMember() Pokemon
-        +hasAvailableMember() boolean
-        +switchActive(index: int) boolean
+        +hasAvailableMember() Boolean
+        +switchActive(index: Integer) Boolean
     }
 
     class Battle #F8FAFC {
         -player: Trainer
         -opponent: Trainer
         -context: BattleContext
-        -finished: boolean
+        -finished: Boolean
         -winner: Trainer
         +start() void
         +runTurn() void
-        +isFinished() boolean
+        +isFinished() Boolean
     }
 
     class BattleContext #F8FAFC {
-        -turnNumber: int
+        -turnNumber: Integer
         -player: Trainer
         -opponent: Trainer
-        +canCapture(actor: Trainer, target: Pokemon) boolean
-        +isValidAction(actor: Trainer, action: CombatAction) boolean
+        +canCapture(actor: Trainer, target: Pokemon) Boolean
+        +isValidAction(actor: Trainer, action: CombatAction) Boolean
     }
 
     abstract class CombatAction <<abstract>> #FFF7ED {
         -actor: Trainer
-        +getPriority() int
+        +getPriority() Integer
         +execute(context: BattleContext) ActionResult
     }
 
@@ -94,25 +94,25 @@ package "domain.battle" {
         -user: Pokemon
         -target: Pokemon
         -move: Move
-        +getPriority() int
+        +getPriority() Integer
         +execute(context: BattleContext) ActionResult
     }
 
     class ItemAction #F8FAFC {
         -target: Pokemon
         -item: Item
-        +getPriority() int
+        +getPriority() Integer
         +execute(context: BattleContext) ActionResult
     }
 
     class SwitchAction #F8FAFC {
-        -targetIndex: int
-        +getPriority() int
+        -targetIndex: Integer
+        +getPriority() Integer
         +execute(context: BattleContext) ActionResult
     }
 
     class FleeAction #F8FAFC {
-        +getPriority() int
+        +getPriority() Integer
         +execute(context: BattleContext) ActionResult
     }
 
@@ -132,7 +132,7 @@ package "domain.shared" {
     class Item #F8FAFC
 }
 
-Trainer <|.. PlayerTrainer
+Trainer <|.. Player
 Trainer <|.. NpcTrainer
 Trainer <|.. WildTrainer
 
@@ -161,6 +161,11 @@ BattleContext ..> Pokemon
 note right of WildTrainer
 WildTrainer models a wild encounter as
 a trainer with one Pokemon in team.
+end note
+
+note bottom of Player
+This is the same concrete player object
+integrated with GameObject in diagram 05.
 end note
 
 @enduml

@@ -1,106 +1,175 @@
 @startuml domain_engine_integration
 skinparam style strictuml
 skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
 
-package "application.battle" {
-    interface PlayerActionPort {
-        +submit(action: CombatAction) void
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #64748B
+    FontColor #0F172A
+}
+
+skinparam class<<abstract>> {
+    BackgroundColor #FFF7ED
+    BorderColor #C2410C
+    FontColor #9A3412
+}
+
+skinparam class<<interface>> {
+    BackgroundColor #ECFEFF
+    BorderColor #0F766E
+    FontColor #115E59
+}
+
+skinparam class<<enum>> {
+    BackgroundColor #EEF2FF
+    BorderColor #4338CA
+    FontColor #312E81
+}
+
+package "game.integration" {
+    class BattleSession #F8FAFC {
+        -battle: Battle
+        -scheduler: EventScheduler
+        -hud: BattleHud
+        -playerTrainer: Player
+        -opponentTrainer: Trainer
+        -playerPokemonObject: PlayerPokemonObject
+        -otherPokemonObject: OtherPokemonObject
+        -running: Boolean
+        +start(battle: Battle, player: Player, opponent: Trainer) void
+        +submitPlayerAction(action: CombatAction) void
+        +update(deltaTime: Double) void
+        +queueTurnPresentation(results: List<ActionResult>) void
+        +syncVisualState() void
+        +finish() void
     }
 
-    class BattleController {
-        +start(battle: Battle) void
-        +submit(action: CombatAction) void
-        +update(deltaTime: double) void
-        +isPresentationBusy() boolean
+    class BattleHud #F8FAFC {
+        -rootPanel: UiImage
+        -playerHpBar: UiProgressBar
+        -opponentHpBar: UiProgressBar
+        -messageText: UiText
+        -actionButtons: List<UiButton>
+        -inputLocked: Boolean
+        +buildHierarchy() void
+        +bindBattle(battle: Battle) void
+        +refresh() void
+        +showMessage(message: String) void
+        +setInputLocked(locked: Boolean) void
     }
 
-    class BattlePresenter {
-        +presentTurn(resolution: TurnResolution) void
-        +presentMessage(message: String) void
+    class PlayerPokemonObject #F8FAFC {
+        -boundPokemon: Pokemon
+        -animator: Animator
+        -active: Boolean
+        +bind(pokemon: Pokemon) void
+        +syncFromBattle(context: BattleContext) void
+        +playHitAnimation() void
+        +playFaintAnimation() void
     }
 
-    class BattleViewModel {
-        +refreshFrom(battle: Battle) void
-        +getPlayerName() String
-        +getOpponentName() String
-        +getPlayerHpRatio() double
-        +getOpponentHpRatio() double
-        +isInputLocked() boolean
+    class OtherPokemonObject #F8FAFC {
+        -boundPokemon: Pokemon
+        -animator: Animator
+        -active: Boolean
+        +bind(pokemon: Pokemon) void
+        +syncFromBattle(context: BattleContext) void
+        +playHitAnimation() void
+        +playFaintAnimation() void
     }
 
-    class InputActionMapper {
-        +toMoveAction(moveSlot: int) CombatAction
-        +toItemAction(itemId: String, targetIndex: int) CombatAction
-        +toSwitchAction(targetIndex: int) CombatAction
-        +toRunAction() CombatAction
+    class Player #F8FAFC {
+        -worldTeam: Team
+        -selectedAction: CombatAction
+        -isInBattle: Boolean
+        +selectAction(context: BattleContext) CombatAction
+        +enterBattleSession() void
+        +exitBattleSession() void
+        +update() void
+        +setup() void
+    }
+
+    class Npc #F8FAFC {
+        -trainerData: NpcTrainer
+        -interactionEnabled: Boolean
+        +onInteract(player: Player) Battle
+        +canStartBattle() Boolean
+        +setDefeated() void
+        +update() void
+        +setup() void
     }
 }
 
 package "integration.visual" {
-    class PlayerPokemonView <<GameObjectAdapter>> {
-        +bind(viewModel: BattleViewModel) void
-        +syncFromViewModel() void
-    }
-
-    class OpponentPokemonView <<GameObjectAdapter>> {
-        +bind(viewModel: BattleViewModel) void
-        +syncFromViewModel() void
-    }
-
-    class BattleHudView <<UiAdapter>> {
-        +bind(viewModel: BattleViewModel, actionPort: PlayerActionPort) void
-        +showMessage(message: String) void
-        +updateWidgets() void
-    }
-
-    class EventQueuePresenterAdapter {
-        +enqueueTurnPresentation(resolution: TurnResolution) void
-        +enqueueMessage(message: String) void
-        +isResolving() boolean
-    }
+    class UiImage <<external>> #F8FAFC
+    class UiText <<external>> #F8FAFC
+    class UiButton <<external>> #F8FAFC
+    class UiProgressBar <<external>> #F8FAFC
 }
 
 package "domain (external)" {
-    class Battle <<external>>
-    class CombatAction <<external>>
-    class TurnResolution <<external>>
+    interface Trainer <<interface>> #ECFEFF
+    class Battle #F8FAFC
+    class BattleContext #F8FAFC
+    class CombatAction #F8FAFC
+    enum ActionResult <<enum>> #EEF2FF
+    class Team #F8FAFC
+    class Pokemon #F8FAFC
+    class NpcTrainer #F8FAFC
 }
 
 package "engine (external)" {
-    class GameObject <<external>>
-    class UiElement <<external>>
-    class GamePanel <<external>>
-    class EventScheduler <<external>>
+    class GameObject #F8FAFC
+    class GamePanel #F8FAFC
+    class EventScheduler #F8FAFC
+    class Animator #F8FAFC
 }
 
-PlayerActionPort <|.. BattleController
+Player --|> GameObject
+Npc --|> GameObject
+PlayerPokemonObject --|> GameObject
+OtherPokemonObject --|> GameObject
+BattleHud --|> UiImage
 
-BattleController --> BattlePresenter
-BattleController --> BattleViewModel
-BattleController --> InputActionMapper
-BattleController ..> Battle
-BattleController ..> CombatAction
+Trainer <|.. Player
 
-InputActionMapper ..> CombatAction
-BattlePresenter --> EventQueuePresenterAdapter
-BattlePresenter ..> TurnResolution
-BattleViewModel ..> Battle
+BattleSession --> Battle
+BattleSession --> EventScheduler
+BattleSession --> BattleHud
+BattleSession --> PlayerPokemonObject
+BattleSession --> OtherPokemonObject
+BattleSession --> Player
+BattleSession --> Trainer
+BattleSession ..> CombatAction
+BattleSession ..> ActionResult
 
-PlayerPokemonView --|> GameObject
-OpponentPokemonView --|> GameObject
-BattleHudView --|> UiElement
+BattleHud --> UiProgressBar
+BattleHud --> UiText
+BattleHud --> UiButton
+BattleHud ..> Battle
 
-PlayerPokemonView ..> BattleViewModel
-OpponentPokemonView ..> BattleViewModel
-BattleHudView ..> BattleViewModel
-BattleHudView ..> PlayerActionPort
+PlayerPokemonObject --> Animator
+OtherPokemonObject --> Animator
+PlayerPokemonObject --> Pokemon
+OtherPokemonObject --> Pokemon
+PlayerPokemonObject ..> BattleContext
+OtherPokemonObject ..> BattleContext
 
-EventQueuePresenterAdapter ..> EventScheduler
-EventQueuePresenterAdapter ..> GamePanel
+Npc --> NpcTrainer
+Npc --> Battle
 
-note bottom of BattleViewModel
-Domain classes do not depend on GameObject or UiElement.
-Visual adapters read BattleViewModel and mirror logical state.
+BattleSession ..> GamePanel
+
+note bottom of BattleSession
+EventScheduler is a concrete instance owned by BattleSession.
+No presenter/adapter/mapper micro-classes are required.
+end note
+
+note bottom of Npc
+NPC interaction validation (distance/button/click)
+happens in game object logic before creating battle.
 end note
 
 @enduml
