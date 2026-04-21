@@ -38,7 +38,7 @@ public class ManualTilemap extends Tilemap
     }
 
     @Override
-    protected void onDraw(Graphics2D g2d)
+    protected void drawTilemap(Graphics2D g2d)
     {
         var backup = g2d.getTransform();
         g2d.translate(transform.getPosition().x(), transform.getPosition().y());

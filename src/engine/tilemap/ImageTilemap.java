@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 
 public class ImageTilemap extends Tilemap
 {
-    private static final int THRESHOLD = 128;
+    private static final int THRESHOLD = 64;
     private final BufferedImage visualMap;
 
     public ImageTilemap(BufferedImage visual, BufferedImage mask, double tileSize)
@@ -36,7 +36,7 @@ public class ImageTilemap extends Tilemap
     }
 
     @Override
-    protected void onDraw(Graphics2D g2d)
+    protected void drawTilemap(Graphics2D g2d)
     {
         var backup = g2d.getTransform();
         g2d.translate(transform.getPosition().x(), transform.getPosition().y());

@@ -2,6 +2,8 @@ package execs;
 
 import engine.core.GamePanel;
 import engine.input.Input;
+import examples.TilemapExample;
+
 import java.awt.Color;
 import javax.swing.JFrame;
 
@@ -17,6 +19,10 @@ public class Main
         gamePanel.setBackground(Color.DARK_GRAY);
 
         frame.setContentPane(gamePanel);
+        frame.pack();
+        frame.setVisible(true);
+
+        TilemapExample.runExample();
 
         new Thread(() -> {
             long lastTime = System.nanoTime();
