@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 
 import engine.animation.Animator;
 import engine.assets.AssetManager;
+
 import engine.core.GameObject;
 import engine.core.GamePanel;
 import engine.input.Input;
