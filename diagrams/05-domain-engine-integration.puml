@@ -1,4 +1,4 @@
-@startuml domain_engine_integration
+@startuml engine_integration
 skinparam style strictuml
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -80,17 +80,6 @@ package "game.integration" {
         +playFaintAnimation() void
     }
 
-    class Player #F8FAFC {
-        -worldTeam: Team
-        -selectedAction: CombatAction
-        -isInBattle: Boolean
-        +selectAction(context: BattleContext) CombatAction
-        +enterBattleSession() void
-        +exitBattleSession() void
-        +update() void
-        +setup() void
-    }
-
     class Npc #F8FAFC {
         -trainerData: NpcTrainer
         -interactionEnabled: Boolean
@@ -102,29 +91,51 @@ package "game.integration" {
     }
 }
 
-package "integration.visual" {
-    class UiImage <<external>> #F8FAFC
-    class UiText <<external>> #F8FAFC
-    class UiButton <<external>> #F8FAFC
-    class UiProgressBar <<external>> #F8FAFC
+package "game.player" {
+    class Player #F8FAFC {
+        -worldTeam: Team
+        -selectedAction: CombatAction
+        -isInBattle: Boolean
+        +selectAction(context: BattleContext) CombatAction
+        +enterBattleSession() void
+        +exitBattleSession() void
+        +update() void
+        +setup() void
+    }
 }
 
-package "domain (external)" {
+package "game.battle" {
     interface Trainer <<interface>> #ECFEFF
     class Battle #F8FAFC
     class BattleContext #F8FAFC
     class CombatAction #F8FAFC
     enum ActionResult <<enum>> #EEF2FF
     class Team #F8FAFC
-    class Pokemon #F8FAFC
     class NpcTrainer #F8FAFC
 }
 
-package "engine (external)" {
+package "game.creature" {
+    class Pokemon #F8FAFC
+}
+
+package "engine.core" {
     class GameObject #F8FAFC
     class GamePanel #F8FAFC
+}
+
+package "engine.events" {
     class EventScheduler #F8FAFC
+}
+
+package "engine.animation" {
     class Animator #F8FAFC
+}
+
+package "engine.ui.elements" {
+    class UiImage #F8FAFC
+    class UiText #F8FAFC
+    class UiButton #F8FAFC
+    class UiProgressBar #F8FAFC
 }
 
 Player --|> GameObject

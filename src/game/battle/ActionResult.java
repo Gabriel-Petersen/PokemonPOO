@@ -1,4 +1,4 @@
-package domain.battle;
+package game.battle;
 public enum ActionResult{
     SUCCESS,
     FAILED,

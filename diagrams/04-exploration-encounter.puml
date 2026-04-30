@@ -28,7 +28,7 @@ skinparam class<<enum>> {
     FontColor #312E81
 }
 
-package "domain.exploration" {
+package "game.exploration" {
     class EncounterZone #F8FAFC {
         -name: String
         -isCaptureArea: Boolean
@@ -75,13 +75,21 @@ package "domain.exploration" {
     }
 }
 
-package "domain.shared" {
+package "game.shared" {
     interface Interactable <<interface>> #ECFEFF {
         +onInteract(player: Player) void
     }
+}
 
+package "game.creature" {
     class Species #F8FAFC
+}
+
+package "game.player" {
     class Player #F8FAFC
+}
+
+package "game.battle" {
     class NpcTrainer #F8FAFC
     class WildTrainer #F8FAFC
     class Battle #F8FAFC
@@ -105,7 +113,7 @@ Interactable <|.. NpcTrainer
 note right of EncounterService
 NPC battle start is abstract here.
 Interaction validation (distance/button/click)
-is performed outside domain by NPC GameObject
+is performed outside this package by NPC GameObject
 or interaction layer before calling startNpcBattle.
 end note
 

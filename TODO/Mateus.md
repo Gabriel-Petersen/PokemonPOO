@@ -1,36 +1,37 @@
 # Mateus - Contratos base de batalha e interacao
 
 Objetivo
-- Criar contratos minimos de treinador e interacao no dominio (sem logica de batalha).
+- Criar os contratos minimos de treinador e batalha no pacote `game.battle`, e o contrato de interacao em `game.shared`.
 
 Pacotes e arquivos (crie se nao existir)
-- src/domain/battle/Trainer.java
-- src/domain/battle/Player.java
-- src/domain/battle/NpcTrainer.java
-- src/domain/battle/WildTrainer.java
-- src/domain/battle/Team.java
-- src/domain/battle/ActionResult.java
-- src/domain/shared/Interactable.java
+- `src/game/battle/ActionResult.java`
+- `src/game/battle/BattleContext.java`
+- `src/game/battle/Trainer.java`
+- `src/game/battle/NpcTrainer.java`
+- `src/game/battle/WildTrainer.java`
+- `src/game/battle/Team.java`
+- `src/game/player/Interactable.java`
 
 O que implementar (traduzido do diagrama)
-- ActionResult enum: SUCCESS, FAILED, INVALID_ACTION, MISSED, FLED, CAPTURED.
-- Team: lista de Pokemon, activeIndex; metodos getActiveMember, hasAvailableMember, switchActive.
-- Trainer interface: getDisplayName, getTeam, isWild, selectAction(BattleContext) (pode retornar null por enquanto).
-- Player/NpcTrainer/WildTrainer: dados simples (displayName, team, wild) + selectAction stub.
-- Interactable: interface com onInteract(Player).
+- `ActionResult`: `SUCCESS`, `FAILED`, `INVALID_ACTION`, `MISSED`, `FLED`, `CAPTURED`.
+- `BattleContext`: contexto leve usado nas assinaturas de acao (sem logica completa).
+- `Team`: lista de `Pokemon`, `activeIndex`; metodos `getActiveMember`, `hasAvailableMember`, `switchActive`.
+- `Trainer`: `getDisplayName`, `getTeam`, `isWild`, `selectAction(BattleContext)`.
+- `NpcTrainer` e `WildTrainer`: dados simples (`displayName`, `team`, `wild`) + `selectAction` stub.
+- `Interactable`: interface com `onInteract(Player)`.
 
 Dependencias
-- Pokemon (Gustavo) para Team.
-- Inventory (Pedro) apenas se quiser associar inventario ao Trainer agora (opcional).
+- `game.creature.Pokemon` (Gustavo) para `Team`.
+- `game.player.Player` (Gabriel) para a assinatura de `onInteract`.
 
 Guia do ciclo
-1. Criar ActionResult enum.
-2. Implementar Team com lista de Pokemon.
-3. Criar Trainer interface com assinaturas.
-4. Criar Player/NpcTrainer/WildTrainer com implementacoes simples.
-5. Criar Interactable em domain/shared.
+1. Criar `ActionResult` e `BattleContext`.
+2. Implementar `Team` com lista de `Pokemon`.
+3. Criar `Trainer`, `NpcTrainer` e `WildTrainer` com implementacoes simples.
+4. Criar `Interactable` em `game.shared`.
 
 Referencias
-- diagrams/01-battle-core-actions.puml
-- diagrams/04-exploration-encounter.puml (Interactable)
-- docs/01-visao-geral-da-engine.md (contexto de arquitetura)
+- `diagrams/01-battle-core-actions.puml`
+- `diagrams/04-exploration-encounter.puml`
+- `diagrams/05-domain-engine-integration.puml`
+- `docs/01-visao-geral-da-engine.md`

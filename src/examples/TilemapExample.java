@@ -5,8 +5,7 @@ import engine.core.GamePanel;
 import engine.input.Input;
 import engine.tilemap.ImageTilemap;
 import engine.tilemap.Tilemap;
-import game.Player;
-
+import game.player.Player;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.Objects;

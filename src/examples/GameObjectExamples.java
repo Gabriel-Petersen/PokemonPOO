@@ -5,7 +5,7 @@ import engine.core.GamePanel;
 import engine.primitives.Square;
 import engine.rendering.Renderer;
 import engine.rendering.ShapeFactory;
-import game.Player;
+import game.player.Player;
 import java.awt.Color;
 
 public final class GameObjectExamples

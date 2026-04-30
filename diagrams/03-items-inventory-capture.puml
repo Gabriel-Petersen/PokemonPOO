@@ -28,7 +28,7 @@ skinparam class<<enum>> {
     FontColor #312E81
 }
 
-package "domain.items" {
+package "game.items" {
     abstract class Item <<abstract>> #FFF7ED {
         -name: String
         -description: String
@@ -78,7 +78,7 @@ package "domain.items" {
     }
 }
 
-package "domain.commerce" {
+package "game.commerce" {
     interface Seller <<interface>> #ECFEFF {
         +listItemsForSale() List<Item>
     }
@@ -100,19 +100,27 @@ package "domain.commerce" {
     }
 }
 
-package "domain.shared" {
+package "game.shared" {
     interface Interactable <<interface>> #ECFEFF {
         +onInteract(player: Player) void
     }
+}
 
+package "game.battle" {
     class Trainer #F8FAFC
     class WildTrainer #F8FAFC
     class NpcTrainer #F8FAFC
-    class Player #F8FAFC
-    class Pokemon #F8FAFC
     class BattleContext #F8FAFC
     class ItemAction #F8FAFC
     enum ActionResult <<enum>> #EEF2FF
+}
+
+package "game.player" {
+    class Player #F8FAFC
+}
+
+package "game.creature" {
+    class Pokemon #F8FAFC
 }
 
 Item <|-- HealingItem

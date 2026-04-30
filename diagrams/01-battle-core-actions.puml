@@ -28,18 +28,11 @@ skinparam class<<enum>> {
     FontColor #312E81
 }
 
-package "domain.battle" {
+package "game.battle" {
     interface Trainer <<interface>> #ECFEFF {
         +getDisplayName() String
         +getTeam() Team
         +isWild() Boolean
-        +selectAction(context: BattleContext) CombatAction
-    }
-
-    class Player #F8FAFC {
-        -displayName: String
-        -team: Team
-        -wild: Boolean
         +selectAction(context: BattleContext) CombatAction
     }
 
@@ -126,9 +119,24 @@ package "domain.battle" {
     }
 }
 
-package "domain.shared" {
+package "game.player" {
+    class Player #F8FAFC {
+        -displayName: String
+        -team: Team
+        -wild: Boolean
+        +selectAction(context: BattleContext) CombatAction
+    }
+}
+
+package "game.creature" {
     class Pokemon #F8FAFC
+}
+
+package "game.creature.move" {
     class Move #F8FAFC
+}
+
+package "game.items" {
     class Item #F8FAFC
 }
 

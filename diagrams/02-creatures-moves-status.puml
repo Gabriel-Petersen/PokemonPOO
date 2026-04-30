@@ -28,7 +28,7 @@ skinparam class<<enum>> {
     FontColor #312E81
 }
 
-package "domain.creature" {
+package "game.creature" {
     class Pokemon #F8FAFC {
         -id: Integer
         -nickname: String
@@ -74,7 +74,7 @@ package "domain.creature" {
     }
 }
 
-package "domain.move" {
+package "game.creature.move" {
     abstract class Move <<abstract>> #FFF7ED {
         -name: String
         -power: Integer
@@ -131,7 +131,7 @@ package "domain.move" {
     }
 }
 
-package "domain.status" {
+package "game.creature.move.status" {
     interface StatModifier <<functional, interface>> #ECFEFF {
         +apply(baseValue: Integer, context: BattleContext) Integer
     }
@@ -171,7 +171,7 @@ package "domain.status" {
     }
 }
 
-package "domain.shared" {
+package "game.battle" {
     class BattleContext #F8FAFC
 }
 
