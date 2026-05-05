@@ -1,14 +1,42 @@
 package execs;
 
+import engine.assets.AssetManager;
 import engine.core.GamePanel;
 import engine.input.Input;
-import examples.TilemapExample;
-
+import engine.tilemap.ImageTilemap;
+import engine.tilemap.Tilemap;
+import game.player.Player;
 import java.awt.Color;
 import javax.swing.JFrame;
 
 public class Main
 {
+    private static void buildMap()
+    {
+        GamePanel gamePanel = GamePanel.getInstance();
+
+        Tilemap tilemap = new ImageTilemap(
+                AssetManager.getSprite("scenario/mapa_limited.png"),
+                AssetManager.getSprite("scenario/collision_matrix_map.png"),
+                16
+        );
+
+        tilemap.setLayer(-1);
+        tilemap.getTransform().setScale(3, 3);
+        tilemap.getTransform().setPosition(
+                -4 * tilemap.getSizeX(),
+                -4 * tilemap.getSizeY()
+        );
+
+        gamePanel.addElement(tilemap);
+
+        Player player = new Player();
+        player.getTransform().setScale(1.8, 1.8);
+        player.setCurrentMap(tilemap);
+        player.getTransform().setPosition(2806, 5522);
+        gamePanel.addElement(player);
+    }
+
     public static void main(String[] args)
     {
         JFrame frame = new JFrame("Minha janela");
@@ -22,7 +50,7 @@ public class Main
         frame.pack();
         frame.setVisible(true);
 
-        TilemapExample.runExample();
+        buildMap();
 
         new Thread(() -> {
             long lastTime = System.nanoTime();

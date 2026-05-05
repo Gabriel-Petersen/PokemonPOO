@@ -26,7 +26,6 @@ public class Player extends GameObject
 
     private Tilemap currentMap;
     private LastLookDir lastLookDir = LastLookDir.DOWN;
-    
 	private Animator animator;
 	private final MutableVec2d speedVec = new MutableVec2d();
 
@@ -67,6 +66,7 @@ public class Player extends GameObject
     @Override
     public void update()
     {
+        debugs();
         animator.update();
 
         speedVec.set(
@@ -133,4 +133,10 @@ public class Player extends GameObject
 	protected Renderer createSwingRenderer() {
 		return new SpriteRenderer("player_sheet/walk_down/sprite_01.png");
 	}
+
+    private void debugs()
+    {
+        if (Input.getKeyDown(KeyEvent.VK_P))
+            System.out.println(transform.getPosition());
+    }
 }

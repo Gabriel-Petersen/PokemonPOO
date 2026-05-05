@@ -1,11 +1,12 @@
 package engine.assets;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
+import javax.imageio.ImageIO;
 
 public class AssetManager
 {
@@ -16,7 +17,9 @@ public class AssetManager
         if (!sprites.containsKey(path))
         {
             try {
-                BufferedImage img = ImageIO.read(Objects.requireNonNull(AssetManager.class.getResourceAsStream("/assets/" + path)));
+                InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream("assets/" + path);
+
+                BufferedImage img = ImageIO.read(Objects.requireNonNull(stream));
                 sprites.put(path, img);
             }
             catch (IOException e) {
