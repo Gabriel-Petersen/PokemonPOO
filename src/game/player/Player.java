@@ -26,6 +26,7 @@ public class Player extends GameObject
 
     private Tilemap currentMap;
     private LastLookDir lastLookDir = LastLookDir.DOWN;
+    
 	private Animator animator;
 	private final MutableVec2d speedVec = new MutableVec2d();
 
