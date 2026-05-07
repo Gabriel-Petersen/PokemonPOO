@@ -11,6 +11,8 @@ import engine.primitives.Square;
 import engine.rendering.Renderer;
 import engine.rendering.SpriteRenderer;
 import engine.tilemap.Tilemap;
+import game.ui.PauseMenu;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -24,14 +26,22 @@ public class Player extends GameObject
         public char c() { return c; }
     }
 
+    private final PlayerMetadata metadata = new PlayerMetadata();
     private Tilemap currentMap;
     private LastLookDir lastLookDir = LastLookDir.DOWN;
 	private Animator animator;
 	private final MutableVec2d speedVec = new MutableVec2d();
+	private boolean isUiOpen = false;
+	private final PauseMenu pauseMenu = new PauseMenu(40, 120, Color.white);
 
     private final Square footPos = new Square(0, 0, 5, Color.blue, 2);
 
-    public Player() { GamePanel.getInstance().addElement(footPos); }
+    public Player() { 
+    	var gamePanel = GamePanel.getInstance();
+    	gamePanel.addElement(footPos); 
+    	gamePanel.addElement(pauseMenu);
+    	pauseMenu.setVisible(false);
+    }
 
     @Override
     public void setup()
@@ -68,35 +78,43 @@ public class Player extends GameObject
     {
         debugs();
         animator.update();
-
-        speedVec.set(
-                Input.getAxisRaw("Horizontal"),
-                Input.getAxisRaw("Vertical")
-        );
-
-        float speed = Input.getKey(KeyEvent.VK_SHIFT) ? 8 : 3;
-
-        if (speedVec.magnitudeSqrt() > 0)
+        
+        if (Input.getKeyDown(KeyEvent.VK_ESCAPE))
         {
-            Vec2d direction = new MutableVec2d(speedVec).normalized().mul(speed);
-            Vec2d nextPos = new MutableVec2d(transform.getPosition()).add(direction);
-
-            boolean collision = false;
-            double footX = nextPos.x();
-            double footY = nextPos.y() + (transform.getScale().y() * 7);
-
-            footPos.getTransform().setPosition(footX, footY);
-
-            if (currentMap.isSolidAt(footX, footY))
-                collision = true;
-
-            if (!collision || Input.getKey(KeyEvent.VK_CONTROL))
-                transform.translate(direction);
-
-            updateAnimation(speed);
+        	isUiOpen = !isUiOpen;
+        	pauseMenu.setVisible(isUiOpen);
         }
-        else
-            animator.play("idle" + lastLookDir.c());
+        else if (canWalk())
+        {
+        	speedVec.set(
+                    Input.getAxisRaw("Horizontal"),
+                    Input.getAxisRaw("Vertical")
+            );
+
+            float speed = Input.getKey(KeyEvent.VK_SHIFT) ? 8 : 3;
+
+            if (speedVec.magnitudeSqrt() > 0)
+            {
+                Vec2d direction = new MutableVec2d(speedVec).normalized().mul(speed);
+                Vec2d nextPos = new MutableVec2d(transform.getPosition()).add(direction);
+
+                boolean collision = false;
+                double footX = nextPos.x();
+                double footY = nextPos.y() + (transform.getScale().y() * 7);
+
+                footPos.getTransform().setPosition(footX, footY);
+
+                if (currentMap.isSolidAt(footX, footY))
+                    collision = true;
+
+                if (!collision || Input.getKey(KeyEvent.VK_CONTROL))
+                    transform.translate(direction);
+
+                updateAnimation(speed);
+            }
+            else
+                animator.play("idle" + lastLookDir.c());
+        }
 
         GamePanel.getCamera().lookAt(transform.getPosition());
     }
@@ -128,6 +146,14 @@ public class Player extends GameObject
     }
 
     public void setCurrentMap(Tilemap currentMap) { this.currentMap = currentMap; }
+    
+    public PlayerMetadata getMetadata() { return metadata; }
+    
+    public boolean isUiOpen() { return isUiOpen; }
+    
+    private boolean canWalk() {
+    	return !isUiOpen;
+    }
 
     @Override
 	protected Renderer createSwingRenderer() {
