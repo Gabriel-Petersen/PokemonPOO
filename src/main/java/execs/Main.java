@@ -7,6 +7,7 @@ import engine.tilemap.ImageTilemap;
 import engine.tilemap.Tilemap;
 import game.player.Player;
 import java.awt.Color;
+import java.util.Objects;
 import javax.swing.JFrame;
 
 public class Main
@@ -16,7 +17,7 @@ public class Main
         GamePanel gamePanel = GamePanel.getInstance();
 
         Tilemap tilemap = new ImageTilemap(
-                AssetManager.getSprite("scenario/mapa_limited.png"),
+                Objects.requireNonNull(AssetManager.getSprite("scenario/mapa_limited.png")),
                 AssetManager.getSprite("scenario/collision_matrix_map.png"),
                 16
         );

@@ -11,8 +11,7 @@ import engine.primitives.Square;
 import engine.rendering.Renderer;
 import engine.rendering.SpriteRenderer;
 import engine.tilemap.Tilemap;
-import game.ui.PauseMenu;
-
+import game.ui.player.PauseMenu;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -27,12 +26,12 @@ public class Player extends GameObject
     }
 
     private final PlayerMetadata metadata = new PlayerMetadata();
+    private final MutableVec2d speedVec = new MutableVec2d();
+	private final PauseMenu pauseMenu = new PauseMenu(110, 190, Color.lightGray, this);
     private Tilemap currentMap;
     private LastLookDir lastLookDir = LastLookDir.DOWN;
 	private Animator animator;
-	private final MutableVec2d speedVec = new MutableVec2d();
-	private boolean isUiOpen = false;
-	private final PauseMenu pauseMenu = new PauseMenu(40, 120, Color.white);
+    private boolean isUiOpen = false;
 
     private final Square footPos = new Square(0, 0, 5, Color.blue, 2);
 
