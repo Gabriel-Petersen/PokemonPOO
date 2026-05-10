@@ -1,7 +1,6 @@
 package engine.ui.elements;
 
 import engine.ui.core.UiElement;
-
 import java.awt.*;
 
 public class UiText extends UiElement {
@@ -14,10 +13,22 @@ public class UiText extends UiElement {
     }
 
     @Override
+    protected void beforeDraw(Graphics2D g2d) {
+        g2d.setFont(font);
+
+        FontMetrics metrics = g2d.getFontMetrics(font);
+        int width = Math.max(1, metrics.stringWidth(text));
+        int height = Math.max(1, metrics.getHeight());
+        getTransform().setScale(width, height);
+    }
+
+    @Override
     protected void drawSelf(Graphics2D g2d) {
         g2d.setColor(color);
         g2d.setFont(font);
-        g2d.drawString(text, 0, 0);
+
+        FontMetrics metrics = g2d.getFontMetrics(font);
+        g2d.drawString(text, 0, metrics.getAscent());
     }
 
     public void setFont(Font font) {

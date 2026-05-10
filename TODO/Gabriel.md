@@ -4,10 +4,10 @@ Objetivo
 - Integrar a pausa navegavel, a aba de metadados do player e os NPCs basicos, usando somente `engine.ui` (sem Swing direto).
 
 Pacotes e arquivos (crie se nao existir)
-- `src/game/player/Player.java` (ajustes)
-- `src/game/ui/PauseMenu.java`
-- `src/game/ui/PauseTab.java`
-- `src/game/ui/PlayerMetadataTab.java`
+- `src/game/player/Player.java` (ajustes) -> falta animação de "correndo"
+- `src/game/ui/PauseMenu.java` -> 80% OK
+- `src/game/ui/PauseTab.java` -> OK
+- `src/game/ui/PlayerMetadataTab.java` -> OK (adaptado)
 - `src/game/integration/Npc.java`
 - `src/execs/Main.java` (ajustes)
 
