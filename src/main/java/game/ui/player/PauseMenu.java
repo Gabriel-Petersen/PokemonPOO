@@ -74,6 +74,9 @@ public class PauseMenu extends UiImage
     @Override
     protected void onEnableVisible() { closeAll(); }
 
+	@Override
+	protected void onDisableVisible() { closeAll(); }
+
 	private void onInfoClick()
 	{
 		System.out.println("Info clicked");
