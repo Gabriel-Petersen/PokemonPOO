@@ -3,7 +3,6 @@ package engine.animation;
 import engine.assets.AssetManager;
 import engine.core.GamePanel;
 import engine.rendering.SpriteRenderer;
-
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +44,7 @@ public class Animator
         if (currentAnim != null && currentAnim.getName().equals(name)) return;
         currentAnim = animations.get(name);
         currentFrameIndex = 0;
+        elapsed = 0;
         updateRenderer();
     }
 
@@ -54,7 +54,7 @@ public class Animator
         elapsed += GamePanel.getInstance().getDeltaTime();
         double duration = currentAnim.getFrameDurationMillis() / 1000.0;
 
-        if (elapsed >= duration) {
+        while (elapsed >= duration) {
             advanceFrame();
             elapsed -= duration;
         }

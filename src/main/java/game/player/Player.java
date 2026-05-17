@@ -6,32 +6,43 @@ import engine.core.GameObject;
 import engine.core.GamePanel;
 import engine.input.Input;
 import engine.math.vectors.MutableVec2d;
-import engine.math.vectors.Vec2d;
 import engine.primitives.Square;
 import engine.rendering.Renderer;
 import engine.rendering.SpriteRenderer;
 import engine.tilemap.Tilemap;
+import game.ui.player.PauseMenu;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class Player extends GameObject 
 {
     protected enum LastLookDir {
-        UP('U'), DOWN('D'), LEFT('L'), RIGHT('R');
+        UP('u'), DOWN('d'), LEFT('l'), RIGHT('r');
 
         private final char c;
         LastLookDir(char c) { this.c = c; }
         public char c() { return c; }
     }
 
+    private final PlayerMetadata metadata = new PlayerMetadata();
+    private final MutableVec2d speedVec = new MutableVec2d();
+    private final MutableVec2d directionPool = new MutableVec2d();
+    private final MutableVec2d nextPosPool = new MutableVec2d();
+	private final PauseMenu pauseMenu = new PauseMenu(110, 190, Color.lightGray, this);
     private Tilemap currentMap;
     private LastLookDir lastLookDir = LastLookDir.DOWN;
 	private Animator animator;
-	private final MutableVec2d speedVec = new MutableVec2d();
+    private boolean isUiOpen = false;
+    private boolean isRunning = false;
 
     private final Square footPos = new Square(0, 0, 5, Color.blue, 2);
 
-    public Player() { GamePanel.getInstance().addElement(footPos); }
+    public Player() { 
+    	var gamePanel = GamePanel.getInstance();
+    	gamePanel.addElement(footPos); 
+    	gamePanel.addElement(pauseMenu);
+    	pauseMenu.setVisible(false);
+    }
 
     @Override
     public void setup()
@@ -41,19 +52,19 @@ public class Player extends GameObject
         animator = new Animator((SpriteRenderer) renderer);
 
         animator.addAnimation(
-                "idleD", 1, true,
+                "idle_d", 1, true,
                 AssetManager.getSprite("player_sheet/walk_down/sprite_01.png")
         );
         animator.addAnimation(
-                "idleU", 1, true,
+                "idle_u", 1, true,
                 AssetManager.getSprite("player_sheet/walk_up/sprite_04.png")
         );
         animator.addAnimation(
-                "idleR", 1, true,
+                "idle_r", 1, true,
                 AssetManager.getSprite("player_sheet/walk_right/sprite_10.png")
         );
         animator.addAnimation(
-                "idleL", 1, true,
+                "idle_l", 1, true,
                 AssetManager.getSprite("player_sheet/walk_left/sprite_07.png")
         );
 
@@ -61,6 +72,11 @@ public class Player extends GameObject
         animator.addAnimation("wk_u", 10, true, "player_sheet/walk_up");
         animator.addAnimation("wk_r", 10, true, "player_sheet/walk_right");
         animator.addAnimation("wk_l", 10, true, "player_sheet/walk_left");
+
+        animator.addAnimation("run_d", 10, true, "player_sheet/run_down");
+        animator.addAnimation("run_u", 10, true, "player_sheet/run_up");
+        animator.addAnimation("run_l", 10, true, "player_sheet/run_left");
+        animator.addAnimation("run_r", 10, true, "player_sheet/run_right");
     }
 
     @Override
@@ -68,66 +84,79 @@ public class Player extends GameObject
     {
         debugs();
         animator.update();
-
-        speedVec.set(
-                Input.getAxisRaw("Horizontal"),
-                Input.getAxisRaw("Vertical")
-        );
-
-        float speed = Input.getKey(KeyEvent.VK_SHIFT) ? 8 : 3;
-
-        if (speedVec.magnitudeSqrt() > 0)
+        
+        if (Input.getKeyDown(KeyEvent.VK_ESCAPE))
         {
-            Vec2d direction = new MutableVec2d(speedVec).normalized().mul(speed);
-            Vec2d nextPos = new MutableVec2d(transform.getPosition()).add(direction);
-
-            boolean collision = false;
-            double footX = nextPos.x();
-            double footY = nextPos.y() + (transform.getScale().y() * 7);
-
-            footPos.getTransform().setPosition(footX, footY);
-
-            if (currentMap.isSolidAt(footX, footY))
-                collision = true;
-
-            if (!collision || Input.getKey(KeyEvent.VK_CONTROL))
-                transform.translate(direction);
-
-            updateAnimation(speed);
+        	isUiOpen = !isUiOpen;
+        	pauseMenu.setVisible(isUiOpen);
         }
-        else
-            animator.play("idle" + lastLookDir.c());
+        else if (canWalk())
+        {
+            int inputh = Input.getAxisRaw("Horizontal");
+            int inputv = Input.getAxisRaw("Vertical");
+        	if (inputh != 0)
+                speedVec.set(inputh, 0);
+            else
+                speedVec.set(0, inputv);
+
+            if (speedVec.magnitudeSqrt() > 0)
+            {
+                isRunning = Input.getKey(KeyEvent.VK_SHIFT);
+                directionPool.set(speedVec).normalize();
+                directionPool.mul(
+                    isRunning ? PlayerMetadata.RUN_SPEED : PlayerMetadata.WK_SPEED
+                );
+                nextPosPool.set(transform.getPosition()).add(directionPool);
+
+                boolean collision = false;
+                double footX = nextPosPool.x();
+                double footY = nextPosPool.y() + (transform.getScale().y() * 7);
+
+                footPos.getTransform().setPosition(footX, footY);
+
+                if (currentMap.isSolidAt(footX, footY))
+                    collision = true;
+
+                if (!collision || Input.getKey(KeyEvent.VK_CONTROL))
+                    transform.translate(directionPool);
+
+                if (collision) isRunning = false;
+                updateAnimation();
+            }
+            else
+            {
+                isRunning = false;
+                animator.play("idle_" + lastLookDir.c());
+            }
+        }
 
         GamePanel.getCamera().lookAt(transform.getPosition());
     }
 
-    private void updateAnimation(float speed)
+    private void updateAnimation()
     {
         if (speedVec.y < 0)
-        {
-            animator.play("wk_u");
             lastLookDir = LastLookDir.UP;
-        }
         else if (speedVec.y > 0)
-        {
-            animator.play("wk_d");
             lastLookDir = LastLookDir.DOWN;
-        }
         else if (speedVec.x > 0)
-        {
-            animator.play("wk_r");
             lastLookDir = LastLookDir.RIGHT;
-        }
         else if (speedVec.x < 0)
-        {
-            animator.play("wk_l");
             lastLookDir = LastLookDir.LEFT;
-        }
 
-        animator.getCurrentAnim().setFrameDurationMillis(speed == 8 ? 40 : 60);
+        String prefix = isRunning ? "run_" : "wk_";
+        animator.play(prefix + lastLookDir.c());
     }
 
     public void setCurrentMap(Tilemap currentMap) { this.currentMap = currentMap; }
+    
+    public PlayerMetadata getMetadata() { return metadata; }
+    
+    public boolean isUiOpen() { return isUiOpen; }
+    
+    private boolean canWalk() {
+    	return !isUiOpen;
+    }
 
     @Override
 	protected Renderer createSwingRenderer() {

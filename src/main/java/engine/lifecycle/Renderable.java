@@ -2,7 +2,6 @@ package engine.lifecycle;
 
 import engine.core.EngineElement;
 import engine.core.GamePanel;
-
 import java.awt.*;
 
 public abstract class Renderable implements Comparable<Renderable>, EngineElement
@@ -30,6 +29,16 @@ public abstract class Renderable implements Comparable<Renderable>, EngineElemen
         return Integer.compare(layer, o.layer);
     }
 
-    public void setVisible(boolean visible) { isVisible = visible; }
+    protected void onEnableVisible() { }
+    protected void onDisableVisible() { }
+
     public boolean isVisible() { return isVisible; }
+    public void setVisible(boolean visible) 
+    { 
+        isVisible = visible; 
+        if (isVisible)
+            onEnableVisible();
+        else
+            onDisableVisible();
+    }
 }
