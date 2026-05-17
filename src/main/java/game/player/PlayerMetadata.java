@@ -3,8 +3,8 @@ package game.player;
 import java.util.Date;
 
 public class PlayerMetadata {
-    public static final double WK_SPEED = 0.1;
-    public static final double RUN_SPEED = 0.2;
+    public static final double WK_SPEED = 3;
+    public static final double RUN_SPEED = 7;
 
     private Integer money;
     private String name;
