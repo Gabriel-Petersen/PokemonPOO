@@ -1,5 +1,14 @@
 package game.creature.move;
 
-public class ElementType {
-    
+public enum ElementType {
+    FIRE,
+    WATER,
+    GRASS,
+    ROCK,
+    NORMAL,
+    ELECTRIC,
+    FIGHTING,
+    POISON,
+    DRAGON,
+    FAIRY;
 }

@@ -1,5 +1,10 @@
 package game.creature.move;
 
-public class StatType {
-    
+public enum StatType {
+    HP,
+    ATTACK,
+    DEFENSE,
+    SPECIAL_ATTACK,
+    SPECIAL_DEFENSE,
+    SPEED;
 }
