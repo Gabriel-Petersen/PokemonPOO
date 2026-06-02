@@ -2,22 +2,9 @@ package game.items;
 
 import java.awt.image.BufferedImage;
 
-public abstract class HealingItem extends Item {
-     private Integer healAmount;
-
-    public HealingItem(String name, String description, Boolean battleUsable, Integer basePrice, BufferedImage sprite, Integer healAmount) {
-        super(name, description, battleUsable, basePrice, sprite);
-        this.healAmount = healAmount;
+public abstract class HealingItem extends Item 
+{
+    public HealingItem(String name, String description, Integer basePrice, BufferedImage sprite) {
+        super(name, description, true, basePrice, sprite);
     }
-  
-
-    public Integer getHealAmount() {
-        return healAmount;
-    }
-
-    public void setHealAmount(Integer healAmount) {
-        this.healAmount = healAmount;
-    }
-
-    
 }

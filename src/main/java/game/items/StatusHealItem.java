@@ -10,12 +10,12 @@ import java.util.Set;
 public class StatusHealItem extends HealingItem {
     private final Set<StatusEffect> curedStatus = new HashSet<>();
 
-    public StatusHealItem(String name, String description, Boolean battleUsable, Integer basePrice,
-            BufferedImage sprite, Integer healAmount) {
-        super(name, description, battleUsable, basePrice, sprite, healAmount);
+    public StatusHealItem(String name, String description, Integer basePrice, BufferedImage sprite) {
+        super(name, description, basePrice, sprite);
     }
 
-
+    public void addCurableStatus(StatusEffect status) { curedStatus.add(status); }
+    public void removeCurableStatus(StatusEffect status) { curedStatus.remove(status); }
 
     @Override
     public Boolean canUse(Pokemon target) {
