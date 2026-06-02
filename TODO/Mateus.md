@@ -4,13 +4,13 @@ Objetivo
 - Criar os contratos minimos de treinador e batalha no pacote `game.battle`, e o contrato de interacao em `game.shared`.
 
 Pacotes e arquivos (crie se nao existir)
-- `src/game/battle/ActionResult.java`
-- `src/game/battle/BattleContext.java`
-- `src/game/battle/Trainer.java`
+- `src/game/battle/ActionResult.java`-> OK
+- `src/game/battle/BattleContext.java`-> OK
+- `src/game/battle/Trainer.java`-> OK
 - `src/game/battle/NpcTrainer.java`
 - `src/game/battle/WildTrainer.java`
-- `src/game/battle/Team.java`
-- `src/game/player/Interactable.java`
+- `src/game/battle/Team.java`-> OK
+- `src/game/player/Interactable.java`-> OK
 
 O que implementar (traduzido do diagrama)
 - `ActionResult`: `SUCCESS`, `FAILED`, `INVALID_ACTION`, `MISSED`, `FLED`, `CAPTURED`.
