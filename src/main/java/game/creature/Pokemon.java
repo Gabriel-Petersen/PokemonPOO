@@ -1,16 +1,13 @@
 package game.creature;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import game.creature.move.Move;
 import game.creature.move.StatType;
 import game.creature.move.status.StatusEffect;
-import javax.naming.Context;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pokemon {
     private Integer currentAccuracy;
-    private Integer id;
     private String nickname;
     private Integer currentHp;
     private Species species;
@@ -21,6 +18,34 @@ public class Pokemon {
     private final List<StatusEffect> statusEffects = new ArrayList<>();
 
 
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public Integer getCurrentHp() {
+        return currentHp;
+    }
+
+    public Species getSpecies() {
+        return species;
+    }
+
+    public Stats getCurrentStats() {
+        return currentStats;
+    }
+
+    public Integer getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public Integer getCurrentExperience() {
+        return currentExperience;
+    }
+
+    public Move[] getMoves() {
+        return moves;
+    }
 
     public Boolean isAlive(){
         return currentHp>0;
@@ -84,5 +109,9 @@ public class Pokemon {
                 mv.restorePP();
             }
         }
+    }
+
+    public List<StatusEffect> getStatusEffects() {
+        return statusEffects;
     }
 }
