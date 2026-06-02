@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import game.creature.Pokemon;
 public class Team{
     private final List<Pokemon>members=new ArrayList<>();
-    private Integer activeIndex;
-    public Team(Integer activeIndex){this.activeIndex=activeIndex;}
+    private Integer activeIndex = 0;
+    
     public Integer getActiveIndex(){return activeIndex;}
     public void setActiveIndex(Integer activeIndex){this.activeIndex=activeIndex;}
     public List<Pokemon> getMembers(){return members;}
