@@ -3,21 +3,38 @@ package game.creature;
 import game.creature.move.Move;
 import game.creature.move.StatType;
 import game.creature.move.status.StatusEffect;
+import game.creature.move.status.VolatileStatusEffect;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Pokemon {
-    private Integer currentAccuracy;
+    private Integer currentAccuracy = 100;
     private String nickname;
     private Integer currentHp;
-    private Species species;
+    private Specie specie;
     private Stats currentStats;
     private Integer currentLevel;
     private Integer currentExperience;
-    private final Move[] moves = new Move[4];
+    private Boolean hasOwner = false;
+    private final Move[] moves;
     private final List<StatusEffect> statusEffects = new ArrayList<>();
+    
+    public Pokemon(String nickname, Specie Specie, Integer currentLevel) { this(nickname, Specie, currentLevel, new Move[4]); }
 
+    public Pokemon(String nickname, Specie Specie, Integer currentLevel, Move[] moves) {
+        this.nickname = nickname;
+        this.specie = Specie;
+        this.currentLevel = currentLevel;
+        this.moves = moves;
+        currentStats = Specie.getBaseStats().scaleForLevel(currentLevel);
+        currentHp = currentStats.getValue(StatType.HP);
+    }
 
+    public void setupForBattle() {
+        currentAccuracy = 100;
+        statusEffects.removeIf(ef -> ef instanceof VolatileStatusEffect || ef.isExpired());
+    }
 
     public String getNickname() {
         return nickname;
@@ -27,8 +44,8 @@ public class Pokemon {
         return currentHp;
     }
 
-    public Species getSpecies() {
-        return species;
+    public Specie getSpecie() {
+        return specie;
     }
 
     public Stats getCurrentStats() {
@@ -50,6 +67,9 @@ public class Pokemon {
     public Boolean isAlive(){
         return currentHp>0;
     }
+
+    public Boolean hasOwner() { return hasOwner; }
+    public void setOwner(Boolean hasOwner) { this.hasOwner = hasOwner; }
 
     public Integer receiveDamage(Integer damage){
         currentHp-=damage;
