@@ -1,9 +1,10 @@
-package game.items;
+package game.itemsystem.items;
 
 import java.awt.image.BufferedImage;
 
 import game.battle.ActionResult;
 import game.creature.Pokemon;
+import game.itemsystem.Item;
 
 public class CaptureItem extends Item{
     private Double captureModifier;

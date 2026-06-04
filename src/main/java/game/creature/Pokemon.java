@@ -4,7 +4,6 @@ import game.creature.move.Move;
 import game.creature.move.StatType;
 import game.creature.move.status.StatusEffect;
 import game.creature.move.status.VolatileStatusEffect;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class Pokemon {
 
     public void setupForBattle() {
         currentAccuracy = 100;
-        statusEffects.removeIf(ef -> ef instanceof VolatileStatusEffect || ef.isExpired());
+        statusEffects.removeIf(ef -> ef == null || ef instanceof VolatileStatusEffect || ef.isExpired());
     }
 
     public String getNickname() {

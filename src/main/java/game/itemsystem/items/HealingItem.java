@@ -1,6 +1,8 @@
-package game.items;
+package game.itemsystem.items;
 
 import java.awt.image.BufferedImage;
+
+import game.itemsystem.Item;
 
 public abstract class HealingItem extends Item 
 {

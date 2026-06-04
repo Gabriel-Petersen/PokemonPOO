@@ -1,4 +1,4 @@
-package game.items;
+package game.itemsystem.items;
 
 import game.battle.ActionResult;
 import game.creature.Pokemon;

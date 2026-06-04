@@ -1,4 +1,4 @@
-package game.items;
+package game.itemsystem;
 
 import game.battle.ActionResult;
 
