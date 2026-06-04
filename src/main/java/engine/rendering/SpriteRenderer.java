@@ -1,8 +1,7 @@
 package engine.rendering;
 
-import engine.core.Transform;
 import engine.assets.AssetManager;
-
+import engine.core.Transform;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -10,9 +9,8 @@ public class SpriteRenderer implements Renderer
 {
     private BufferedImage image;
 
-    public SpriteRenderer(String assetPath) {
-        this.image = AssetManager.getSprite(assetPath);
-    }
+    public SpriteRenderer(String assetPath) { this.image = AssetManager.getSprite(assetPath); }
+    public SpriteRenderer(BufferedImage sprite) { image = sprite; }
 
     @Override
     public void render(Graphics2D g2d, Transform transform)
@@ -23,10 +21,12 @@ public class SpriteRenderer implements Renderer
         g2d.rotate(Math.toRadians(transform.rotation));
         g2d.scale(transform.getScale().x(), transform.getScale().y());
 
-        g2d.drawImage(image,
-                -image.getWidth()/2,
-                -image.getHeight()/2,
-                null);
+        g2d.drawImage(
+            image,
+            -image.getWidth()/2,
+            -image.getHeight()/2,
+            null
+        );
 
         g2d.setTransform(backup);
     }

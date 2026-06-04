@@ -1,5 +1,5 @@
 package game.creature.move.status;
 
-public class StatusEffect {
-    
+public interface StatusEffect {
+    Boolean isExpired();    
 }

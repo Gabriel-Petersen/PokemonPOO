@@ -8,23 +8,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Species {
+public class Specie {
     private final Integer dexNumber;
     private final String name;
     private final Stats baseStats;
     private final ElementType primaryType;
     private final ElementType secondaryType;
-    private Species evolution;
+    private final Specie evolution;
     private final Map<Integer,Move> movePool = new HashMap<>();
     private final BufferedImage sprite;
 
-    public Species(Stats baseStats, Integer dexNumber, String name, ElementType primaryType, ElementType secondaryType) {
+    public Specie(Stats baseStats, Integer dexNumber, String name, ElementType primaryType, ElementType secondaryType, BufferedImage sprite) {
         this.baseStats = baseStats;
         this.dexNumber = dexNumber;
         this.name = name;
         this.primaryType = primaryType;
         this.secondaryType = secondaryType;
-        this.sprite = null;
+        this.sprite = sprite;
+        this.evolution = null;
+    }
+
+    public Specie(Stats baseStats, Integer dexNumber, String name, ElementType primaryType, ElementType secondaryType, BufferedImage sprite, Specie evolution) {
+        this.baseStats = baseStats;
+        this.dexNumber = dexNumber;
+        this.name = name;
+        this.primaryType = primaryType;
+        this.secondaryType = secondaryType;
+        this.sprite = sprite;
+        this.evolution = evolution;
     }
     
     public Integer getDexNumber() {
@@ -59,12 +70,8 @@ public class Species {
         return sprite;
     }
 
-    public Species getEvolution() {
+    public Specie getEvolution() {
         return evolution;
-    }
-
-    public void setEvolution(Species evolution) {
-        this.evolution = evolution;
     }
 
     public List<Move> resolveMovessForLevel(Integer level){
@@ -78,8 +85,4 @@ public class Species {
         return moves;
             
     }
-
-    
-
-    
 }
