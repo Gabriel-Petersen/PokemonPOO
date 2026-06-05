@@ -62,7 +62,7 @@ package "game.items" {
     }
 
     class Inventory #F8FAFC {
-        -stacks: List<ItemStack>
+        -stacks: Map<Item, ItemStack>
         +count(item: Item) Integer
         +has(item: Item, amount: Integer) Boolean
         +add(item: Item, amount: Integer) void
@@ -80,18 +80,16 @@ package "game.items" {
 
 package "game.commerce" {
     interface Seller <<interface>> #ECFEFF {
-        +listItemsForSale() List<Item>
+        +listItemsForSale() List<ItemStack>
     }
 
     class NpcSeller #F8FAFC {
         -displayName: String
         -catalog: List<Item>
-        -unlimitedStock: Boolean
-        +listItemsForSale() List<Item>
+        +listItemsForSale() List<ItemStack>
     }
 
     class ShopService #F8FAFC {
-        -priceAdjustment: Double
         -buyMultiplier: Double
         -sellMultiplier: Double
         +buyItem(player: Player, seller: Seller, item: Item, amount: Integer) ActionResult

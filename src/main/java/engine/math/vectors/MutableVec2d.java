@@ -70,6 +70,8 @@ public class MutableVec2d implements Vec2d
         return this;
     }
 
+    public void normalize() { normalized(); }
+
     @Override
     public String toString() { return "(" + x + ", " + y + ")"; }
 }

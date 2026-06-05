@@ -9,7 +9,6 @@ import engine.rendering.Renderer;
 import engine.ui.mouselisteners.OnMouseClickListener;
 import engine.ui.mouselisteners.OnMouseEnterListener;
 import engine.ui.mouselisteners.OnMouseExitListener;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -69,6 +68,8 @@ public abstract class UiElement extends GameObject
     {
         AffineTransform oldTransform = g2d.getTransform();
 
+        beforeDraw(g2d);
+
         Vec2d parentSize = (getParent() == null)
                 ? new MutableVec2d(GamePanel.getInstance().getWidth(), GamePanel.getInstance().getHeight())
                 : getParent().getTransform().getScale();
@@ -88,6 +89,8 @@ public abstract class UiElement extends GameObject
 
         g2d.setTransform(oldTransform);
     }
+
+    protected void beforeDraw(Graphics2D g2d) { }
 
     protected abstract void drawSelf(Graphics2D g2d);
 

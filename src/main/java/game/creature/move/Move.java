@@ -1,6 +1,6 @@
 package game.creature.move;
 
-public class Move {
+public abstract class Move {
     public void restorePP(){
         
     }
