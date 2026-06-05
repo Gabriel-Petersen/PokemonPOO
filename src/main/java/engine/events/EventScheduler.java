@@ -8,6 +8,7 @@ public class EventScheduler
 {
     private final Queue<GameEvent> events = new LinkedList<>();
     private boolean isResolving = false;
+    private Runnable onEndResolving;
 
     public EventScheduler() {
         GamePanel.getInstance().addScheduler(this);
@@ -17,6 +18,7 @@ public class EventScheduler
     {
         if (events.isEmpty()) {
             isResolving = false;
+            onEndResolving.run();
             return;
         }
 
@@ -34,7 +36,10 @@ public class EventScheduler
         {
             events.poll();
             if (events.isEmpty())
+            {
                 isResolving = false;
+                onEndResolving.run();
+            }
         }
     }
 
@@ -46,5 +51,7 @@ public class EventScheduler
         if (!events.isEmpty()) isResolving = true;
     }
 
+    public void setOnEndResolving(Runnable onEndResolving) { this.onEndResolving = onEndResolving; }
     public boolean isResolving() { return isResolving; }
+    public void clear() { isResolving = false; events.clear(); }
 }

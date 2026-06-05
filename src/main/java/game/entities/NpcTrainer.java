@@ -1,5 +1,6 @@
 package game.entities;
 
+import engine.assets.AssetManager;
 import game.battle.BattleContext;
 import game.battle.Team;
 import game.battle.Trainer;
@@ -10,28 +11,33 @@ import java.awt.image.BufferedImage;
 
 public class NpcTrainer extends Npc implements Trainer 
 {
+    private BufferedImage battleSprite;
     private Team team;
     private Inventory inventory;
 
-    public NpcTrainer(Inventory inventory, Team team, String name, BufferedImage sprite) {
+    public NpcTrainer(Inventory inventory, Team team, String name, BufferedImage sprite, BufferedImage battleSprite) {
         super(name, sprite);
         this.inventory = inventory;
         this.team = team;
+        this.battleSprite = battleSprite;
     }
 
-    public NpcTrainer(Inventory inventory, Team team, String name, String spritePath) {
+    public NpcTrainer(Inventory inventory, Team team, String name, String spritePath, String battleSpritePath) {
         super(name, spritePath);
         this.inventory = inventory;
         this.team = team;
+        this.battleSprite = AssetManager.getSprite(battleSpritePath);
     }
 
     @Override public String getDisplayName() { return name; }
     @Override public Team getTeam() { return team; }
     @Override public Boolean isWild() { return false; }
     @Override public Inventory getInventory() { return inventory; }
+    @Override public BufferedImage getOnBattleSprite() { return battleSprite; }
 
     public void setTeam(Team team) { this.team = team; }
     public void setInventory(Inventory inventory) { this.inventory = inventory; }
+    public void setBattleSprite(BufferedImage battleSprite) { this.battleSprite = battleSprite; }
 
     @Override
     public CombatAction selectAction(BattleContext context) {
