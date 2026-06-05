@@ -1,12 +1,10 @@
 package game.creature;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import game.creature.move.Move;
 import game.creature.move.StatType;
 import game.creature.move.status.StatusEffect;
-import javax.naming.Context;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pokemon {
     private Integer currentAccuracy;
