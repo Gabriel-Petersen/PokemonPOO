@@ -6,13 +6,12 @@ Finalizar a camada física de movimentação e animação do jogador, implementa
 
 ### Pacotes e Arquivos (Crie ou Modifique)
 
-* `src/game/player/Player.java` (Finalizar animação de corrida)
-* `src/game/entities/Npc.java` (Classe base de NPC físico e interativo) 
+* `src/game/player/Player.java` (Finalizar animação de corrida) -> OK
+* `src/game/entities/Npc.java` (Classe base de NPC físico e interativo)  -> OK
 * `src/game/entities/NpcSeller.java` (Especialização de comércio) 
 * `src/game/entities/NpcTrainer.java` (Especialização de batalha) 
 * `src/game/integration/BattleSession.java` (Esqueleto estrutural) 
 * `src/game/ui/BattleHud.java` e `ShopHud.java` (Camadas visuais da engine) 
-* `src/engine/EventScheduler.java` (Motor de fila de eventos) 
 
 ### O que Implementar
 

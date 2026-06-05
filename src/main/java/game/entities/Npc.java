@@ -7,7 +7,8 @@ import engine.rendering.Renderer;
 import engine.rendering.SpriteRenderer;
 import game.player.Interactable;
 import game.player.Player;
-import game.ui.DialogueBox;
+import game.ui.common.DialogueBox;
+
 import java.awt.image.BufferedImage;
 
 public class Npc extends GameObject implements Interactable 
