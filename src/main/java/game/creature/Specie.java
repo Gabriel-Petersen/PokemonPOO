@@ -16,28 +16,37 @@ public class Specie {
     private final ElementType secondaryType;
     private final Specie evolution;
     private final Map<Integer,Move> movePool = new HashMap<>();
-    private final BufferedImage sprite;
+    private final BufferedImage frontSprite;
+    private final BufferedImage backSprite;
 
-    public Specie(Stats baseStats, Integer dexNumber, String name, ElementType primaryType, ElementType secondaryType, BufferedImage sprite) {
-        this.baseStats = baseStats;
+    public Specie (
+        Integer dexNumber, String name, Stats baseStats, ElementType primaryType, ElementType secondaryType, BufferedImage frontSprite, BufferedImage backSprite
+    ) 
+    {
         this.dexNumber = dexNumber;
         this.name = name;
+        this.baseStats = baseStats;
         this.primaryType = primaryType;
         this.secondaryType = secondaryType;
-        this.sprite = sprite;
+        this.frontSprite = frontSprite;
+        this.backSprite = backSprite;
         this.evolution = null;
     }
 
-    public Specie(Stats baseStats, Integer dexNumber, String name, ElementType primaryType, ElementType secondaryType, BufferedImage sprite, Specie evolution) {
-        this.baseStats = baseStats;
+    public Specie (
+        Integer dexNumber, String name, Stats baseStats, ElementType primaryType, ElementType secondaryType, Specie evolution, BufferedImage frontSprite, BufferedImage backSprite
+    ) 
+    {
         this.dexNumber = dexNumber;
         this.name = name;
+        this.baseStats = baseStats;
         this.primaryType = primaryType;
         this.secondaryType = secondaryType;
-        this.sprite = sprite;
         this.evolution = evolution;
+        this.frontSprite = frontSprite;
+        this.backSprite = backSprite;
     }
-    
+
     public Integer getDexNumber() {
         return dexNumber;
     }
@@ -66,8 +75,12 @@ public class Specie {
         return primaryType == type || secondaryType == type;
     }
 
-    public BufferedImage getSprite() {
-        return sprite;
+    public BufferedImage getfrontSprite() {
+        return frontSprite;
+    }
+
+    public BufferedImage getBackSprite() {
+        return backSprite;
     }
 
     public Specie getEvolution() {
