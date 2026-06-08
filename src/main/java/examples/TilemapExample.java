@@ -8,7 +8,6 @@ import engine.tilemap.Tilemap;
 import game.player.Player;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.util.Objects;
 
 public class TilemapExample
 {
@@ -17,7 +16,7 @@ public class TilemapExample
         GamePanel gamePanel = GamePanel.getInstance();
 
         Tilemap tilemap = new DynamicDebuggableTilemap(
-                Objects.requireNonNull(AssetManager.getSprite("scenario/mapa_limited.png")),
+                AssetManager.getSprite("scenario/mapa_limited.png"),
                 AssetManager.getSprite("scenario/collision_matrix_map.png"),
                 16
         );

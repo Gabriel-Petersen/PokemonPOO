@@ -52,7 +52,12 @@ public abstract class Item {
     this.sprite = sprite;
  }
 
+ @Override public boolean equals(Object other) {
+    if (other instanceof Item it) return it.name.equals(name);
+    return false;
+ }
 
+ @Override public int hashCode() { return name.hashCode(); }
 
  public abstract Boolean canUse(Pokemon target);
 
