@@ -7,6 +7,8 @@ import game.battle.Trainer;
 import game.battle.actions.CombatAction;
 import game.itemsystem.Inventory;
 import game.player.Player;
+import game.ui.battle.BattleSession;
+
 import java.awt.image.BufferedImage;
 
 public class NpcTrainer extends Npc implements Trainer 
@@ -47,7 +49,6 @@ public class NpcTrainer extends Npc implements Trainer
 
     @Override
     public void onInteract(Player player) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Not supported yet.");
+        new BattleSession(player, this).startBattle();
     }
 }

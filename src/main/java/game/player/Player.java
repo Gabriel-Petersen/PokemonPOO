@@ -10,11 +10,17 @@ import engine.primitives.Square;
 import engine.rendering.Renderer;
 import engine.rendering.SpriteRenderer;
 import engine.tilemap.Tilemap;
+import game.battle.BattleContext;
+import game.battle.Team;
+import game.battle.Trainer;
+import game.battle.actions.CombatAction;
+import game.itemsystem.Inventory;
 import game.ui.player.PauseMenu;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 
-public class Player extends GameObject 
+public class Player extends GameObject implements Trainer
 {
     protected enum LastLookDir {
         UP('u'), DOWN('d'), LEFT('l'), RIGHT('r');
@@ -23,14 +29,18 @@ public class Player extends GameObject
         LastLookDir(char c) { this.c = c; }
         public char c() { return c; }
     }
+    
     public static final int INTERACT_KEY = KeyEvent.VK_I;
     public static final double INTERACTION_RADIUS = 55; 
 
+    private final BufferedImage battleSprite = AssetManager.getSprite("");
     private final PlayerMetadata metadata = new PlayerMetadata();
     private final MutableVec2d speedVec = new MutableVec2d();
     private final MutableVec2d directionPool = new MutableVec2d();
     private final MutableVec2d nextPosPool = new MutableVec2d();
 	private final PauseMenu pauseMenu = new PauseMenu(110, 190, Color.lightGray, this);
+    private final Inventory inventory = new Inventory();
+    private final Team team = new Team();
     private Tilemap currentMap;
     private LastLookDir lastLookDir = LastLookDir.DOWN;
 	private Animator animator;
@@ -181,7 +191,18 @@ public class Player extends GameObject
     public boolean isTalking() { return isTalking; }
     public void setBattling(boolean isBattling) { this.isBattling = isBattling; }
     public boolean isBattling() { return isBattling; }
+    @Override public Team getTeam() { return team; }
+    @Override public Inventory getInventory() { return inventory; }
+    @Override public BufferedImage getOnBattleSprite() { return battleSprite; }
+    @Override public Boolean isWild() { return false; }
+    @Override public String getDisplayName() { return metadata.getName(); }
     
+    @Override
+    public CombatAction selectAction(BattleContext context) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'selectAction'");
+    }
+
     private boolean canWalk() {
     	return !isUiOpen && !isTalking && !isBattling;
     }
