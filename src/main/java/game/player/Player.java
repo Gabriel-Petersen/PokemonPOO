@@ -37,10 +37,12 @@ public class Player extends GameObject
     private boolean isUiOpen = false;
     private boolean isRunning = false;
     private boolean isTalking = false;
+    private boolean isBattling = false;
 
     private final Square footPos = new Square(0, 0, 5, Color.blue, 2);
 
     public Player() { 
+        setLayer(5);
     	var gamePanel = GamePanel.getInstance();
     	gamePanel.addElement(footPos); 
     	gamePanel.addElement(pauseMenu);
@@ -177,9 +179,11 @@ public class Player extends GameObject
     public boolean isUiOpen() { return isUiOpen; }
     public void setTalking(boolean isTalking) { this.isTalking = isTalking; }
     public boolean isTalking() { return isTalking; }
+    public void setBattling(boolean isBattling) { this.isBattling = isBattling; }
+    public boolean isBattling() { return isBattling; }
     
     private boolean canWalk() {
-    	return !isUiOpen;
+    	return !isUiOpen && !isTalking && !isBattling;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package game.ui;
+package game.ui.common;
 
 import engine.core.GamePanel;
 import engine.events.EventScheduler;

@@ -6,13 +6,13 @@ Finalizar a camada física de movimentação e animação do jogador, implementa
 
 ### Pacotes e Arquivos (Crie ou Modifique)
 
-* `src/game/player/Player.java` (Finalizar animação de corrida)
-* `src/game/entities/Npc.java` (Classe base de NPC físico e interativo) 
+* `src/game/player/Player.java` (Finalizar animação de corrida) -> OK
+* `src/game/entities/Npc.java` (Classe base de NPC físico e interativo)  -> OK
 * `src/game/entities/NpcSeller.java` (Especialização de comércio) 
 * `src/game/entities/NpcTrainer.java` (Especialização de batalha) 
 * `src/game/integration/BattleSession.java` (Esqueleto estrutural) 
-* `src/game/ui/BattleHud.java` e `ShopHud.java` (Camadas visuais da engine) 
-* `src/engine/EventScheduler.java` (Motor de fila de eventos) 
+* `src/game/ui/*/BattleHud.java` e `ShopHud.java` (Camadas visuais da engine) 
+* `src/game/loader/SpecieRegister.java` (carregamento de espécies do disco) -> 70% OK
 
 ### O que Implementar
 
@@ -51,11 +51,7 @@ Finalizar a camada física de movimentação e animação do jogador, implementa
 
 * Instanciar o objeto de controle da sessão de batalha (`BattleSession`). Neste ciclo, ela não roda o loop de turnos automático, mas deve ser capaz de receber o contexto e inicializar o estado visual do `BattleHud` na tela.
 
-Excelente adição. Centralizar a criação de dados dinâmicos em arquivos de texto (como `.txt`, `.csv` ou `.json`) é a melhor prática para limpar a verbosidade do código Java e isolar os dados de design da lógica do motor.
-
-Aqui está o escopo desse extra para o seu **TODO**, integrando a infraestrutura necessária:
-
-#### Extra: `SpeciesLoader` (Data Management)
+#### 5. `SpeciesLoader` (Data Management)
 
 **Objetivo:**
 Implementar um gerenciador em formato **Singleton** responsável por realizar o parsing de um arquivo de configuração de texto estruturado, instanciando e armazenando todas as `Species` do jogo em memória durante a inicialização.
@@ -64,7 +60,6 @@ Implementar um gerenciador em formato **Singleton** responsável por realizar o 
 
 * **Padrão Singleton:** Garantir construtor privado e o método de acesso global `public static SpeciesLoader getInstance()`.
 * **Coleção Indexada:** Manter um mapa interno `Map<Integer, Species> speciesRegistry` para armazenar as instâncias indexadas pelo seu `dexNumber`. Extra: criar um `Enum` de espécies com correspondência para o mapa.
-
 
 * **Método `public void loadSpecies(String filePath)`:**
 1. Ler o arquivo de texto linha por linha utilizando `BufferedReader` ou `Scanner`.

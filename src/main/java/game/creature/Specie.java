@@ -87,6 +87,11 @@ public class Specie {
         return evolution;
     }
 
+    public void loadMovepool(Map<Integer, Move> pool) {
+        movePool.clear();
+        movePool.putAll(pool);
+    }
+
     public List<Move> resolveMovessForLevel(Integer level){
         List<Move> moves = new ArrayList<>();
         for(int i=0;i<=level;i++){
