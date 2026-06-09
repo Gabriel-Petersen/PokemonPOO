@@ -100,6 +100,8 @@ public class Player extends GameObject implements Trainer
         debugs();
         animator.update();
         
+        if (isBattling) return;
+        
         if (Input.getKeyDown(KeyEvent.VK_ESCAPE))
         {
         	isUiOpen = !isUiOpen;

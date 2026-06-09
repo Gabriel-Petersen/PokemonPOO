@@ -1,0 +1,1 @@
+1,Charmander,FIRE,-,100,20,20,30,30,60,npcs/ingame/npc_ingame08.png,npcs/ingame/npc_ingame08.png

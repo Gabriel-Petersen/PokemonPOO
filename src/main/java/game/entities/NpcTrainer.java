@@ -8,6 +8,7 @@ import game.battle.actions.CombatAction;
 import game.itemsystem.Inventory;
 import game.player.Player;
 import game.ui.battle.BattleSession;
+import game.ui.common.DialogueBox;
 
 import java.awt.image.BufferedImage;
 
@@ -48,7 +49,30 @@ public class NpcTrainer extends Npc implements Trainer
     }
 
     @Override
-    public void onInteract(Player player) {
-        new BattleSession(player, this).startBattle();
+    public void onInteract(Player player) 
+    {
+        System.out.println(getDisplayName() + " desafiou o jogador!");
+        player.setTalking(true);
+        
+        var db = DialogueBox.getInstance();
+        db.setVisible(true);
+        db.getEventQueue().clear();
+
+        if (getMessage() != null && getMessage().length > 0 && getMessage()[0] != null)
+            for (String s : getMessage()) db.showText(s);
+        else
+            db.showText(getDisplayName() + " quer batalhar!");
+
+        db.getEventQueue().setOnEndResolving(() -> {
+            player.setTalking(false);
+            db.setVisible(false);
+            
+            player.setBattling(true);
+            
+            BattleSession session = new BattleSession(player, this);
+            session.startBattle();
+        });
+        
+        this.pending = 1; 
     }
 }
