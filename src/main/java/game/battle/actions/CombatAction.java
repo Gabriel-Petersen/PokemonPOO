@@ -1,9 +1,7 @@
 package game.battle.actions;
-
 import game.battle.ActionResult;
 import game.battle.BattleContext;
 import game.battle.Trainer;
-
 public abstract class CombatAction{
     private Trainer actor;
     public CombatAction(Trainer actor){this.actor=actor;}
