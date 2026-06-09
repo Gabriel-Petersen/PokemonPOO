@@ -71,9 +71,13 @@ public class GamePanel extends JPanel
         this.deltaTime = deltaTime;
         if (isAnySchedulerResolving())
         {
-            for (var scheduler : eventSchedulers)
+            for (int i = 0; i < eventSchedulers.size(); i++)
+            {
+                var scheduler = eventSchedulers.get(i);
                 if (scheduler.isResolving())
                     scheduler.update(deltaTime);
+            }
+                
             return;
         }
 

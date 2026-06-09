@@ -62,7 +62,6 @@ public class Main
         npc2.getTransform().setScale(3, 3);
         npc2.getTransform().setPosition(3000, 5522);
         String[] npc2Message = {
-            "Olá certinho!",
             "Vamos lutar!"
         };
         npc2.setMessage(npc2Message);

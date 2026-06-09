@@ -150,16 +150,18 @@ public class BattleHud extends UiImage
             txt.setFont("Arial", Font.BOLD, 14);
     }
 
+    public void updateConsoleMessage(String message) {
+        if (this.consoleTxt == null)
+            consoleTxt = new UiText(message);
+        else
+            this.consoleTxt.setText(message);
+    }
+
     private void onFightClick() 
     {
         setTrainerStageVisible(false);
         setPokemonStageVisible(true);
         consoleTxt.setText("Vai, " + playerPokemonIcon.getSource().getSpecie().getName() + "!");
-    }
-
-    public void updateConsoleMessage(String message) {
-        if (this.consoleTxt != null)
-            this.consoleTxt.setText(message);
     }
 
     private void onBagClick() {}
