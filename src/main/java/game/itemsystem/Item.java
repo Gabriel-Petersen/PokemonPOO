@@ -7,14 +7,16 @@ import java.awt.image.BufferedImage;
 public abstract class Item {
  private String name;
  private String description;
+ private String inGameMessage;
  private Boolean battleUsable;
  private Integer basePrice;
  private BufferedImage sprite;
  
  
- public Item(String name, String description, Boolean battleUsable, Integer basePrice, BufferedImage sprite) {
+ public Item(String name, String description, String inGameMessage, Boolean battleUsable, Integer basePrice, BufferedImage sprite) {
     this.name = name;
     this.description = description;
+    this.inGameMessage = inGameMessage;
     this.battleUsable = battleUsable;
     this.basePrice = basePrice;
     this.sprite = sprite;
@@ -29,6 +31,9 @@ public abstract class Item {
  }
  public String getDescription() {
     return description;
+ }
+ public String getInGameMessage() {
+   return inGameMessage;
  }
  public void setDescription(String description) {
     this.description = description;

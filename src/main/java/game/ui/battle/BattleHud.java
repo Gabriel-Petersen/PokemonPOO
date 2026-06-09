@@ -157,6 +157,34 @@ public class BattleHud extends UiImage
             this.consoleTxt.setText(message);
     }
 
+    public void setActionButtonsEnabled(boolean enabled) 
+    {
+        fightBtn.setVisible(enabled);
+        bagBtn.setVisible(enabled);
+        pokemonBtn.setVisible(enabled);
+        runBtn.setVisible(enabled);
+    }
+
+    public void updateActivePokemonSprites() 
+    {
+        removeChild(playerPokemonIcon);
+        removeChild(opponentPokemonIcon);
+
+        playerPokemonIcon = PokemonInBattleIcon.buildPlayerIcon(playerIcon.getSource().getTeam().getActiveMember());
+        opponentPokemonIcon = PokemonInBattleIcon.buildNpcIcon(opponentIcon.getSource().getTeam().getActiveMember());
+
+        opponentPokemonIcon.getUiTransform().setAnchor(Anchor.TOP_RIGHT);
+        opponentPokemonIcon.getUiTransform().setPosition(-60, 50);
+
+        playerPokemonIcon.getUiTransform().setAnchor(Anchor.BOTTOM_LEFT);
+        playerPokemonIcon.getUiTransform().setPosition(60, -220);
+
+        addChild(playerPokemonIcon);
+        addChild(opponentPokemonIcon);
+        
+        setPokemonStageVisible(true);
+    }
+
     private void onFightClick() 
     {
         setTrainerStageVisible(false);
@@ -167,4 +195,6 @@ public class BattleHud extends UiImage
     private void onBagClick() {}
     private void onPokemonClick() {}
     private void onRunClick() {}
+
+    public UiText getConsole() { return consoleTxt; }
 }

@@ -1,5 +1,10 @@
 package game.battle;
 
+import java.util.List;
+import java.util.Random;
+
+import game.battle.actions.CombatAction;
+
 public class Battle 
 {
     private Trainer player;
@@ -20,4 +25,17 @@ public class Battle
     public BattleContext getContext() { return context; }
     public Trainer getWinner() { return winner; }
     public Boolean isFinished() { return isFinished; }
+
+    public List<CombatAction> determineOrder(CombatAction playerAction, CombatAction opponentAction) 
+    {
+        if (playerAction.getPriority() > opponentAction.getPriority())
+            return List.of(playerAction, opponentAction);
+        else if (opponentAction.getPriority() > playerAction.getPriority())
+            return List.of(opponentAction, playerAction);
+        
+        var rand = new Random(((int)System.currentTimeMillis()));
+        if (rand.nextInt(2) == 0)
+            return List.of(playerAction, opponentAction);
+        return List.of(opponentAction, playerAction);
+    }
 }

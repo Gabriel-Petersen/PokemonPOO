@@ -1,9 +1,13 @@
 package game.battle.actions;
+import engine.events.EventScheduler;
+import engine.events.ProgressBarChangeEvent;
+import engine.events.TypewriterEvent;
 import game.battle.ActionResult;
 import game.battle.BattleContext;
 import game.battle.Trainer;
 import game.creature.Pokemon;
 import game.itemsystem.Item;
+import game.itemsystem.items.HpHealItem;
 public class ItemAction extends CombatAction{
     private Pokemon target;
     private Item item;
@@ -17,8 +21,16 @@ public class ItemAction extends CombatAction{
     public Item getItem(){return item;}
     public void setItem(Item item){this.item=item;}
     @Override
-    public ActionResult execute(BattleContext context){
-        if(item.canUse(target))return item.use(target);
+    public ActionResult execute(BattleContext context, EventScheduler scheduler){
+        if(item.canUse(target)) { 
+            scheduler.enqueue(new TypewriterEvent(context.getHud().getConsole(), "Using " + item.getName() + " in " + target.getNickname(), 0.01, 1.2));
+            scheduler.enqueue(new TypewriterEvent(context.getHud().getConsole(), item.getInGameMessage(), 0.01, 1.2));
+            if (item instanceof HpHealItem)
+            {
+                // ProgressBarChangeEvent
+            }
+            return item.use(target); 
+        }
         return ActionResult.INVALID_ACTION;
     }
     @Override

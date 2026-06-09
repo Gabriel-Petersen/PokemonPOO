@@ -36,7 +36,7 @@ public class Pokemon {
     }
 
     public String getNickname() {
-        return nickname;
+        return (nickname == null || nickname.isBlank() ? specie.getName() : nickname);
     }
 
     public Integer getCurrentHp() {

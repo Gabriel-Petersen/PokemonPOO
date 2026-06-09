@@ -24,13 +24,13 @@ public class CaptureItem extends Item{
 
     
     public Double computeCatchChance(Pokemon target){
-        return 1.0;//STUB
+        return 1.0 * captureModifier;
     }
 
 
     @Override
     public Boolean canUse(Pokemon target) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return !target.hasOwner();
     }
 
     @Override

@@ -1,12 +1,17 @@
 package game.ui.battle;
 
 import java.awt.Color;
+import java.awt.Desktop.Action;
+import java.util.List;
 
 import engine.core.GamePanel;
 import engine.events.EventScheduler;
+import engine.events.LambdaEvent;
 import engine.lifecycle.Updatable;
+import game.battle.ActionResult;
 import game.battle.Battle;
 import game.battle.Trainer;
+import game.battle.actions.CombatAction;
 
 public class BattleSession implements Updatable
 {
@@ -49,5 +54,39 @@ public class BattleSession implements Updatable
         String oActive = opponent.getTeam().getActiveMember().getSpecie().getName();
         
         battleHud.updateConsoleMessage(opponent.getDisplayName() + " enviou " + oActive + "! Vai, " + pActive + "!");
+    }
+
+    public boolean processTurn(CombatAction playerAction, CombatAction opponentAction) 
+    {
+        battleHud.setActionButtonsEnabled(false);
+
+        List<CombatAction> orderedActions = battle.determineOrder(playerAction, opponentAction);
+
+        /*
+        for (CombatAction action : orderedActions) 
+        {
+            ActionResult result = action.execute(battle.getContext());
+            
+            enqueueActionVisuals(action, result);
+
+            if (result == ActionResult.INVALID_ACTION) return false;
+
+            if (battle.checkBattleOver()) 
+                {
+                enqueueBattleOverVisuals();
+                break;
+            }
+        }
+        */
+
+        scheduler.enqueue(new LambdaEvent(() -> {
+            if (!battle.isFinished()) {
+                battleHud.setActionButtonsEnabled(true);
+                battleHud.updateConsoleMessage("O que você fará a seguir?");
+            }
+        }));
+
+        scheduler.resolve();
+        return true;
     }
 }
