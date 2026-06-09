@@ -1,11 +1,10 @@
 package game.battle;
-import java.util.List;
-import java.util.ArrayList;
 import game.creature.Pokemon;
+import java.util.ArrayList;
+import java.util.List;
 public class Team{
     private final List<Pokemon>members=new ArrayList<>();
     private Integer activeIndex = 0;
-    
     public Integer getActiveIndex(){return activeIndex;}
     public void setActiveIndex(Integer activeIndex){this.activeIndex=activeIndex;}
     public List<Pokemon> getMembers(){return members;}
@@ -23,4 +22,5 @@ public class Team{
         }
         return false;
     }
+    public boolean hasIndex(Integer index){return index>=0&&index<members.size();}
 }
