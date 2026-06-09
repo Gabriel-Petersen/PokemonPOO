@@ -3,7 +3,9 @@ package game.creature;
 import game.creature.move.Move;
 import game.creature.move.StatType;
 import game.creature.move.status.StatusEffect;
-import javax.naming.Context;
+import game.creature.move.status.VolatileStatusEffect;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pokemon {
     private Integer currentAccuracy = 100;
