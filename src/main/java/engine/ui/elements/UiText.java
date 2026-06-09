@@ -12,6 +12,8 @@ public class UiText extends UiElement {
         this.text = text;
     }
 
+    public UiText() { }
+
     @Override
     protected void beforeDraw(Graphics2D g2d) {
         g2d.setFont(font);

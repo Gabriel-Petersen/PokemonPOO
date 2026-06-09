@@ -1,5 +1,6 @@
 package game.player;
 
+import game.battle.ActionResult;
 import java.util.Date;
 
 public class PlayerMetadata {
@@ -27,4 +28,20 @@ public class PlayerMetadata {
     public void setGameStartTime(Date startTime) { gameStartTime = startTime; }
     
     public void addNewWin() { ++enemiesWinned; }
+
+    public ActionResult addMoney(Integer amount){
+        if(amount <= 0)
+            return ActionResult.FAILED;
+        money += amount;
+        return ActionResult.SUCCESS;
+    }
+
+    public ActionResult removeMoney(Integer amount){
+        if(amount <= 0)
+            return ActionResult.FAILED;
+        if(money < amount)
+            return ActionResult.FAILED;
+        money -= amount;
+        return ActionResult.SUCCESS;
+    }
 }

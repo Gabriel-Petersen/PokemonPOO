@@ -19,6 +19,16 @@ public class Stats {
         this.specialDefense = other.specialDefense;
         this.speed = other.speed;
     }
+
+    public Stats(Integer hp, Integer attack, Integer defense, Integer specialAttack, Integer specialDefense, Integer speed) {
+        this.attack = attack;
+        this.defense = defense;
+        this.hp = hp;
+        this.specialAttack = specialAttack;
+        this.specialDefense = specialDefense;
+        this.speed = speed;
+    }
+
     public Stats scaleForLevel(Integer level) {
         Stats scaledStats = new Stats(this);
         scaledStats.hp = (int) (this.hp * (1 + level * 0.05));

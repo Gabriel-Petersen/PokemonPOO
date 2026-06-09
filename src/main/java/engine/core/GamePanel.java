@@ -141,6 +141,7 @@ public class GamePanel extends JPanel
     public void addScheduler(EventScheduler scheduler) { eventSchedulers.add(scheduler); }
     public double getDeltaTime() { return deltaTime; }
 
+    public List<Updatable> getLogics() { return logics; }
     public static GamePanel getInstance() { return INSTANCE; }
     public static Camera getCamera() { return INSTANCE.cam; }
 }

@@ -5,6 +5,7 @@ import engine.core.GamePanel;
 import engine.input.Input;
 import engine.tilemap.ImageTilemap;
 import engine.tilemap.Tilemap;
+import game.entities.Npc;
 import game.player.Player;
 import java.awt.Color;
 import java.util.Objects;
@@ -36,6 +37,17 @@ public class Main
         player.setCurrentMap(tilemap);
         player.getTransform().setPosition(2806, 5522);
         gamePanel.addElement(player);
+
+        Npc npc1 = new Npc("Certinho", "npcs/ingame/npc_ingame01.png");
+        npc1.getTransform().setScale(3, 3);
+        npc1.getTransform().setPosition(2856, 5522);
+        String[] npc1Message = {
+            "Olá certinho!",
+            "Vamos abrir o Eclipse para fazer nosso programinha em Java?",
+            "E o Grêmio?"
+        };
+        npc1.setMessage(npc1Message);
+        gamePanel.addElement(npc1);
     }
 
     public static void main(String[] args)
