@@ -89,7 +89,7 @@ public class Specie {
 
     public void loadMovepool(Map<Integer, Move> pool) {
         movePool.clear();
-        movePool.putAll(pool);
+        if (pool != null) movePool.putAll(pool);
     }
 
     public List<Move> resolveMovessForLevel(Integer level){

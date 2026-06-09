@@ -9,7 +9,7 @@ public class Team{
     public Integer getActiveIndex(){return activeIndex;}
     public void setActiveIndex(Integer activeIndex){this.activeIndex=activeIndex;}
     public List<Pokemon> getMembers(){return members;}
-    public void addMember(Pokemon pokemon){if(members.size()>6)members.add(pokemon);}
+    public void addMember(Pokemon pokemon){if(members.size()<6)members.add(pokemon);}
     public void removeMember(Pokemon pokemon){if(!members.isEmpty())members.remove(pokemon);}
     public Pokemon getActiveMember(){return members.get(activeIndex);}
     public Boolean hasAvailableMember(){

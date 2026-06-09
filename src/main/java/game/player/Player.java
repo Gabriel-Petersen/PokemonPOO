@@ -34,7 +34,7 @@ public class Player extends GameObject implements Trainer
     public static final double INTERACTION_RADIUS = 55; 
 
     private final BufferedImage battleSprite = AssetManager.getSprite("");
-    private final PlayerMetadata metadata = new PlayerMetadata();
+    private final PlayerMetadata metadata = new PlayerMetadata("Player");
     private final MutableVec2d speedVec = new MutableVec2d();
     private final MutableVec2d directionPool = new MutableVec2d();
     private final MutableVec2d nextPosPool = new MutableVec2d();
@@ -99,6 +99,8 @@ public class Player extends GameObject implements Trainer
     {
         debugs();
         animator.update();
+        
+        if (isBattling) return;
         
         if (Input.getKeyDown(KeyEvent.VK_ESCAPE))
         {

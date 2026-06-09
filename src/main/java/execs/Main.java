@@ -5,7 +5,12 @@ import engine.core.GamePanel;
 import engine.input.Input;
 import engine.tilemap.ImageTilemap;
 import engine.tilemap.Tilemap;
+import game.battle.Team;
+import game.creature.Pokemon;
 import game.entities.Npc;
+import game.entities.NpcTrainer;
+import game.itemsystem.Inventory;
+import game.loader.SpecieRegister;
 import game.player.Player;
 import java.awt.Color;
 import java.util.Objects;
@@ -36,6 +41,7 @@ public class Main
         player.getTransform().setScale(1.8, 1.8);
         player.setCurrentMap(tilemap);
         player.getTransform().setPosition(2806, 5522);
+        player.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 2));
         gamePanel.addElement(player);
 
         Npc npc1 = new Npc("Certinho", "npcs/ingame/npc_ingame01.png");
@@ -48,6 +54,18 @@ public class Main
         };
         npc1.setMessage(npc1Message);
         gamePanel.addElement(npc1);
+
+        NpcTrainer npc2 = new NpcTrainer(
+            new Inventory(), new Team(), "sei la", "npcs/ingame/npc_ingame05.png", "npcs/ingame/npc_ingame05.png"
+        );
+        npc2.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 1));
+        npc2.getTransform().setScale(3, 3);
+        npc2.getTransform().setPosition(3000, 5522);
+        String[] npc2Message = {
+            "Vamos lutar!"
+        };
+        npc2.setMessage(npc2Message);
+        gamePanel.addElement(npc2);
     }
 
     public static void main(String[] args)
