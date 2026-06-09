@@ -9,7 +9,7 @@ Finalizar a camada física de movimentação e animação do jogador, implementa
 * `src/game/player/Player.java` (Finalizar animação de corrida) -> OK
 * `src/game/entities/Npc.java` (Classe base de NPC físico e interativo)  -> OK
 * `src/game/entities/NpcSeller.java` (Especialização de comércio) 
-* `src/game/entities/NpcTrainer.java` (Especialização de batalha) 
+* `src/game/entities/NpcTrainer.java` (Especialização de batalha) -> 60% OK
 * `src/game/integration/BattleSession.java` (Esqueleto estrutural) 
 * `src/game/ui/*/BattleHud.java` e `ShopHud.java` (Camadas visuais da engine) 
 * `src/game/loader/SpecieRegister.java` (carregamento de espécies do disco) -> 70% OK
@@ -25,6 +25,7 @@ Finalizar a camada física de movimentação e animação do jogador, implementa
 * **`NpcSeller`:** Herda de `Npc`. Carrega o catálogo de `ItemStack` do Pedro e, no `onInteract`, congela o input do mapa e invoca o `ShopHud`.
 
 * **`NpcTrainer`:** Herda de `Npc`. Carrega os dados de `Trainer`/`Team` (do Mateus) e um estado `defeated`. No `onInteract`, se não estiver derrotado, prepara a transição de contexto para a batalha.
+
 
 #### 2. Roteiro Visual de HUDs (Camada `engine.ui`)
 
@@ -76,7 +77,7 @@ Implementar um gerenciador em formato **Singleton** responsável por realizar o 
 **Exemplo de formato sugerido para o seu arquivo de texto (`species.txt`):**
 
 ```text
-# id, nome, tipo1, tipo2, hp, atk, def, spatk, spdef, speed
+// id, nome, tipo1, tipo2, hp, atk, def, spatk, spdef, speed
 1,Bulbasaur,GRASS,POISON,45,49,49,65,65,45
 4,Charmander,FIRE,NONE,39,52,43,60,50,65
 7,Squirtle,WATER,NONE,44,48,65,50,64,43
