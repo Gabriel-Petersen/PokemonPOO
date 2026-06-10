@@ -13,15 +13,16 @@ public abstract class Item {
  private BufferedImage sprite;
  
  
- public Item(String name, String description, String inGameMessage, Boolean battleUsable, Integer basePrice, BufferedImage sprite) {
+ public Item(
+   String name, String description, String inGameMessage, Boolean battleUsable, Integer basePrice, BufferedImage sprite
+ ) {
     this.name = name;
     this.description = description;
     this.inGameMessage = inGameMessage;
     this.battleUsable = battleUsable;
     this.basePrice = basePrice;
     this.sprite = sprite;
-}
-
+ }
 
  public String getName() {
     return name;
@@ -32,13 +33,16 @@ public abstract class Item {
  public String getDescription() {
     return description;
  }
- public String getInGameMessage() {
-   return inGameMessage;
- }
  public void setDescription(String description) {
     this.description = description;
  }
-    public Boolean isBattleUsable() {
+ public String getInGameMessage() {
+   return inGameMessage;
+ }
+ public void setInGameMessage(String message) {
+   inGameMessage = message;
+ }
+ public Boolean isBattleUsable() {
     return battleUsable;
  }
  public void setBattleUsable(Boolean battleUsable) {

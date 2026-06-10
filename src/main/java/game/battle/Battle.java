@@ -1,23 +1,23 @@
 package game.battle;
 
+import game.battle.actions.CombatAction;
+import game.ui.battle.BattleHud;
 import java.util.List;
 import java.util.Random;
 
-import game.battle.actions.CombatAction;
-
 public class Battle 
 {
-    private Trainer player;
-    private Trainer opponent;
+    private final Trainer player;
+    private final Trainer opponent;
     private BattleContext context;
 
     private Trainer winner = null;
     private Boolean isFinished = false;
 
-    public Battle(Trainer player, Trainer opponent) {
+    public Battle(BattleHud hud, Trainer player, Trainer opponent) {
         this.player = player;
         this.opponent = opponent;
-        this.context = new BattleContext(0, player, opponent);
+        this.context = new BattleContext(hud, player, opponent);
     }
 
     public Trainer getPlayer() { return player; }
@@ -37,5 +37,17 @@ public class Battle
         if (rand.nextInt(2) == 0)
             return List.of(playerAction, opponentAction);
         return List.of(opponentAction, playerAction);
+    }
+
+    public void setContext(BattleContext context) {
+        this.context = context;
+    }
+
+    public void setWinner(Trainer winner) {
+        this.winner = winner;
+    }
+
+    public void setIsFinished(Boolean isFinished) {
+        this.isFinished = isFinished;
     }
 }

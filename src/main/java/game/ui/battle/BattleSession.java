@@ -1,25 +1,22 @@
 package game.ui.battle;
 
-import java.awt.Color;
-import java.awt.Desktop.Action;
-import java.util.List;
-
 import engine.core.GamePanel;
 import engine.events.EventScheduler;
 import engine.events.LambdaEvent;
 import engine.lifecycle.Updatable;
-import game.battle.ActionResult;
 import game.battle.Battle;
 import game.battle.Trainer;
 import game.battle.actions.CombatAction;
+import java.awt.Color;
+import java.util.List;
 
 public class BattleSession implements Updatable
 {
     private final EventScheduler scheduler = new EventScheduler();
-    private Battle battle;
-    private BattleHud battleHud;
-    private Trainer player;
-    private Trainer opponent;
+    private final Battle battle;
+    private final BattleHud battleHud;
+    private final Trainer player;
+    private final Trainer opponent;
 
     public BattleSession(Trainer player, Trainer opponent)
     {
@@ -28,8 +25,9 @@ public class BattleSession implements Updatable
 
         GamePanel.getInstance().addScheduler(scheduler);
 
-        battle = new Battle(player, opponent);
         battleHud = new BattleHud(800, 600, new Color(40, 44, 52), scheduler, player, opponent);
+        battle = new Battle(battleHud, player, opponent);
+       
         
         GamePanel.getInstance().addElement(battleHud);
     }
@@ -88,5 +86,17 @@ public class BattleSession implements Updatable
 
         scheduler.resolve();
         return true;
+    }
+
+    public BattleHud getBattleHud() {
+        return battleHud;
+    }
+
+    public Trainer getPlayer() {
+        return player;
+    }
+
+    public Trainer getOpponent() {
+        return opponent;
     }
 }

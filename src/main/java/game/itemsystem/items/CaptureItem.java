@@ -1,16 +1,17 @@
 package game.itemsystem.items;
 
-import java.awt.image.BufferedImage;
-
 import game.battle.ActionResult;
 import game.creature.Pokemon;
 import game.itemsystem.Item;
+import java.awt.image.BufferedImage;
 
 public class CaptureItem extends Item{
     private Double captureModifier;
 
-    public CaptureItem(Double captureModifier, String name, String description, Boolean battleUsable, Integer basePrice, BufferedImage sprite) {
-        super(name, description, battleUsable, basePrice, sprite);
+    public CaptureItem(
+        Double captureModifier, String name, String description, String inGameMessage, Boolean battleUsable, Integer basePrice, BufferedImage sprite
+    ) {
+        super(name, description, inGameMessage, battleUsable, basePrice, sprite);
         this.captureModifier = captureModifier;
     }
 

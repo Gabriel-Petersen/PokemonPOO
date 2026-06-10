@@ -1,4 +1,7 @@
 package game.battle.actions;
+import engine.events.EventScheduler;
+import engine.events.LambdaEvent;
+import engine.events.TypewriterEvent;
 import game.battle.ActionResult;
 import game.battle.BattleContext;
 import game.battle.Team;
@@ -14,11 +17,27 @@ public class SwitchAction extends CombatAction{
     public Integer getTargetIndex(){return targetIndex;}
     public void setTargetIndex(Integer targetIndex){this.targetIndex=targetIndex;}
     @Override
-    public ActionResult execute(BattleContext context){
+    public ActionResult execute(BattleContext context, EventScheduler scheduler){
         Team team=getActor().getTeam();
         List<Pokemon>members=team.getMembers();
         if(!team.hasIndex(targetIndex)||!members.get(targetIndex).isAlive())return ActionResult.INVALID_ACTION;
+        
         team.switchActive(targetIndex);
+        scheduler.enqueue(new TypewriterEvent(
+            context.getHud().getConsole(), 
+            "Changing to " + team.getActiveMember().getNickname(), 
+            0.1, 
+            1.5
+        ));
+        var newActive = team.getActiveMember();
+        
+        scheduler.enqueue(new LambdaEvent(() -> {
+            var hud = context.getHud();
+            if (getActor().equals(context.getPlayer()))
+                hud.getPlayerPokemonIcon().setSource(newActive);
+            else
+                hud.getOpponentPokemonIcon().setSource(newActive);
+        }));
         return ActionResult.SUCCESS;
     }
     @Override

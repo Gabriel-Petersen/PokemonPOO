@@ -1,4 +1,5 @@
 package game.battle.actions;
+import engine.events.EventScheduler;
 import game.battle.ActionResult;
 import game.battle.BattleContext;
 import game.battle.Trainer;
@@ -20,7 +21,7 @@ public class MoveAction extends CombatAction{
     public Move getMove(){return move;}
     public void setMove(Move move){this.move=move;}
     @Override
-    public ActionResult execute(BattleContext context){
+    public ActionResult execute(BattleContext context, EventScheduler scheduler){
         var result=move.execute(user,target,context);
         return null;
     }
