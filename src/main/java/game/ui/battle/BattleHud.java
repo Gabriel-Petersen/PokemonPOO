@@ -1,14 +1,13 @@
 package game.ui.battle;
 
-import java.awt.Color;
-import java.awt.Font;
-
 import engine.events.EventScheduler;
 import engine.ui.core.UiTransform.Anchor;
 import engine.ui.elements.UiButton;
 import engine.ui.elements.UiImage;
 import engine.ui.elements.UiText;
 import game.battle.Trainer;
+import java.awt.Color;
+import java.awt.Font;
 
 public class BattleHud extends UiImage 
 {
@@ -183,6 +182,22 @@ public class BattleHud extends UiImage
         addChild(opponentPokemonIcon);
         
         setPokemonStageVisible(true);
+    }
+
+    public PokemonInBattleIcon getPlayerPokemonIcon() {
+        return playerPokemonIcon;
+    }
+
+    public PokemonInBattleIcon getOpponentPokemonIcon() {
+        return opponentPokemonIcon;
+    }
+
+    public TrainerUiIcon getPlayerIcon() {
+        return playerIcon;
+    }
+
+    public TrainerUiIcon getOpponentIcon() {
+        return opponentIcon;
     }
 
     private void onFightClick() 

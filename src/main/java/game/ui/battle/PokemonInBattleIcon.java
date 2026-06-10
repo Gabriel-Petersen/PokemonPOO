@@ -1,15 +1,14 @@
 package game.ui.battle;
 
-import java.awt.Color;
-import java.awt.Font;
-
 import engine.ui.core.UiTransform.Anchor;
 import engine.ui.elements.UiImage;
 import engine.ui.elements.UiProgressBar;
-import engine.ui.elements.UiText;
 import engine.ui.elements.UiProgressBar.Direction;
+import engine.ui.elements.UiText;
 import game.creature.Pokemon;
 import game.creature.move.StatType;
+import java.awt.Color;
+import java.awt.Font;
 
 public class PokemonInBattleIcon extends UiImage 
 {
@@ -17,11 +16,13 @@ public class PokemonInBattleIcon extends UiImage
     private UiText pokemonName;
     private Pokemon source;
     private UiImage statusPanel;
+    private final boolean isBackSprite;
 
     private PokemonInBattleIcon(Pokemon source, boolean isBackSprite) 
     {
         super(isBackSprite ? source.getSpecie().getBackSprite() : source.getSpecie().getfrontSprite());
         this.source = source;
+        this.isBackSprite = isBackSprite;
         
         getTransform().setScale(160, 160);
 
@@ -63,4 +64,10 @@ public class PokemonInBattleIcon extends UiImage
     public Pokemon getSource() { return source; }
     public UiProgressBar getHpBar() { return hpBar; }
     public UiText getPokemonName() { return pokemonName; }
+
+    public void setSource(Pokemon source)
+    {
+        this.source = source;
+        setImage(isBackSprite ? source.getSpecie().getBackSprite() : source.getSpecie().getfrontSprite());
+    }
 }

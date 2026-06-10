@@ -2,13 +2,12 @@ package engine.ui.elements;
 
 import engine.assets.AssetManager;
 import engine.ui.core.UiElement;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class UiImage extends UiElement
 {
-    private final BufferedImage image;
+    private BufferedImage image;
     private Color color;
 
     public UiImage(BufferedImage sprite) {
@@ -50,5 +49,13 @@ public class UiImage extends UiElement
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public void setImage(BufferedImage image) {
+        this.image = image;
     }
 }

@@ -10,8 +10,8 @@ import java.util.Set;
 public class StatusHealItem extends HealingItem {
     private final Set<StatusEffect> curedStatus = new HashSet<>();
 
-    public StatusHealItem(String name, String description, Integer basePrice, BufferedImage sprite) {
-        super(name, description, basePrice, sprite);
+    public StatusHealItem(String name, String description, String inGameMessage, Integer basePrice, BufferedImage sprite) {
+        super(name, description, inGameMessage, basePrice, sprite);
     }
 
     public void addCurableStatus(StatusEffect status) { curedStatus.add(status); }
