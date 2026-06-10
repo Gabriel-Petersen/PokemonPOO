@@ -25,11 +25,16 @@ public class ItemAction extends CombatAction{
         if(item.canUse(target)) { 
             scheduler.enqueue(new TypewriterEvent(context.getHud().getConsole(), "Using " + item.getName() + " in " + target.getNickname(), 0.01, 1.2));
             scheduler.enqueue(new TypewriterEvent(context.getHud().getConsole(), item.getInGameMessage(), 0.01, 1.2));
+            var result = item.use(target); 
             if (item instanceof HpHealItem)
             {
-                // ProgressBarChangeEvent
+                var hud = context.getHud();
+                if (hud.getPlayerPokemonIcon().getSource().equals(target))
+                    scheduler.enqueue(new ProgressBarChangeEvent(hud.getPlayerPokemonIcon().getHpBar(), target.getCurrentHp(), 1));
+                else
+                    scheduler.enqueue(new ProgressBarChangeEvent(hud.getOpponentPokemonIcon().getHpBar(), target.getCurrentHp(), 1));
             }
-            return item.use(target); 
+            return result;
         }
         return ActionResult.INVALID_ACTION;
     }

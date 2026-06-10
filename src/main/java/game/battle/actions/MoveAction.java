@@ -1,5 +1,6 @@
 package game.battle.actions;
 import engine.events.EventScheduler;
+import engine.events.TypewriterEvent;
 import game.battle.ActionResult;
 import game.battle.BattleContext;
 import game.battle.Trainer;
@@ -23,6 +24,8 @@ public class MoveAction extends CombatAction{
     @Override
     public ActionResult execute(BattleContext context, EventScheduler scheduler){
         var result=move.execute(user,target,context);
+        scheduler.enqueue(new TypewriterEvent(context.getHud().getConsole(), result.getResultMessage(), 0.1, 2));
+        //if (!user.isAlive() || !target.isAlive())
         return null;
     }
     @Override

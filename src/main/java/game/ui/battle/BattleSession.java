@@ -3,10 +3,15 @@ package game.ui.battle;
 import engine.core.GamePanel;
 import engine.events.EventScheduler;
 import engine.events.LambdaEvent;
+import engine.events.TypewriterEvent;
 import engine.lifecycle.Updatable;
+import engine.ui.elements.UiText;
+import game.battle.ActionResult;
 import game.battle.Battle;
 import game.battle.Trainer;
 import game.battle.actions.CombatAction;
+import game.player.Player;
+
 import java.awt.Color;
 import java.util.List;
 
@@ -60,22 +65,41 @@ public class BattleSession implements Updatable
 
         List<CombatAction> orderedActions = battle.determineOrder(playerAction, opponentAction);
 
-        /*
+        boolean roundInterrupted = false;
+
         for (CombatAction action : orderedActions) 
         {
-            ActionResult result = action.execute(battle.getContext());
+            ActionResult result = action.execute(battle.getContext(), scheduler);
             
-            enqueueActionVisuals(action, result);
+            if (result == ActionResult.INVALID_ACTION) {
+                roundInterrupted = true;
+                break; 
+            }
 
-            if (result == ActionResult.INVALID_ACTION) return false;
-
-            if (battle.checkBattleOver()) 
-                {
+            if (battle.isFinished()) {
                 enqueueBattleOverVisuals();
                 break;
             }
         }
-        */
+
+        if (roundInterrupted) 
+        {
+            scheduler.clear(); 
+            
+            battleHud.setActionButtonsEnabled(true);
+            battleHud.updateConsoleMessage("Ação inválida! Escolha outra opção.");
+        } 
+        else 
+        {
+            scheduler.enqueue(new LambdaEvent(() -> {
+                if (!battle.isFinished()) {
+                    battleHud.setActionButtonsEnabled(true);
+                    battleHud.updateConsoleMessage("O que você fará a seguir?");
+                }
+            }));
+            
+            scheduler.resolve();
+        }
 
         scheduler.enqueue(new LambdaEvent(() -> {
             if (!battle.isFinished()) {
@@ -86,6 +110,16 @@ public class BattleSession implements Updatable
 
         scheduler.resolve();
         return true;
+    }
+
+    private void enqueueBattleOverVisuals() 
+    {
+        UiText console = battleHud.getConsole();
+        scheduler.enqueue(new TypewriterEvent(console, "A batalha terminou!", 0.05, 1.0));
+        scheduler.enqueue(new LambdaEvent(() -> {
+            System.out.println("Sessão finalizada. Retornando ao Overworld.");
+            ((Player)player).setBattling(false);
+        }));
     }
 
     public BattleHud getBattleHud() {
