@@ -15,6 +15,14 @@ public interface Vec2d
     default double magnitudeSqrt() { return x()*x() + y()*y(); }
     default double magnitude() { return Math.sqrt(magnitudeSqrt()); }
 
+    default double distanceTo(Vec2d other) {  return Math.sqrt(distanceSqrtTo(other)); }
+    default double distanceSqrtTo(Vec2d other) 
+    {
+        var dx = x() - other.x();
+        var dy = y() - other.y();
+        return dx * dx + dy * dy;
+    }
+
     default double angleBtw(Vec2d other)
     {
         double dotProduct = x()*other.x() + y()*other.y();

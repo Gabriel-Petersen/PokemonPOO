@@ -1,17 +1,16 @@
 package game.itemsystem.items;
 
-import java.awt.image.BufferedImage;
-
 import game.battle.ActionResult;
 import game.creature.Pokemon;
 import game.creature.move.StatType;
+import java.awt.image.BufferedImage;
 
 public class HpHealItem extends HealingItem
 {
     private Integer healAmount;
 
-    public HpHealItem(String name, String description, Integer basePrice, BufferedImage sprite, Integer healAmount) {
-        super(name, description, basePrice, sprite);
+    public HpHealItem(String name, String description, String inGameMessage, Integer basePrice, BufferedImage sprite, Integer healAmount) {
+        super(name, description, inGameMessage, basePrice, sprite);
         this.healAmount = healAmount;
     }
 

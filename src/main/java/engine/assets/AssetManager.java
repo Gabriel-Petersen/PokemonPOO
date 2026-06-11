@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
@@ -48,14 +49,14 @@ public class AssetManager
 
             Arrays.sort(files, Comparator.comparing(File::getName));
 
-            BufferedImage[] sprites = new BufferedImage[files.length];
+            BufferedImage[] spriteArray = new BufferedImage[files.length];
             for (int i = 0; i < files.length; i++) {
-                sprites[i] = getSprite(folderPath + "/" + files[i].getName());
+                spriteArray[i] = getSprite(folderPath + "/" + files[i].getName());
             }
 
-            return sprites;
+            return spriteArray;
         }
-        catch (Exception e) {
+        catch (IOException | URISyntaxException e) {
             System.err.println("Erro ao listar pasta de sprites: " + e.getMessage());
             return new BufferedImage[0];
         }

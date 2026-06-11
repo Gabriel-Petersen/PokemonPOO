@@ -16,7 +16,7 @@ public class Npc extends GameObject implements Interactable
     private final BufferedImage sprite;
     private String[] message;
     protected String name;
-    private int pending = 0;
+    protected int pending = 0;
 
     public Npc (String name, BufferedImage sprite) { 
         this.sprite = sprite;

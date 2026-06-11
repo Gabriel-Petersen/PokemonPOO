@@ -12,9 +12,10 @@ public class PlayerMetadata {
     private Integer enemiesWinned;
     private Date gameStartTime;
 
-    public PlayerMetadata() {
+    public PlayerMetadata(String name) {
         this.money = 0;
         this.enemiesWinned = 0;
+        this.name = name;
         this.gameStartTime = new Date(System.currentTimeMillis());
     }
 

@@ -1,21 +1,19 @@
 package game.itemsystem;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Inventory {
     
-    private final Map<Item, ItemStack> items = new HashMap<>();
+    private final Map<Item, Integer> items = new HashMap<>();
 
     public void add(Item item, int amount){ //add: increase the amount of an item, if the item does not exist, add it to the inventory
         if (amount <= 0)
             throw new IllegalArgumentException("amount must be positive");
         if (items.containsKey(item)){
-            items.get(item).increase(amount);
+            items.put(item, items.get(item) + amount);
         } else {
-            items.put(item, new ItemStack(item, amount));
+            items.put(item, amount);
         }
     }
 
@@ -23,10 +21,10 @@ public class Inventory {
         if (amount <= 0)
             throw new IllegalArgumentException("amount must be positive");
         if (items.containsKey(item)){
-            var stack = items.get(item);
-            if(stack.canConsume(amount)){
-                stack.decrease(amount);
-                if(stack.getAmount()==0){
+            var qtd = items.get(item);
+            if(qtd >= amount){
+                items.put(item, items.get(item) - amount);
+                if(items.get(item)==0){
                     items.remove(item);
                 }
                 return true;
@@ -39,22 +37,22 @@ public class Inventory {
         if (amount <= 0)
             throw new IllegalArgumentException("amount must be positive");
         if(items.containsKey(item)){
-            return items.get(item).canConsume(amount); 
+            return items.get(item) >= amount; 
         }
         return false;
     }
 
     public int count(Item item){
         if (items.containsKey(item))
-            return items.get(item).getAmount();
+            return items.get(item);
         return 0;
     }
 
-    public ItemStack getStack(Item item){ //getStack: obtains the stack of an item, return this stack if existis, null otherwise
+    public Integer getStack(Item item){ //getStack: obtains the stack of an item, return this stack if existis, null otherwise
         return items.get(item);
     }
 
-    public Collection<ItemStack> getItems() {
-        return Collections.unmodifiableCollection(items.values());
+    public Map<Item, Integer> getItems() {
+        return items;
     }
 }

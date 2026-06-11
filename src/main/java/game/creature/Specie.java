@@ -89,7 +89,7 @@ public class Specie {
 
     public void loadMovepool(Map<Integer, Move> pool) {
         movePool.clear();
-        movePool.putAll(pool);
+        if (pool != null) movePool.putAll(pool);
     }
 
     public List<Move> resolveMovessForLevel(Integer level){
@@ -102,5 +102,25 @@ public class Specie {
         }
         return moves;
             
+    }
+
+    @Override
+    public int hashCode() { return dexNumber.hashCode(); }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Specie other = (Specie) obj;
+        if (dexNumber == null) {
+            if (other.dexNumber != null)
+                return false;
+        } else if (!dexNumber.equals(other.dexNumber))
+            return false;
+        return true;
     }
 }
