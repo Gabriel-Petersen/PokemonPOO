@@ -2,5 +2,6 @@ package game.creature.move;
 
 public enum MoveCategory {
     PHYSICAL,
-    SPECIAL;
+    SPECIAL,
+    STATUS
 }

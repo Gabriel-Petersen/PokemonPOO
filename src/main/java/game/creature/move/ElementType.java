@@ -62,6 +62,9 @@ public enum ElementType {
         public Set<ElementType> getWeaknesses() {
             return Set.of(NORMAL, POISON);
         }
+    },
+    NONE {
+        @Override public Set<ElementType> getWeaknesses() { return Set.of(); }
     };
 
     public abstract Set<ElementType> getWeaknesses();

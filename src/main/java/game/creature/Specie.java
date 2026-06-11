@@ -3,10 +3,9 @@ package game.creature;
 import game.creature.move.ElementType;
 import game.creature.move.Move;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class Specie {
     private final Integer dexNumber;
@@ -15,7 +14,7 @@ public class Specie {
     private final ElementType primaryType;
     private final ElementType secondaryType;
     private final Specie evolution;
-    private final Map<Integer,Move> movePool = new HashMap<>();
+    private final TreeMap<Integer,Move> movePool = new TreeMap<>();
     private final BufferedImage frontSprite;
     private final BufferedImage backSprite;
 
@@ -105,16 +104,9 @@ public class Specie {
         if (pool != null) movePool.putAll(pool);
     }
 
-    public List<Move> resolveMovessForLevel(Integer level){
-        List<Move> moves = new ArrayList<>();
-        for(int i=0;i<=level;i++){
-            Move newMove = movePool.getOrDefault(i, null);
-            if(newMove!=null){
-                moves.add(newMove);
-            }
-        }
+    public Collection<Move> resolveMovessForLevel(Integer level){
+        Collection<Move> moves = movePool.headMap(level + 1).values();
         return moves;
-            
     }
 
     @Override

@@ -1,5 +1,9 @@
 package game.battle.actions;
+import java.awt.Color;
+
 import engine.events.EventScheduler;
+import engine.events.LambdaEvent;
+import engine.events.ProgressBarChangeEvent;
 import engine.events.TypewriterEvent;
 import game.battle.ActionResult;
 import game.battle.BattleContext;
@@ -29,6 +33,12 @@ public class MoveAction extends CombatAction{
         for (String txt : messages)
             scheduler.enqueue(new TypewriterEvent(context.getHud().getConsole(), txt, 0.1, 2));
 
+        if (result.getDamageApplied() > 0) {
+            var barTarget = getActor() == context.getPlayer() ? context.getHud().getOpponentPokemonIcon() : context.getHud().getPlayerPokemonIcon();
+            scheduler.enqueue(new LambdaEvent(() -> barTarget.getHpBar().setFillColor(Color.red)));
+            scheduler.enqueue(new ProgressBarChangeEvent(barTarget.getHpBar(), target.getCurrentHp(), 1));
+            scheduler.enqueue(new LambdaEvent(() -> barTarget.getHpBar().setFillColor(Color.green)));
+        }
         return result.getHit() ? ActionResult.SUCCESS : ActionResult.MISSED;
     }
     @Override
