@@ -10,6 +10,7 @@ import game.creature.Pokemon;
 import game.entities.Npc;
 import game.entities.NpcTrainer;
 import game.itemsystem.Inventory;
+import game.loader.ItemRegistry;
 import game.loader.SpecieRegister;
 import game.player.Player;
 import java.awt.Color;
@@ -43,6 +44,10 @@ public class Main
         player.getTransform().setPosition(2806, 5522);
         player.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 2));
         gamePanel.addElement(player);
+
+        var inv = player.getInventory();
+        inv.add(ItemRegistry.smallPotion, 3);
+        inv.add(ItemRegistry.mediumPotion, 10);
 
         Npc npc1 = new Npc("Certinho", "npcs/ingame/npc_ingame01.png");
         npc1.getTransform().setScale(3, 3);

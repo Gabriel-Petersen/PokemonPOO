@@ -184,21 +184,10 @@ public class BattleHud extends UiImage
         setPokemonStageVisible(true);
     }
 
-    public PokemonInBattleIcon getPlayerPokemonIcon() {
-        return playerPokemonIcon;
-    }
-
-    public PokemonInBattleIcon getOpponentPokemonIcon() {
-        return opponentPokemonIcon;
-    }
-
-    public TrainerUiIcon getPlayerIcon() {
-        return playerIcon;
-    }
-
-    public TrainerUiIcon getOpponentIcon() {
-        return opponentIcon;
-    }
+    public PokemonInBattleIcon getPlayerPokemonIcon() { return playerPokemonIcon; }
+    public PokemonInBattleIcon getOpponentPokemonIcon() { return opponentPokemonIcon; }
+    public TrainerUiIcon getPlayerIcon() { return playerIcon; }
+    public TrainerUiIcon getOpponentIcon() { return opponentIcon; }
 
     private void onFightClick() 
     {

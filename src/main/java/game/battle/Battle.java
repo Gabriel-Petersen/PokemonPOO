@@ -12,7 +12,6 @@ public class Battle
     private BattleContext context;
 
     private Trainer winner = null;
-    private Boolean isFinished = false;
 
     public Battle(BattleHud hud, Trainer player, Trainer opponent) {
         this.player = player;
@@ -24,7 +23,6 @@ public class Battle
     public Trainer getOpponent() { return opponent; }
     public BattleContext getContext() { return context; }
     public Trainer getWinner() { return winner; }
-    public Boolean isFinished() { return isFinished; }
 
     public List<CombatAction> determineOrder(CombatAction playerAction, CombatAction opponentAction) 
     {
@@ -47,7 +45,7 @@ public class Battle
         this.winner = winner;
     }
 
-    public void setIsFinished(Boolean isFinished) {
-        this.isFinished = isFinished;
+    public Boolean isFinished() {
+        return !(player.getTeam().hasAvailableMember() && opponent.getTeam().hasAvailableMember());
     }
 }
