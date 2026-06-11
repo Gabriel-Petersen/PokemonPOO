@@ -1,10 +1,42 @@
 package game.creature.move;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class MoveResult {
-    private String resultMessage;
+    private final List<String> resultMessage = new ArrayList<>();
     private Boolean hit;
     private Integer damageApplied;
     private Boolean statusApplied;
+
+    public MoveResult(String resultMessage, Boolean hit, Integer damageApplied, Boolean statusApplied) {
+        this.resultMessage.add(resultMessage);
+        this.hit = hit;
+        this.damageApplied = damageApplied;
+        this.statusApplied = statusApplied;
+    }
+    
+    public MoveResult(String resultMessage, Boolean hit) {
+        this.resultMessage.add(resultMessage);
+        this.hit = hit;
+        damageApplied = 0;
+        statusApplied = false;
+    }
+
+    public MoveResult(Boolean hit, Integer damageApplied, Boolean statusApplied) {
+        this.hit = hit;
+        this.damageApplied = damageApplied;
+        this.statusApplied = statusApplied;
+    }
+    
+    public MoveResult(Boolean hit) {
+        this.hit = hit;
+        damageApplied = 0;
+        statusApplied = false;
+    }
+
+    public void addMessage(String message) { resultMessage.add(message); }
 
     public Boolean getHit() {
         return hit;
@@ -24,18 +56,6 @@ public class MoveResult {
     public void setStatusApplied(Boolean statusApplied) {
         this.statusApplied = statusApplied;
     }
-    public MoveResult(String resultMessage, Boolean hit, Integer damageApplied, Boolean statusApplied) {
-        this.resultMessage = resultMessage;
-        this.hit = hit;
-        this.damageApplied = damageApplied;
-        this.statusApplied = statusApplied;
-    }
     
-    public MoveResult(boolean b, String string) {
-        this.hit=b;
-        this.resultMessage=string;
-    }
-    public String getResultMessage() { return resultMessage; }
-    
-    public void setResultMessage(String resultMessage) { this.resultMessage = resultMessage; }
+    public Collection<String> getResultMessages() { return resultMessage; }
 }

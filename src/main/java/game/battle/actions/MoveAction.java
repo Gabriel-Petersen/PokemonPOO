@@ -6,6 +6,7 @@ import game.battle.BattleContext;
 import game.battle.Trainer;
 import game.creature.Pokemon;
 import game.creature.move.Move;
+import game.creature.move.StatType;
 public class MoveAction extends CombatAction{
     private Pokemon user,target;
     private Move move;
@@ -24,10 +25,12 @@ public class MoveAction extends CombatAction{
     @Override
     public ActionResult execute(BattleContext context, EventScheduler scheduler){
         var result=move.execute(user,target,context);
-        scheduler.enqueue(new TypewriterEvent(context.getHud().getConsole(), result.getResultMessage(), 0.1, 2));
-        //if (!user.isAlive() || !target.isAlive())
-        return null;
+        var messages = result.getResultMessages();
+        for (String txt : messages)
+            scheduler.enqueue(new TypewriterEvent(context.getHud().getConsole(), txt, 0.1, 2));
+
+        return result.getHit() ? ActionResult.SUCCESS : ActionResult.MISSED;
     }
     @Override
-    public Integer getPriority(){return move.getPriority();}
+    public Integer getPriority(){return move.getPriority() * user.getCurrentStats().getValue(StatType.SPEED);}
 }

@@ -26,15 +26,27 @@ public class DamageMove extends Move {
     }
 
     @Override
-    public MoveResult execute(Pokemon attacker, Pokemon target,BattleContext context){
+    public MoveResult execute(Pokemon attacker, Pokemon target, BattleContext context){
         if(!canUse(context)){
-            return new MoveResult(false, "Sem PP!");
-        }else{
-            if(math.random()<=getAccuracy()){
-                int damage = calculateDamage(attacker, target, context);
-                target.receiveDamage(damage);
-                return new MoveResult(true, "O ataque acertou e causou "+damage+" de dano!");
+            return new MoveResult("Sem PP suficiente!", false);
         }
-    }
+        
+        MoveResult result = new MoveResult(attacker.getNickname() + " utilizou " + getName() + "!", false, 0, false);
 
+        if(Math.random()<=getAccuracy() * (double)attacker.getCurrentAccuracy()/100.0){
+            result.setDamageApplied(calculateDamage(attacker, target, context));
+            result.setHit(true);
+            target.receiveDamage(result.getDamageApplied());
+            if (target.getSpecie().weaknessTo(elementType) > 1) 
+                result.addMessage("Foi superefetivo!!");
+            result.addMessage("Causou " + result.getDamageApplied() + " de dano!!");
+
+            if (target.isAlive())
+                result.addMessage(target.getNickname() + " foi derrotado!!");
+        }
+        else {
+            result.addMessage("Errou!!!");
+        }
+        return result;
+    }
 }
