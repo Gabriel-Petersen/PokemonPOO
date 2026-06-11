@@ -8,9 +8,9 @@ public class UiProgressBar extends UiElement
     public enum Direction { LEFT2RIGHT, RIGHT2LEFT, UP2DOWN, DOWN2UP }
 
     private final Direction direction;
-    private Color backgroundColor;
-    private Color fillColor;
-    private double progress;
+    private Color backgroundColor = Color.BLACK;
+    private Color fillColor = Color.WHITE;
+    private double progress = 1.0;
 
     public UiProgressBar(Direction direction) {
         this.direction = direction;

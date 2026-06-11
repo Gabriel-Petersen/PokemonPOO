@@ -9,7 +9,7 @@ public class ShopService {
     private static final double MULT = 0.10;
 
     public ActionResult buyItem(Player player, Seller seller, Item item, int amount){
-    if(seller.getInventory().getStack(item).canConsume(amount)){
+    if(seller.getInventory().getStack(item) >= amount){
         int price = (int)(item.getBasePrice() * amount * (1+MULT));
         if(player.getMetadata().getMoney() >=price){
             player.getMetadata().removeMoney(price);
@@ -22,7 +22,7 @@ public class ShopService {
 
 
 public ActionResult sellItem(Player player, Seller seller, Item item, int amount){
-    if(player.getInventory().getStack(item).canConsume(amount)){
+    if(player.getInventory().getStack(item) >= amount){
         int earning = (int)(item.getBasePrice()*amount*(1-MULT));
         player.getInventory().remove(item, amount);
         player.getMetadata().addMoney(earning);

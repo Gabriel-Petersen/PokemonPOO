@@ -33,13 +33,13 @@ public class Player extends GameObject implements Trainer
     public static final int INTERACT_KEY = KeyEvent.VK_I;
     public static final double INTERACTION_RADIUS = 55; 
 
-    private final BufferedImage battleSprite = AssetManager.getSprite("");
+    private final BufferedImage battleSprite = AssetManager.getSprite("player_sheet/battle/player_battle0.png");
     private final PlayerMetadata metadata = new PlayerMetadata("Player");
     private final MutableVec2d speedVec = new MutableVec2d();
     private final MutableVec2d directionPool = new MutableVec2d();
     private final MutableVec2d nextPosPool = new MutableVec2d();
-	private final PauseMenu pauseMenu = new PauseMenu(110, 190, Color.lightGray, this);
     private final Inventory inventory = new Inventory();
+	private final PauseMenu pauseMenu = new PauseMenu(110, 190, Color.lightGray, this);
     private final Team team = new Team();
     private Tilemap currentMap;
     private LastLookDir lastLookDir = LastLookDir.DOWN;

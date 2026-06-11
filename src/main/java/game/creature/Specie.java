@@ -19,6 +19,19 @@ public class Specie {
     private final BufferedImage frontSprite;
     private final BufferedImage backSprite;
 
+    public int weaknessTo(ElementType element){
+        if (primaryType.getWeaknesses().contains(element)) {
+            if (secondaryType != null && secondaryType.getWeaknesses().contains(element)) {
+                return 4;
+            }
+            return 2;
+        }
+        if (secondaryType != null && secondaryType.getWeaknesses().contains(element)) {
+            return 2;
+        }
+        return 1;
+    }
+
     public Specie (
         Integer dexNumber, String name, Stats baseStats, ElementType primaryType, ElementType secondaryType, BufferedImage frontSprite, BufferedImage backSprite
     ) 
@@ -102,5 +115,25 @@ public class Specie {
         }
         return moves;
             
+    }
+
+    @Override
+    public int hashCode() { return dexNumber.hashCode(); }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Specie other = (Specie) obj;
+        if (dexNumber == null) {
+            if (other.dexNumber != null)
+                return false;
+        } else if (!dexNumber.equals(other.dexNumber))
+            return false;
+        return true;
     }
 }

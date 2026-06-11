@@ -63,6 +63,10 @@ public class PauseMenu extends UiImage
 		InfoPauseTab infoTab = new InfoPauseTab(450, 300, color, player);
 		tabs.put(PauseTabType.INFO, infoTab);
 		GamePanel.getInstance().addElement(infoTab);
+
+		InventoryTab invTab = new InventoryTab(450, 300, color, player);
+		tabs.put(PauseTabType.INVENTORY, invTab);
+		GamePanel.getInstance().addElement(invTab);
 	}
 
 	private void closeAll() 
@@ -71,11 +75,8 @@ public class PauseMenu extends UiImage
 		closeTabBtn.setVisible(false);
 	}
 
-    @Override
-    protected void onEnableVisible() { closeAll(); }
-
-	@Override
-	protected void onDisableVisible() { closeAll(); }
+    @Override protected void onEnableVisible() { closeAll(); }
+	@Override protected void onDisableVisible() { closeAll(); }
 
 	private void onInfoClick()
 	{
@@ -93,8 +94,16 @@ public class PauseMenu extends UiImage
 
 	private void onInventoryClick()
 	{
-		System.out.println("Inventory clicked (WIP)");
+		System.out.println("Inventory clicked");
 		closeAll();
+		closeTabBtn.setVisible(true);
+		var currTab = tabs.get(PauseTabType.INVENTORY);
+		if (currTab != null)
+			currTab.setVisible(true);
+		else
+			throw new NullPointerException(
+				"There's no such 'InfoTab' in PauseTabType.INVENTORY key at 'tabs' Map"
+			);
 	}
 
 	private void onTeamClick()
