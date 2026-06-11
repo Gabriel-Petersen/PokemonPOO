@@ -255,8 +255,7 @@ public class BattleHud extends UiImage
     {
         if (battleInventoryPanel.isVisible()) 
             battleInventoryPanel.setVisible(false);
-        FleeAction action = new FleeAction(playerIcon.getSource()); 
-        session.submitPlayerAction(action);
+        session.submitPlayerAction(FleeAction.getInstance(playerIcon.getSource()));
     }
 
     public UiText getConsole() { return consoleTxt; }

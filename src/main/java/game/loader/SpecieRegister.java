@@ -15,6 +15,7 @@ import java.util.Map;
 
 public class SpecieRegister {
     private static final String SPECIE_TXT_PATH = "registry/species.txt";
+    private static final boolean FORCE_LOAD = false;
 
     private static final Map<Integer, Specie> specieIdMap = new HashMap<>();
     private static final Map<String, Specie> specieNameMap = new HashMap<>();
@@ -61,12 +62,12 @@ public class SpecieRegister {
         catch (ParseException e) {
             System.err.println("Erro ao parsear duas espécies de mesmo ID em: " + SPECIE_TXT_PATH + "\nO erro é: " + e);
         }
-        catch (SpecieLoadingException e) {
+        catch (GameLoadingException e) {
             System.err.println("Erro ao parsear as espécies em: " + SPECIE_TXT_PATH + "\nO erro é: " + e);
         }
     }
 
-    private static Specie loadSpecie(String[] traits) throws NumberFormatException, SpecieLoadingException
+    private static Specie loadSpecie(String[] traits) throws NumberFormatException, GameLoadingException
     {
         Stats stats = null;
         int id = -1;
@@ -82,7 +83,7 @@ public class SpecieRegister {
                 i = SpecieData.SPEED.id();
             }
             else if (i == SpecieData.MOVEPOOL.id()) {
-                movePool = MoveLoader.load(traits, i);
+                movePool = MoveRegister.loadMovePool(traits, i, FORCE_LOAD);
             }
             else
             {
@@ -103,21 +104,21 @@ public class SpecieRegister {
                         try { evolutionID = Integer.valueOf(traits[i]); } 
                         catch (NumberFormatException e) { evolutionID = null; }
                     } 
-                    default -> throw new SpecieLoadingException(name, id, "No data mapped for i == " + i);
+                    default -> throw GameLoadingException.specieError(name, id, "No data mapped for i == " + i);
                 }
             }
         }
 
         Specie sp;
         if (t1 == null)
-            throw new SpecieLoadingException(name, id, "must have at least a valid primary type (Type1)");
+            throw GameLoadingException.specieError(name, id, "must have at least a valid primary type (Type1)");
         if (evolutionID == null)
             sp = new Specie(id, name, stats, t1, t2, AssetManager.getSprite(frPath), AssetManager.getSprite(bkPath));
         else
         {
             var evo = specieIdMap.get(evolutionID);
             if (evo == null)
-                throw new SpecieLoadingException(name, id, "is trying to evolve to unloaded specie of id=" + evolutionID);
+                throw GameLoadingException.specieError(name, id, "is trying to evolve to unloaded specie of id=" + evolutionID);
             sp = new Specie(id, name, stats, t1, t2, evo, AssetManager.getSprite(frPath), AssetManager.getSprite(bkPath));
         }
             
