@@ -30,11 +30,13 @@ public class DamageMove extends Move {
         if(!canUse(context)){
             return new MoveResult(false, "Sem PP!");
         }else{
-            if(math.random()<=getAccuracy()){
+            if(Math.random()<=getAccuracy()){
                 int damage = calculateDamage(attacker, target, context);
                 target.receiveDamage(damage);
-                return new MoveResult(true, "O ataque acertou e causou "+damage+" de dano!");
+                return new MoveResult("O ataque acertou e causou "+damage+" de dano!", true, damage, false);
+            }else{
+                return new MoveResult("O ataque errou!", false, 0, false);
+            }
         }
     }
-
 }
