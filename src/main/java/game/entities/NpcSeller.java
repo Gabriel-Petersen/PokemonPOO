@@ -1,15 +1,15 @@
-package game.commerce;
+package game.entities;
 
-import game.entities.Npc;
+import game.commerce.Seller;
 import game.itemsystem.Inventory;
 import game.player.Player;
-import java.awt.image.BufferedImage;
+import game.ui.shop.ShopHud;
 
 public class NpcSeller extends Npc implements Seller{
 
     private final Inventory inventory = new Inventory();
 
-    public NpcSeller(String name, BufferedImage sprite) {
+    public NpcSeller(String name, String sprite) {
         super(name, sprite);
     }
 
@@ -25,6 +25,7 @@ public class NpcSeller extends Npc implements Seller{
 
     @Override
     public void onInteract(Player player) {
-        super.onInteract(player);
+        player.setTalking(true);
+        ShopHud.getInstance().openShop(player, this);
     }
 }
