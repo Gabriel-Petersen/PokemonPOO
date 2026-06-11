@@ -51,6 +51,7 @@ public class PokemonInBattleIcon extends UiImage
         hpBar.getTransform().setScale(160, 12);
         hpBar.getUiTransform().setAnchor(Anchor.CENTER_BOTTOM);
         hpBar.getUiTransform().setPosition(0, -10);
+        hpBar.setFillColor(Color.green);
         
         double hpPercent = (double) source.getCurrentHp() / source.getCurrentStats().getValue(StatType.HP);
         hpBar.setProgress(hpPercent);

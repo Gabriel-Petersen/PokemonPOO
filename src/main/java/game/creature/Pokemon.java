@@ -7,6 +7,7 @@ import game.creature.move.status.StatusEffect;
 import game.creature.move.status.VolatileStatusEffect;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public class Pokemon {
@@ -20,15 +21,31 @@ public class Pokemon {
     private Boolean hasOwner = false;
     private final Move[] moves;
     private final List<StatusEffect> statusEffects = new ArrayList<>();
-    
-    public Pokemon(String nickname, Specie Specie, Integer currentLevel) { this(nickname, Specie, currentLevel, new Move[4]); }
 
-    public Pokemon(String nickname, Specie Specie, Integer currentLevel, Move[] moves) {
+    private static Move[] getLast4Moves(Collection<Move> moves) 
+    {
+        Move[] mvs = new Move[4];
+        int count = 0;
+
+        for (Move move : moves) 
+        {
+            if (move == null) continue;
+            mvs[count % 4] = move;
+            count++;
+        }
+        return mvs;
+    }
+    
+    public Pokemon(String nickname, Specie specie, Integer currentLevel) { 
+        this(nickname, specie, currentLevel, getLast4Moves(specie.resolveMovessForLevel(currentLevel)));
+    }
+
+    public Pokemon(String nickname, Specie specie, Integer currentLevel, Move[] moves) {
         this.nickname = nickname;
-        this.specie = Specie;
+        this.specie = specie;
         this.currentLevel = currentLevel;
         this.moves = moves;
-        currentStats = Specie.getBaseStats().scaleForLevel(currentLevel);
+        currentStats = specie.getBaseStats().scaleForLevel(currentLevel);
         currentHp = currentStats.getValue(StatType.HP);
     }
 

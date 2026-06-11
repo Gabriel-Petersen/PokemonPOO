@@ -5,10 +5,14 @@ import engine.ui.core.UiTransform.Anchor;
 import engine.ui.elements.UiButton;
 import engine.ui.elements.UiImage;
 import engine.ui.elements.UiText;
+
+import game.battle.BattleSession;
 import game.battle.Trainer;
 import game.battle.actions.FleeAction;
 import game.battle.actions.ItemAction;
+import game.battle.actions.MoveAction;
 import game.creature.Pokemon;
+import game.creature.move.Move;
 import game.itemsystem.Inventory;
 import game.itemsystem.items.CaptureItem;
 import game.ui.common.InventoryUiPanel;
@@ -36,6 +40,9 @@ public class BattleHud extends UiImage
     private UiButton bagBtn;
     private UiButton pokemonBtn;
     private UiButton runBtn;
+
+    private UiImage moveMenu;
+    private UiButton[] moveButtons = new UiButton[4];
 
     public BattleHud(BattleSession session, int sizeX, int sizeY, Color color, EventScheduler scheduler, Trainer player, Trainer opponent) 
     {
@@ -126,7 +133,46 @@ public class BattleHud extends UiImage
         actionMenu.getUiTransform().setPosition(-15, 0);
         bottomBar.addChild(actionMenu);
 
+        // NOVO: Painel de Seleção de Moves (mesma dimensão e posição do actionMenu)
+        moveMenu = new UiImage(260, 120, new Color(62, 73, 94));
+        moveMenu.getUiTransform().setAnchor(Anchor.CENTER_RIGHT);
+        moveMenu.getUiTransform().setPosition(-15, 0);
+        moveMenu.setVisible(false); // Inicia oculto
+        bottomBar.addChild(moveMenu);
+
         setupActionButtons();
+        setupMoveButtons();
+    }
+
+    private void setupMoveButtons() 
+    {
+        int btnW = 115; int btnH = 36;
+        
+        Anchor[] anchors = { Anchor.TOP_LEFT, Anchor.TOP_RIGHT, Anchor.BOTTOM_LEFT, Anchor.BOTTOM_RIGHT };
+        int[] posX = { 12, -12, 12, -12 };
+        int[] posY = { 12, 12, -12, -12 };
+
+        for (int i = 0; i < 4; i++) 
+        {
+            final int slot = i;
+            
+            moveButtons[i] = new UiButton("", () -> onMoveButtonSelected(slot)) {
+                @Override
+                public void onPointerClick() {
+                    Pokemon active = playerIcon.getSource().getTeam().getActiveMember();
+                    Move[] moves = active.getMoves();
+                    
+                    if (slot < moves.length && moves[slot] != null && moves[slot].canUse(session.getBattle().getContext()))
+                        super.onPointerClick();
+                }
+            };
+
+            moveButtons[i].getTransform().setScale(btnW, btnH);
+            moveButtons[i].getUiTransform().setAnchor(anchors[i]);
+            moveButtons[i].getUiTransform().setPosition(posX[i], posY[i]);
+            configureButtonTheme(moveButtons[i], new Color(48, 56, 74), Color.WHITE);
+            moveMenu.addChild(moveButtons[i]);
+        }
     }
 
     private void setupActionButtons() 
@@ -180,6 +226,8 @@ public class BattleHud extends UiImage
 
     public void setActionButtonsEnabled(boolean enabled) 
     {
+        actionMenu.setVisible(enabled);
+        moveMenu.setVisible(false);
         fightBtn.setVisible(enabled);
         bagBtn.setVisible(enabled);
         pokemonBtn.setVisible(enabled);
@@ -206,6 +254,28 @@ public class BattleHud extends UiImage
         setPokemonStageVisible(true);
     }
 
+    private void updateMoveMenuData() 
+    {
+        Pokemon active = playerIcon.getSource().getTeam().getActiveMember();
+        Move[] moves = active.getMoves();
+
+        for (int i = 0; i < 4; i++) 
+        {
+            if (i < moves.length && moves[i] != null) 
+            {
+                Move move = moves[i];
+                moveButtons[i].getAllChildrenFromType(UiText.class).getFirst().setText(move.getName() + " (" + move.getPp() + ")");
+                moveButtons[i].setBackgroundColor(new Color(43, 81, 56)); // Verde para golpes utilizáveis
+                moveButtons[i].setVisible(true);
+            } 
+            else 
+            {
+                moveButtons[i].getAllChildrenFromType(UiText.class).getFirst().setText("-");
+                moveButtons[i].setBackgroundColor(new Color(28, 32, 41)); // Escuro para slots vazios
+            }
+        }
+    }
+
     public PokemonInBattleIcon getPlayerPokemonIcon() { return playerPokemonIcon; }
     public PokemonInBattleIcon getOpponentPokemonIcon() { return opponentPokemonIcon; }
     public TrainerUiIcon getPlayerIcon() { return playerIcon; }
@@ -213,12 +283,35 @@ public class BattleHud extends UiImage
 
     private void onFightClick() 
     {
-        if(battleInventoryPanel.isVisible()) battleInventoryPanel.setVisible(false);
+        System.out.println("Fight Clicked");
+        if (battleInventoryPanel.isVisible()) battleInventoryPanel.setVisible(false);
+        
+        updateMoveMenuData();
+        
+        actionMenu.setVisible(false);
+        moveMenu.setVisible(true);
+        
         consoleTxt.setText("O que " + playerPokemonIcon.getSource().getSpecie().getName() + " fará?");
+    }
+
+    private void onMoveButtonSelected(int slot) 
+    {
+        System.out.println("Using move " + playerIcon.getSource().getTeam().getActiveMember().getMoves()[slot].getName());
+        Pokemon user = playerIcon.getSource().getTeam().getActiveMember();
+        Pokemon target = opponentIcon.getSource().getTeam().getActiveMember();
+        Move move = user.getMoves()[slot];
+
+        MoveAction action = new MoveAction(move, target, user, playerIcon.getSource());
+
+        moveMenu.setVisible(false);
+        actionMenu.setVisible(true);
+
+        session.submitPlayerAction(action);
     }
 
     private void onBagClick() 
     {
+        System.out.println("Bag Clicked");
         if (battleInventoryPanel.isVisible()) 
         {
             battleInventoryPanel.setVisible(false);
@@ -248,11 +341,13 @@ public class BattleHud extends UiImage
     }
 
     private void onPokemonClick() {
+        System.out.println("Pokemon Clicked");
         if(battleInventoryPanel.isVisible()) battleInventoryPanel.setVisible(false);
     }
     
     private void onRunClick() 
     {
+        System.out.println("Run Clicked");
         if (battleInventoryPanel.isVisible()) 
             battleInventoryPanel.setVisible(false);
         session.submitPlayerAction(FleeAction.getInstance(playerIcon.getSource()));

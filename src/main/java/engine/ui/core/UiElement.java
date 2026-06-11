@@ -139,17 +139,18 @@ public abstract class UiElement extends GameObject
         Vec2d mousePos = Input.getMousePos();
         boolean nowOver = getBounds().contains(mousePos.x(), mousePos.y());
 
-        if (this instanceof OnMouseEnterListener listener && nowOver && !isMouseOver)
+        if (isVisible && this instanceof OnMouseEnterListener listener && nowOver && !isMouseOver)
             listener.onPointerEnter();
-        if (this instanceof OnMouseExitListener listener && !nowOver && isMouseOver)
+        if (isVisible && this instanceof OnMouseExitListener listener && !nowOver && isMouseOver)
             listener.onPointerExit();
 
         isMouseOver = nowOver;
 
-        if (this instanceof OnMouseClickListener listener && isMouseOver && Input.getMouseButtonDown(0))
+        if (isVisible && this instanceof OnMouseClickListener listener && isMouseOver && Input.getMouseButtonDown(0))
             listener.onPointerClick();
 
-        for (var el : child) el.update();
+        if (isVisible)
+            for (var el : child) el.update();
     }
 
     public List<UiElement> getAllChildren() { return new ArrayList<>(child); }

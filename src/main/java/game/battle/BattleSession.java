@@ -1,4 +1,4 @@
-package game.ui.battle;
+package game.battle;
 
 import engine.core.GamePanel;
 import engine.events.EventScheduler;
@@ -6,11 +6,9 @@ import engine.events.LambdaEvent;
 import engine.events.TypewriterEvent;
 import engine.lifecycle.Updatable;
 import engine.ui.elements.UiText;
-import game.battle.ActionResult;
-import game.battle.Battle;
-import game.battle.Trainer;
 import game.battle.actions.CombatAction;
 import game.player.Player;
+import game.ui.battle.BattleHud;
 
 import java.awt.Color;
 import java.util.List;

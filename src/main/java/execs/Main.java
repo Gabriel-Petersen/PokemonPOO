@@ -75,6 +75,9 @@ public class Main
         npc2.setMessage(npc2Message);
         gamePanel.addElement(npc2);
 
+        System.out.println("DEBUG");
+        for (var item : player.getTeam().getActiveMember().getMoves()) System.out.println(item == null ? "null" : item.getName());
+
         NpcSeller shopkeeper = new NpcSeller("Vendedor", "npcs/ingame/npc_ingame03.png");
         shopkeeper.getTransform().setScale(3, 3);
         shopkeeper.getTransform().setPosition(3100, 5522);

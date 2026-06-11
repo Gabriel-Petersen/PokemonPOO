@@ -1,1 +1,2 @@
-1,Charmander,FIRE,-,100,20,20,30,30,60,npcs/ingame/npc_ingame08.png,npcs/ingame/npc_ingame08.png
+// ID, NAME, TYPE1, TYPE2, HP, ATK, DEF, SPATK, SPDEF, SPEED, FR_SPRITE_PATH, BK_SPRITE_PATH, EVOLUTION_ID, MOVEPOOL
+1,Charmander,FIRE,NONE,100,20,20,30,30,60,npcs/ingame/npc_ingame08.png,npcs/ingame/npc_ingame08.png,-1,1,1

@@ -106,18 +106,16 @@ public class MoveRegister
         return new DamageMove(id, name, power, accuracy, priority, elementType, category);
     }
 
-    // Expecting: Name:String,Level:int or Id:int,Level:int
-    public static Map<Integer, Move> loadMovePool(String[] traits, Integer currI, boolean forceLoad) throws GameLoadingException
+    public static int loadMovePool(String[] originalTraits, int currI, Map<Integer, Move> pool, boolean forceLoad) throws GameLoadingException
     {
-        if (traits.length % 2 != 0) {
+        int remainingElements = originalTraits.length - currI;
+        if (remainingElements % 2 != 0)
             throw new GameLoadingException("Erro ao carregar a movepool. Nem todo move está pareado a um level (quantidade ímpar de dados)");
-        }
-
-        Map<Integer, Move> pool = new HashMap<>();
-        for (int i = currI; i < traits.length - 1; i += 2) 
+        
+        while (currI < originalTraits.length - 1) 
         {
-            var t1 = traits[i];
-            int level = Integer.parseInt(traits[i+1]);
+            String t1 = originalTraits[currI].trim();
+            int level = Integer.parseInt(originalTraits[currI + 1].trim());
 
             int id = -1;
             try { id = Integer.parseInt(t1); } catch (NumberFormatException e) { }
@@ -126,19 +124,21 @@ public class MoveRegister
             {
                 Move mv = getMove(t1);
                 if (forceLoad && mv == FALLBACK_MOVE) 
-                    throw GameLoadingException.moveError(t1, id, "Move with name=" + t1 + " were not loaded and tryed to be put in a MovePool");
+                    throw GameLoadingException.moveError(t1, id, "Move com nome=" + t1 + " não foi carregado previamente e tentou ser usado na MovePool");
                 pool.put(level, mv);
             }
             else
             {
                 Move mv = getMove(id);
                 if (forceLoad && mv == FALLBACK_MOVE) 
-                    throw GameLoadingException.moveError("no-name-found", id, "Move with id=" + id + " were not loaded and tryed to be put in a MovePool");
+                    throw GameLoadingException.moveError("no-name-found", id, "Move com id=" + id + " não foi carregado previamente e tentou ser usado na MovePool");
                 pool.put(level, mv);
             }
+
+            currI += 2;
         }
 
-        return pool;
+        return currI;
     }
 
     private static enum MoveData {

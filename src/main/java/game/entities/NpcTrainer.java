@@ -2,12 +2,12 @@ package game.entities;
 
 import engine.assets.AssetManager;
 import game.battle.BattleContext;
+import game.battle.BattleSession;
 import game.battle.Team;
 import game.battle.Trainer;
 import game.battle.actions.CombatAction;
 import game.itemsystem.Inventory;
 import game.player.Player;
-import game.ui.battle.BattleSession;
 import game.ui.common.DialogueBox;
 
 import java.awt.image.BufferedImage;
