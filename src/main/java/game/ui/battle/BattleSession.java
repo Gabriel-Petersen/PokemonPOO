@@ -23,6 +23,10 @@ public class BattleSession implements Updatable
     private final Trainer player;
     private final Trainer opponent;
 
+    private CombatAction playerAction;
+    private CombatAction opponentAction;
+    private boolean isEnding = false;
+    
     public BattleSession(Trainer player, Trainer opponent)
     {
         this.player = player;
@@ -30,9 +34,8 @@ public class BattleSession implements Updatable
 
         GamePanel.getInstance().addScheduler(scheduler);
 
-        battleHud = new BattleHud(800, 600, new Color(40, 44, 52), scheduler, player, opponent);
+        battleHud = new BattleHud(this, 800, 600, new Color(40, 44, 52), scheduler, player, opponent);
         battle = new Battle(battleHud, player, opponent);
-       
         
         GamePanel.getInstance().addElement(battleHud);
     }
@@ -42,27 +45,35 @@ public class BattleSession implements Updatable
     @Override public void setup() { }
     
     @Override
-    public void update() {
-        if (scheduler.isResolving()) return;
-        
-        // Aqui no Ciclo 3 entrará a máquina de estados que verifica se ambos os treinadores 
-        // já selecionaram suas CombatActions e disparará o processador de turnos.
-    }
-
-    public void startBattle()
+    public void update() 
     {
-        battleHud.setVisible(true);
+        if (scheduler.isResolving()) return;
+
+        if (battle.isFinished() && !isEnding) 
+        {
+            isEnding = true;
+            battleHud.setVisible(false);
+            if (player instanceof Player) {
+                ((Player) player).setBattling(false);
+            }
+            return;
+        }
+
+        if (opponentAction == null && playerAction != null) 
+            opponentAction = opponent.selectAction(battle.getContext());
         
-        String pActive = player.getTeam().getActiveMember().getSpecie().getName();
-        String oActive = opponent.getTeam().getActiveMember().getSpecie().getName();
-        
-        battleHud.updateConsoleMessage(opponent.getDisplayName() + " enviou " + oActive + "! Vai, " + pActive + "!");
+
+        if (playerAction != null && opponentAction != null)
+        {
+            processTurn(playerAction, opponentAction);
+            playerAction = null;
+            opponentAction = null;
+        }
     }
 
     public boolean processTurn(CombatAction playerAction, CombatAction opponentAction) 
     {
         battleHud.setActionButtonsEnabled(false);
-
         List<CombatAction> orderedActions = battle.determineOrder(playerAction, opponentAction);
 
         boolean roundInterrupted = false;
@@ -74,6 +85,12 @@ public class BattleSession implements Updatable
             if (result == ActionResult.INVALID_ACTION) {
                 roundInterrupted = true;
                 break; 
+            }
+
+            if (result == ActionResult.FLED) {
+                 ((Player)player).setBattling(false);
+                enqueueBattleOverVisuals();
+                break;
             }
 
             if (battle.isFinished()) {
@@ -101,15 +118,17 @@ public class BattleSession implements Updatable
             scheduler.resolve();
         }
 
-        scheduler.enqueue(new LambdaEvent(() -> {
-            if (!battle.isFinished()) {
-                battleHud.setActionButtonsEnabled(true);
-                battleHud.updateConsoleMessage("O que você fará a seguir?");
-            }
-        }));
-
-        scheduler.resolve();
         return true;
+    }
+
+    public void startBattle()
+    {
+        battleHud.setVisible(true);
+        
+        String pActive = player.getTeam().getActiveMember().getSpecie().getName();
+        String oActive = opponent.getTeam().getActiveMember().getSpecie().getName();
+        
+        battleHud.updateConsoleMessage(opponent.getDisplayName() + " enviou " + oActive + "! Vai, " + pActive + "!");
     }
 
     private void enqueueBattleOverVisuals() 
@@ -117,20 +136,17 @@ public class BattleSession implements Updatable
         UiText console = battleHud.getConsole();
         scheduler.enqueue(new TypewriterEvent(console, "A batalha terminou!", 0.05, 1.0));
         scheduler.enqueue(new LambdaEvent(() -> {
-            System.out.println("Sessão finalizada. Retornando ao Overworld.");
+            System.out.println("Sessão finalizada visivelmente. Retornando ao Overworld.");
             ((Player)player).setBattling(false);
         }));
     }
 
-    public BattleHud getBattleHud() {
-        return battleHud;
-    }
+    public BattleHud getBattleHud() { return battleHud; }
+    public Trainer getPlayer() { return player; }
+    public Trainer getOpponent() { return opponent; }
 
-    public Trainer getPlayer() {
-        return player;
-    }
-
-    public Trainer getOpponent() {
-        return opponent;
+    public void submitPlayerAction(CombatAction action) { 
+        if (scheduler.isResolving() || battle.isFinished()) return;
+        this.playerAction = action; 
     }
 }

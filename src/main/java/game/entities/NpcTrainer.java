@@ -18,14 +18,16 @@ public class NpcTrainer extends Npc implements Trainer
     private Team team;
     private Inventory inventory;
 
-    public NpcTrainer(Inventory inventory, Team team, String name, BufferedImage sprite, BufferedImage battleSprite) {
+    public NpcTrainer(Inventory inventory, Team team, String name, BufferedImage sprite, BufferedImage battleSprite) 
+    {
         super(name, sprite);
         this.inventory = inventory;
         this.team = team;
         this.battleSprite = battleSprite;
     }
 
-    public NpcTrainer(Inventory inventory, Team team, String name, String spritePath, String battleSpritePath) {
+    public NpcTrainer(Inventory inventory, Team team, String name, String spritePath, String battleSpritePath) 
+    {
         super(name, spritePath);
         this.inventory = inventory;
         this.team = team;
@@ -66,7 +68,6 @@ public class NpcTrainer extends Npc implements Trainer
         db.getEventQueue().setOnEndResolving(() -> {
             player.setTalking(false);
             db.setVisible(false);
-            
             player.setBattling(true);
             
             BattleSession session = new BattleSession(player, this);
