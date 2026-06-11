@@ -1,5 +1,6 @@
 package game.creature;
 
+import game.battle.BattleContext;
 import game.creature.move.Move;
 import game.creature.move.StatType;
 import game.creature.move.status.StatusEffect;
@@ -84,25 +85,39 @@ public class Pokemon {
         return currentHp;
     }
 
-    /*public Boolean applyStatus(StatusEffect statusEffect, BattleContext context){
-        
-    }*/
+    public Boolean applyStatus(StatusEffect statusEffect, BattleContext context){
+        statusEffects.add(statusEffect);
+        statusEffect.onApply(this, context);
+        return true;
+    }
 
-    /*public Stats getEffectiveStats(BattleContext context){
-    
-    }*/
+    public Stats getEffectiveStats(BattleContext context){
+        Stats effectiveStats = new Stats(currentStats);
+        for(var ef:statusEffects){
+            if(ef!=null){
+                var statModifierRules = ef.getStatModifierRules();
+                if(statModifierRules!=null){
+                    for(var rule:statModifierRules){
+                        effectiveStats = rule.applyOn(effectiveStats, context);
+                    }
+                }
+            }
+        }
+        return effectiveStats;
+    }
 
-    /*public Integer getEffectiveStat(StatType statType, BattleContext context){
-    
-    }*/
+    public Integer getEffectiveStat(StatType statType, BattleContext context){
+        return getEffectiveStats(context).getValue(statType);
+    }
 
-    /*public void resolveStatusAtTurnStart(BattleContext context){
-    
-    }*/
-
-    /*public void resolveStatusAtTurnEnd(BattleContext context){
-    
-    }*/
+    public void resolveStatusAtTurnEnd(BattleContext context){
+        for(var ef:statusEffects){
+            if(ef!=null){
+                ef.onTurnEnd(this, context);
+            }
+        }
+        statusEffects.removeIf(ef -> ef == null || ef.isExpired());
+    }
 
     
 

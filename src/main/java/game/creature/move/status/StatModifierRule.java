@@ -4,7 +4,7 @@ import game.battle.BattleContext;
 import game.creature.Stats;
 import game.creature.move.StatType;
 
-class StatModifierRule implements StatModifier {
+public class StatModifierRule implements StatModifier {
     private final StatType targetStat;
     private final StatModifier modifier;
 
