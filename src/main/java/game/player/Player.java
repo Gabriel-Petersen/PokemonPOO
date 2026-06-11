@@ -51,7 +51,8 @@ public class Player extends GameObject implements Trainer
 
     private final Square footPos = new Square(0, 0, 5, Color.blue, 2);
 
-    public Player() { 
+    public Player() 
+    { 
         setLayer(5);
     	var gamePanel = GamePanel.getInstance();
     	gamePanel.addElement(footPos); 
@@ -198,12 +199,7 @@ public class Player extends GameObject implements Trainer
     @Override public BufferedImage getOnBattleSprite() { return battleSprite; }
     @Override public Boolean isWild() { return false; }
     @Override public String getDisplayName() { return metadata.getName(); }
-    
-    @Override
-    public CombatAction selectAction(BattleContext context) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'selectAction'");
-    }
+    @Override public CombatAction selectAction(BattleContext context) { return null; }
 
     private boolean canWalk() {
     	return !isUiOpen && !isTalking && !isBattling;

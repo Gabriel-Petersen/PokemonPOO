@@ -8,6 +8,7 @@ import engine.tilemap.Tilemap;
 import game.battle.Team;
 import game.creature.Pokemon;
 import game.entities.Npc;
+import game.entities.NpcSeller;
 import game.entities.NpcTrainer;
 import game.itemsystem.Inventory;
 import game.loader.ItemRegistry;
@@ -43,6 +44,7 @@ public class Main
         player.setCurrentMap(tilemap);
         player.getTransform().setPosition(2806, 5522);
         player.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 2));
+        player.getTeam().getActiveMember().setOwner(true);
         gamePanel.addElement(player);
 
         var inv = player.getInventory();
@@ -61,9 +63,10 @@ public class Main
         gamePanel.addElement(npc1);
 
         NpcTrainer npc2 = new NpcTrainer(
-            new Inventory(), new Team(), "sei la", "npcs/ingame/npc_ingame05.png", "npcs/ingame/npc_ingame05.png"
+            new Inventory(), new Team(), "sei la", "npcs/ingame/npc_ingame05.png", "npcs/battle/npc_battle01.png"
         );
         npc2.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 1));
+        npc2.getTeam().getActiveMember().setOwner(true);
         npc2.getTransform().setScale(3, 3);
         npc2.getTransform().setPosition(3000, 5522);
         String[] npc2Message = {
@@ -71,6 +74,13 @@ public class Main
         };
         npc2.setMessage(npc2Message);
         gamePanel.addElement(npc2);
+
+        NpcSeller shopkeeper = new NpcSeller("Vendedor", "npcs/ingame/npc_ingame03.png");
+        shopkeeper.getTransform().setScale(3, 3);
+        shopkeeper.getTransform().setPosition(3100, 5522);
+        shopkeeper.getInventory().add(ItemRegistry.smallPotion, 5);
+        shopkeeper.getInventory().add(ItemRegistry.mediumPotion, 2);
+        gamePanel.addElement(shopkeeper);
     }
 
     public static void main(String[] args)
