@@ -6,16 +6,26 @@ import engine.ui.elements.UiButton;
 import engine.ui.elements.UiImage;
 import engine.ui.elements.UiText;
 import game.battle.Trainer;
+import game.battle.actions.FleeAction;
+import game.battle.actions.ItemAction;
+import game.creature.Pokemon;
+import game.itemsystem.Inventory;
+import game.itemsystem.items.CaptureItem;
+import game.ui.common.InventoryUiPanel;
+
 import java.awt.Color;
 import java.awt.Font;
 
 public class BattleHud extends UiImage 
 {
+    private final BattleSession session;
+
     private PokemonInBattleIcon playerPokemonIcon;
     private PokemonInBattleIcon opponentPokemonIcon;
     
     private TrainerUiIcon playerIcon;
     private TrainerUiIcon opponentIcon;
+    private InventoryUiPanel battleInventoryPanel;
     
     private UiImage bottomBar;
     private UiImage consoleBox;
@@ -27,15 +37,17 @@ public class BattleHud extends UiImage
     private UiButton pokemonBtn;
     private UiButton runBtn;
 
-    public BattleHud(int sizeX, int sizeY, Color color, EventScheduler scheduler, Trainer player, Trainer opponent) 
+    public BattleHud(BattleSession session, int sizeX, int sizeY, Color color, EventScheduler scheduler, Trainer player, Trainer opponent) 
     {
         super(sizeX, sizeY, color);
+        this.session = session;
         getUiTransform().setAnchor(Anchor.CENTER);
         getUiTransform().setPosition(0, 0);
         setVisible(false);
 
         setupArena(player, opponent);
         setupBottomBar(opponent);
+        setupInventory(player.getInventory());
     }
 
     private void setupArena(Trainer player, Trainer opponent) 
@@ -49,25 +61,35 @@ public class BattleHud extends UiImage
         playerIcon.getTransform().setScale(160, 160);
         opponentIcon.getTransform().setScale(160, 160);
 
+
         opponentIcon.getUiTransform().setAnchor(Anchor.TOP_RIGHT);
-        opponentIcon.getUiTransform().setPosition(-60, 50);
+        opponentIcon.getUiTransform().setPosition(-40, 50);
 
         opponentPokemonIcon.getUiTransform().setAnchor(Anchor.TOP_RIGHT);
-        opponentPokemonIcon.getUiTransform().setPosition(-60, 50);
+        opponentPokemonIcon.getUiTransform().setPosition(-200, 50);
 
         playerIcon.getUiTransform().setAnchor(Anchor.BOTTOM_LEFT);
         playerIcon.getUiTransform().setPosition(60, -220);
 
         playerPokemonIcon.getUiTransform().setAnchor(Anchor.BOTTOM_LEFT);
-        playerPokemonIcon.getUiTransform().setPosition(60, -220);
+        playerPokemonIcon.getUiTransform().setPosition(240, -220); 
 
         addChild(opponentIcon);
         addChild(opponentPokemonIcon);
         addChild(playerIcon);
         addChild(playerPokemonIcon);
 
-        setPokemonStageVisible(false);
+        setPokemonStageVisible(true);
         setTrainerStageVisible(true);
+    }
+
+    private void setupInventory(Inventory playerInventory)
+    {
+        battleInventoryPanel = new InventoryUiPanel(480, 320, new Color(40, 46, 58), playerInventory);
+        battleInventoryPanel.getUiTransform().setAnchor(Anchor.CENTER);
+        battleInventoryPanel.getUiTransform().setPosition(0, -40);
+        battleInventoryPanel.setVisible(false);
+        addChild(battleInventoryPanel);
     }
 
     public void setPokemonStageVisible(boolean visible) {
@@ -173,10 +195,10 @@ public class BattleHud extends UiImage
         opponentPokemonIcon = PokemonInBattleIcon.buildNpcIcon(opponentIcon.getSource().getTeam().getActiveMember());
 
         opponentPokemonIcon.getUiTransform().setAnchor(Anchor.TOP_RIGHT);
-        opponentPokemonIcon.getUiTransform().setPosition(-60, 50);
+        opponentPokemonIcon.getUiTransform().setPosition(-200, 50);
 
         playerPokemonIcon.getUiTransform().setAnchor(Anchor.BOTTOM_LEFT);
-        playerPokemonIcon.getUiTransform().setPosition(60, -220);
+        playerPokemonIcon.getUiTransform().setPosition(240, -220);
 
         addChild(playerPokemonIcon);
         addChild(opponentPokemonIcon);
@@ -191,14 +213,51 @@ public class BattleHud extends UiImage
 
     private void onFightClick() 
     {
-        setTrainerStageVisible(false);
-        setPokemonStageVisible(true);
-        consoleTxt.setText("Vai, " + playerPokemonIcon.getSource().getSpecie().getName() + "!");
+        if(battleInventoryPanel.isVisible()) battleInventoryPanel.setVisible(false);
+        consoleTxt.setText("O que " + playerPokemonIcon.getSource().getSpecie().getName() + " fará?");
     }
 
-    private void onBagClick() {}
-    private void onPokemonClick() {}
-    private void onRunClick() {}
+    private void onBagClick() 
+    {
+        if (battleInventoryPanel.isVisible()) 
+        {
+            battleInventoryPanel.setVisible(false);
+            return;
+        } 
+
+        battleInventoryPanel.setVisible(true);
+        
+        battleInventoryPanel.setupContext(true, (item) -> {
+            Pokemon target = item instanceof CaptureItem ? 
+                opponentIcon.getSource().getTeam().getActiveMember() : 
+                playerIcon.getSource().getTeam().getActiveMember();
+            
+            if (!item.canUse(target)) {
+                consoleTxt.setText("Não é o momento de usar isso!");
+                return false;
+            }
+
+            ItemAction action = new ItemAction(item, target, playerIcon.getSource());
+    
+            if (session != null) 
+                session.submitPlayerAction(action); 
+
+            return true;
+        });
+        
+    }
+
+    private void onPokemonClick() {
+        if(battleInventoryPanel.isVisible()) battleInventoryPanel.setVisible(false);
+    }
+    
+    private void onRunClick() 
+    {
+        if (battleInventoryPanel.isVisible()) 
+            battleInventoryPanel.setVisible(false);
+        FleeAction action = new FleeAction(playerIcon.getSource()); 
+        session.submitPlayerAction(action);
+    }
 
     public UiText getConsole() { return consoleTxt; }
 }

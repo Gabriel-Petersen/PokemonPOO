@@ -1,5 +1,7 @@
 package game.ui.battle;
 
+import java.awt.Color;
+
 import engine.ui.elements.UiImage;
 import engine.ui.elements.UiText;
 import game.battle.Trainer;
@@ -13,6 +15,7 @@ public class TrainerUiIcon extends UiImage
         super(source.getOnBattleSprite());
         this.source = source;
         nameText = new UiText(source.getDisplayName());
+        nameText.setColor(Color.white);
         addChild(nameText);
     }
 
