@@ -87,7 +87,7 @@ public class Specie {
         return primaryType == type || secondaryType == type;
     }
 
-    public BufferedImage getfrontSprite() {
+    public BufferedImage getFrontSprite() {
         return frontSprite;
     }
 
@@ -105,8 +105,7 @@ public class Specie {
     }
 
     public Collection<Move> resolveMovessForLevel(Integer level){
-        Collection<Move> moves = movePool.headMap(level + 1).values();
-        return moves;
+        return movePool.headMap(level + 1).values();
     }
 
     @Override
@@ -122,10 +121,11 @@ public class Specie {
             return false;
         Specie other = (Specie) obj;
         if (dexNumber == null) {
-            if (other.dexNumber != null)
-                return false;
-        } else if (!dexNumber.equals(other.dexNumber))
-            return false;
-        return true;
+            return other.dexNumber == null;
+        } else return dexNumber.equals(other.dexNumber);
+    }
+
+    public String getTypes() {
+        return primaryType + " / " + secondaryType;
     }
 }

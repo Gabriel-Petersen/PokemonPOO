@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class SpecieRegister {
     private static final String SPECIE_TXT_PATH = "registry/species.txt";
-    private static final boolean FORCE_LOAD = false;
+    private static final boolean FORCE_LOAD = true;
 
     private static final Map<Integer, Specie> specieIdMap = new HashMap<>();
     private static final Map<String, Specie> specieNameMap = new HashMap<>();
@@ -83,7 +83,8 @@ public class SpecieRegister {
                 i = SpecieData.SPEED.id();
             }
             else if (i == SpecieData.MOVEPOOL.id()) {
-                movePool = MoveRegister.loadMovePool(traits, i, FORCE_LOAD);
+                movePool = new HashMap<>();
+                i = MoveRegister.loadMovePool(traits, i, movePool, FORCE_LOAD);
             }
             else
             {
@@ -101,7 +102,7 @@ public class SpecieRegister {
                     case FR_SPRITE_PATH -> frPath = traits[i];
                     case BK_SPRITE_PATH -> bkPath = traits[i];
                     case EVOLUTION_ID -> {
-                        try { evolutionID = Integer.valueOf(traits[i]); } 
+                        try { evolutionID = Integer.valueOf(traits[i]); if (evolutionID == -1) evolutionID = null; } 
                         catch (NumberFormatException e) { evolutionID = null; }
                     } 
                     default -> throw GameLoadingException.specieError(name, id, "No data mapped for i == " + i);

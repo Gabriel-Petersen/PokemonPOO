@@ -36,8 +36,21 @@ public class MoveAction extends CombatAction{
         if (result.getDamageApplied() > 0) {
             var barTarget = getActor() == context.getPlayer() ? context.getHud().getOpponentPokemonIcon() : context.getHud().getPlayerPokemonIcon();
             scheduler.enqueue(new LambdaEvent(() -> barTarget.getHpBar().setFillColor(Color.red)));
-            scheduler.enqueue(new ProgressBarChangeEvent(barTarget.getHpBar(), target.getCurrentHp(), 1));
+            scheduler.enqueue(new ProgressBarChangeEvent(
+                    barTarget.getHpBar(),
+                    Double.max(0.0, (double)target.getCurrentHp() / target.getEffectiveStat(StatType.HP, context)),
+            1
+            ));
             scheduler.enqueue(new LambdaEvent(() -> barTarget.getHpBar().setFillColor(Color.green)));
+
+            var opponent = context.getOpponent().getCurrent();
+            if (!opponent.isAlive())
+                scheduler.enqueue(new TypewriterEvent(
+                        context.getHud().getConsole(),
+                        opponent.getNickname() + " foi derrotado!!",
+                        0.1,
+                        2
+                ));
         }
         return result.getHit() ? ActionResult.SUCCESS : ActionResult.MISSED;
     }

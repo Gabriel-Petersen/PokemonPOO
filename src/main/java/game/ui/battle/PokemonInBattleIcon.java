@@ -20,7 +20,7 @@ public class PokemonInBattleIcon extends UiImage
 
     private PokemonInBattleIcon(Pokemon source, boolean isBackSprite) 
     {
-        super(isBackSprite ? source.getSpecie().getBackSprite() : source.getSpecie().getfrontSprite());
+        super(isBackSprite ? source.getSpecie().getBackSprite() : source.getSpecie().getFrontSprite());
         this.source = source;
         this.isBackSprite = isBackSprite;
         
@@ -51,6 +51,7 @@ public class PokemonInBattleIcon extends UiImage
         hpBar.getTransform().setScale(160, 12);
         hpBar.getUiTransform().setAnchor(Anchor.CENTER_BOTTOM);
         hpBar.getUiTransform().setPosition(0, -10);
+        hpBar.setFillColor(Color.green);
         
         double hpPercent = (double) source.getCurrentHp() / source.getCurrentStats().getValue(StatType.HP);
         hpBar.setProgress(hpPercent);
@@ -68,6 +69,6 @@ public class PokemonInBattleIcon extends UiImage
     public void setSource(Pokemon source)
     {
         this.source = source;
-        setImage(isBackSprite ? source.getSpecie().getBackSprite() : source.getSpecie().getfrontSprite());
+        setImage(isBackSprite ? source.getSpecie().getBackSprite() : source.getSpecie().getFrontSprite());
     }
 }

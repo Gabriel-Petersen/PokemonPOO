@@ -6,6 +6,7 @@ import game.battle.ActionResult;
 import game.battle.BattleContext;
 import game.battle.Trainer;
 import game.creature.Pokemon;
+import game.creature.move.StatType;
 import game.itemsystem.Item;
 import game.itemsystem.items.HpHealItem;
 public class ItemAction extends CombatAction{
@@ -21,8 +22,10 @@ public class ItemAction extends CombatAction{
     public Item getItem(){return item;}
     public void setItem(Item item){this.item=item;}
     @Override
-    public ActionResult execute(BattleContext context, EventScheduler scheduler){
-        if(item.canUse(target)) { 
+    public ActionResult execute(BattleContext context, EventScheduler scheduler)
+    {
+        if(getActor().getInventory().has(item, 1) && item.canUse(target))
+        {
             scheduler.enqueue(new TypewriterEvent(
                 context.getHud().getConsole(), 
                 "Using " + item.getName() + " in " + target.getNickname(), 
@@ -35,17 +38,19 @@ public class ItemAction extends CombatAction{
                  0.01, 
                  1.2
             ));
-            var result = item.use(target); 
+            var result = item.use(target);
+            getActor().getInventory().remove(item, 1);
             if (item instanceof HpHealItem)
             {
                 var hud = context.getHud();
+                double finalValue = (double)target.getCurrentHp() / target.getEffectiveStat(StatType.HP, context);
                 if (hud.getPlayerPokemonIcon().getSource().equals(target))
                     scheduler.enqueue(new ProgressBarChangeEvent(
-                        hud.getPlayerPokemonIcon().getHpBar(), target.getCurrentHp(), 1
+                        hud.getPlayerPokemonIcon().getHpBar(), finalValue, 1
                     ));
                 else
                     scheduler.enqueue(new ProgressBarChangeEvent(
-                        hud.getOpponentPokemonIcon().getHpBar(), target.getCurrentHp(), 1
+                        hud.getOpponentPokemonIcon().getHpBar(), finalValue, 1
                     ));
             }
             return result;

@@ -26,6 +26,8 @@ public class Battle
 
     public List<CombatAction> determineOrder(CombatAction playerAction, CombatAction opponentAction) 
     {
+        System.out.println("player priority: " + playerAction.getPriority());
+        System.out.println("opponent priority: " + opponentAction.getPriority());
         if (playerAction.getPriority() > opponentAction.getPriority())
             return List.of(playerAction, opponentAction);
         else if (opponentAction.getPriority() > playerAction.getPriority())

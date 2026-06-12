@@ -29,6 +29,7 @@ public class GamePanel extends JPanel
     private final AffineTransform camView = new AffineTransform();
 
     private final List<EventScheduler> eventSchedulers = new ArrayList<>();
+    private boolean clicked;
 
     private double deltaTime = 0;
 
@@ -68,6 +69,7 @@ public class GamePanel extends JPanel
 
     public void updateAll(double deltaTime)
     {
+        clicked = false;
         this.deltaTime = deltaTime;
         if (isAnySchedulerResolving())
         {
@@ -77,7 +79,6 @@ public class GamePanel extends JPanel
                 if (scheduler.isResolving())
                     scheduler.update(deltaTime);
             }
-                
             return;
         }
 
@@ -144,6 +145,8 @@ public class GamePanel extends JPanel
 
     public void addScheduler(EventScheduler scheduler) { eventSchedulers.add(scheduler); }
     public double getDeltaTime() { return deltaTime; }
+    public void setClicked() { clicked = true; }
+    public boolean hasClicked() { return clicked; }
 
     public List<Updatable> getLogics() { return logics; }
     public static GamePanel getInstance() { return INSTANCE; }

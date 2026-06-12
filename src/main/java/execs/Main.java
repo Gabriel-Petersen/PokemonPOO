@@ -43,12 +43,12 @@ public class Main
         player.getTransform().setScale(1.8, 1.8);
         player.setCurrentMap(tilemap);
         player.getTransform().setPosition(2806, 5522);
-        player.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 2));
-        player.getTeam().getActiveMember().setOwner(true);
+        player.getTeam().addMember(new Pokemon("Meu Charmandinho", SpecieRegister.getSpecie(1), 3));
+        player.getCurrent().setOwner(true);
         gamePanel.addElement(player);
 
         var inv = player.getInventory();
-        inv.add(ItemRegistry.smallPotion, 3);
+        inv.add(ItemRegistry.smallPotion, 1);
         inv.add(ItemRegistry.mediumPotion, 10);
 
         Npc npc1 = new Npc("Certinho", "npcs/ingame/npc_ingame01.png");
@@ -63,10 +63,12 @@ public class Main
         gamePanel.addElement(npc1);
 
         NpcTrainer npc2 = new NpcTrainer(
-            new Inventory(), new Team(), "sei la", "npcs/ingame/npc_ingame05.png", "npcs/battle/npc_battle01.png"
+            new Inventory(), new Team(), "sei la",
+                "npcs/ingame/npc_ingame05.png",
+            "npcs/battle/npc_battle01.png"
         );
         npc2.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 1));
-        npc2.getTeam().getActiveMember().setOwner(true);
+        npc2.getCurrent().setOwner(true);
         npc2.getTransform().setScale(3, 3);
         npc2.getTransform().setPosition(3000, 5522);
         String[] npc2Message = {
@@ -74,6 +76,10 @@ public class Main
         };
         npc2.setMessage(npc2Message);
         gamePanel.addElement(npc2);
+
+        System.out.println("DEBUG");
+        for (var item : player.getCurrent().getMoves())
+            System.out.println(item == null ? "null" : item.getName());
 
         NpcSeller shopkeeper = new NpcSeller("Vendedor", "npcs/ingame/npc_ingame03.png");
         shopkeeper.getTransform().setScale(3, 3);
