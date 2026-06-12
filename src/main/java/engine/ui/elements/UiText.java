@@ -33,9 +33,8 @@ public class UiText extends UiElement {
         g2d.drawString(text, 0, metrics.getAscent());
     }
 
-    public void setFont(Font font) {
-        this.font = font;
-    }
+    public String getText() { return text; }
+    public void setFont(Font font) { this.font = font; }
     public void setFont(String fontName, int style, int size) {
         font = new Font(fontName, style, size);
     }

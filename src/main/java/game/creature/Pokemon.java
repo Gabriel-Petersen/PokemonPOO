@@ -57,49 +57,37 @@ public class Pokemon {
     public String getNickname() {
         return (nickname == null || nickname.isBlank() ? specie.getName() : nickname);
     }
-
     public Integer getCurrentHp() {
         return currentHp;
     }
-
     public Specie getSpecie() {
         return specie;
     }
-
     public Stats getCurrentStats() {
         return currentStats;
     }
-
     public Integer getCurrentLevel() {
         return currentLevel;
     }
-
     public Integer getCurrentExperience() {
         return currentExperience;
     }
-
     public Move[] getMoves() {
         return moves;
     }
-
     public Boolean isAlive(){
         return currentHp>0;
     }
-
     public Boolean hasOwner() { return hasOwner; }
     public void setOwner(Boolean hasOwner) { this.hasOwner = hasOwner; }
+    public void receiveDamage(Integer damage){ currentHp-=damage; }
 
-    public Integer receiveDamage(Integer damage){
-        currentHp-=damage;
-        return currentHp;
-    }
-    public Integer heal(Integer heal){
+    public void heal(Integer heal){
         if(currentHp+heal<=currentStats.getValue(StatType.HP)){
             currentHp+=heal;
         }else{
             currentHp=currentStats.getValue(StatType.HP);
         }
-        return currentHp;
     }
 
     public Boolean applyStatus(StatusEffect statusEffect, BattleContext context){
@@ -135,8 +123,6 @@ public class Pokemon {
         }
         statusEffects.removeIf(ef -> ef == null || ef.isExpired());
     }
-
-    
 
     public Boolean replaceMove(Integer slot, Move currentMove){
         Move oldMove = moves[slot];

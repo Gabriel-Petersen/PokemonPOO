@@ -145,9 +145,13 @@ public abstract class UiElement extends GameObject
             listener.onPointerExit();
 
         isMouseOver = nowOver;
+        boolean condition = isVisible && isMouseOver && Input.getMouseButtonDown(0);
 
-        if (isVisible && this instanceof OnMouseClickListener listener && isMouseOver && Input.getMouseButtonDown(0))
+        if (condition && this instanceof OnMouseClickListener listener && !GamePanel.getInstance().hasClicked())
+        {
             listener.onPointerClick();
+            GamePanel.getInstance().setClicked();
+        }
 
         if (isVisible)
             for (var el : child) el.update();
@@ -166,4 +170,6 @@ public abstract class UiElement extends GameObject
 
         throw new IndexOutOfBoundsException(this + " does not has " + index + " children");
     }
+
+    public void removeAllChildren() { child.clear(); }
 }

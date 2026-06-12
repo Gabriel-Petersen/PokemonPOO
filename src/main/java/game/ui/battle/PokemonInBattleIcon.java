@@ -20,7 +20,7 @@ public class PokemonInBattleIcon extends UiImage
 
     private PokemonInBattleIcon(Pokemon source, boolean isBackSprite) 
     {
-        super(isBackSprite ? source.getSpecie().getBackSprite() : source.getSpecie().getfrontSprite());
+        super(isBackSprite ? source.getSpecie().getBackSprite() : source.getSpecie().getFrontSprite());
         this.source = source;
         this.isBackSprite = isBackSprite;
         
@@ -69,6 +69,6 @@ public class PokemonInBattleIcon extends UiImage
     public void setSource(Pokemon source)
     {
         this.source = source;
-        setImage(isBackSprite ? source.getSpecie().getBackSprite() : source.getSpecie().getfrontSprite());
+        setImage(isBackSprite ? source.getSpecie().getBackSprite() : source.getSpecie().getFrontSprite());
     }
 }

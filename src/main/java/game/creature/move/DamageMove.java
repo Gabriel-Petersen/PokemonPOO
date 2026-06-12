@@ -15,7 +15,7 @@ public class DamageMove extends Move
         int defenseStat = category == MoveCategory.PHYSICAL ? target.getEffectiveStat(StatType.DEFENSE, context) : target.getEffectiveStat(StatType.SPECIAL_DEFENSE, context);
         int damage=getPower();
         damage*= target.getSpecie().weaknessTo(elementType);
-        damage*=attackStat*2/defenseStat;
+        damage*= (int) ((double) attackStat * 2 /defenseStat);
         return damage;
     }
 
@@ -33,11 +33,8 @@ public class DamageMove extends Move
             result.setHit(true);
             target.receiveDamage(result.getDamageApplied());
             if (target.getSpecie().weaknessTo(elementType) > 1) 
-                result.addMessage("Foi superefetivo!!");
+                result.addMessage("Foi super efetivo!!");
             result.addMessage("Causou " + result.getDamageApplied() + " de dano!!");
-
-            if (!target.isAlive())
-                result.addMessage(target.getNickname() + " foi derrotado!!");
         }
         else {
             result.addMessage("Errou!!!");

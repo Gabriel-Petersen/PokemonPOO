@@ -19,7 +19,7 @@ public class ProgressBarChangeEvent extends GameEvent
         this.duration = duration;
 
         if (targetValue > 1 || targetValue < 0)
-            throw new IllegalArgumentException("Target value must be between 0.0 and 1.0");
+            throw new IllegalArgumentException("Target value must be between 0.0 and 1.0. Target=" + targetValue);
     }
 
     @Override

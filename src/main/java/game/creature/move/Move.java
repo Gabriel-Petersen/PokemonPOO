@@ -46,7 +46,7 @@ public abstract class Move {
     public Double getAccuracy() { return accuracy; } 
     public void setAccuracy(Double accuracy) { this.accuracy = accuracy; }
 
-    public Integer getPriority() { return priority; }
+    public Integer getPriority() { return 1 + priority; }
     public void setPriority(Integer priority) { this.priority = priority; }
 
     public ElementType getElementType() { return elementType; }

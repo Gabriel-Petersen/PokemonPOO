@@ -10,7 +10,7 @@ public class WaitEvent extends GameEvent
         this.duration = duration;
     }
 
-    @Override public void init() { System.out.println("Iniciando espera de " + duration + "s"); }
+    @Override public void init() { }
     @Override public void update(double dt) { elapsed += dt; }
     @Override public boolean isFinished() { return elapsed >= duration; }
 }

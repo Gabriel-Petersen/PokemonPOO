@@ -15,12 +15,10 @@ public class Team{
         for(Pokemon member:members)if(member.isAlive())return true;
         return false;
     }
-    public Boolean switchActive(Integer index){
+    public void switchActive(Integer index){
         if(index>=0&&index<members.size()){
             activeIndex=index;
-            return true;
         }
-        return false;
     }
     public boolean hasIndex(Integer index){return index>=0&&index<members.size();}
 }

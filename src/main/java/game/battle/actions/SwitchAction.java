@@ -38,6 +38,7 @@ public class SwitchAction extends CombatAction{
             else
                 hud.getOpponentPokemonIcon().setSource(newActive);
         }));
+        newActive.setupForBattle();
         return ActionResult.SUCCESS;
     }
     @Override
