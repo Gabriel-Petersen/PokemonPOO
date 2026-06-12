@@ -57,4 +57,6 @@ public abstract class Move {
 
     public MoveCategory getCategory() { return category; }
     public void setCategory(MoveCategory category) { this.category = category; }
+
+    public static int getMaxPp() { return MAX_PP; }
 }

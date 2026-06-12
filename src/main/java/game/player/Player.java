@@ -39,8 +39,8 @@ public class Player extends GameObject implements Trainer
     private final MutableVec2d directionPool = new MutableVec2d();
     private final MutableVec2d nextPosPool = new MutableVec2d();
     private final Inventory inventory = new Inventory();
-	private final PauseMenu pauseMenu = new PauseMenu(110, 190, Color.lightGray, this);
     private final Team team = new Team();
+	private final PauseMenu pauseMenu = new PauseMenu(110, 190, Color.lightGray, this);
     private Tilemap currentMap;
     private LastLookDir lastLookDir = LastLookDir.DOWN;
 	private Animator animator;

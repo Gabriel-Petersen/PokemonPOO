@@ -341,6 +341,8 @@ public class BattleHud extends UiImage
         battleInventoryPanel.setVisible(true);
         
         battleInventoryPanel.setupContext(true, (item) -> {
+            if (!item.isBattleUsable()) return false;
+            
             Pokemon target = item instanceof CaptureItem ? 
                 opponentIcon.getSource().getCurrent() :
                 playerIcon.getSource().getCurrent();

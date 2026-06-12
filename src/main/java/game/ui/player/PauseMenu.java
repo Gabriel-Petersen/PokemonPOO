@@ -67,6 +67,10 @@ public class PauseMenu extends UiImage
 		InventoryTab invTab = new InventoryTab(450, 300, color, player);
 		tabs.put(PauseTabType.INVENTORY, invTab);
 		GamePanel.getInstance().addElement(invTab);
+
+		PokemonTab pokTab = new PokemonTab(800, 400, color, player);
+        tabs.put(PauseTabType.TEAM, pokTab);
+        GamePanel.getInstance().addElement(pokTab);
 	}
 
 	private void closeAll() 
@@ -107,8 +111,16 @@ public class PauseMenu extends UiImage
 	}
 
 	private void onTeamClick()
-	{
-		System.out.println("Team clicked (WIP)");
-		closeAll();
-	}
+    {
+        System.out.println("Team clicked");
+        closeAll();
+        closeTabBtn.setVisible(true);
+        var currTab = tabs.get(PauseTabType.TEAM);
+        if (currTab != null)
+            currTab.setVisible(true);
+        else
+            throw new NullPointerException(
+                "There's no such 'PokemonTab' in PauseTabType.TEAM key at 'tabs' Map"
+            );
+    }
 }

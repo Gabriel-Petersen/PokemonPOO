@@ -9,12 +9,9 @@ import game.creature.move.Move;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class SmartDamageAI implements BattleAI
 {
-    private final Random random = new Random();
-
     @Override
     public CombatAction selectAction(BattleContext context, Trainer npc)
     {
