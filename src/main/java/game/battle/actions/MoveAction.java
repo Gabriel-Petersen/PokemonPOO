@@ -10,7 +10,7 @@ import game.battle.BattleContext;
 import game.battle.Trainer;
 import game.creature.Pokemon;
 import game.creature.move.Move;
-import game.creature.move.StatType;
+import game.creature.StatType;
 public class MoveAction extends CombatAction{
     private Pokemon user,target;
     private Move move;

@@ -2,7 +2,7 @@ package game.creature.move.status;
 
 import game.battle.BattleContext;
 import game.creature.Stats;
-import game.creature.move.StatType;
+import game.creature.StatType;
 
 public class StatModifierRule implements StatModifier {
     private final StatType targetStat;

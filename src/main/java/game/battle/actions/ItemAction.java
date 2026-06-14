@@ -6,7 +6,7 @@ import game.battle.ActionResult;
 import game.battle.BattleContext;
 import game.battle.Trainer;
 import game.creature.Pokemon;
-import game.creature.move.StatType;
+import game.creature.StatType;
 import game.itemsystem.Item;
 import game.itemsystem.items.HpHealItem;
 public class ItemAction extends CombatAction{

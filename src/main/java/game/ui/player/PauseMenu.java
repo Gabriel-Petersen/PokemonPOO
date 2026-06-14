@@ -16,10 +16,7 @@ public class PauseMenu extends UiImage
 
 	private static final Map<PauseTabType, PauseTab> tabs = new HashMap<>();
 
-	private final UiButton info = new UiButton("Info", this::onInfoClick);
-	private final UiButton inventory = new UiButton("Inventory", this::onInventoryClick);
-	private final UiButton team = new UiButton("Team", this::onTeamClick);
-	private final UiButton closeTabBtn = new UiButton("X", this::closeAll);
+    private final UiButton closeTabBtn = new UiButton("X", this::closeAll);
 	
 	public PauseMenu(int sizeX, int sizeY, Color color, Player player) 
 	{
@@ -27,9 +24,12 @@ public class PauseMenu extends UiImage
 		getUiTransform().setPosition(-24, 0);
 	
 		getUiTransform().setAnchor(Anchor.CENTER_RIGHT);
-		addChild(info);
-		addChild(inventory);
-		addChild(team);
+        UiButton info = new UiButton("Info", this::onInfoClick);
+        addChild(info);
+        UiButton inventory = new UiButton("Inventory", this::onInventoryClick);
+        addChild(inventory);
+        UiButton team = new UiButton("Team", this::onTeamClick);
+        addChild(team);
 
 		closeTabBtn.setBackgroundColor(Color.orange);
 		closeTabBtn.setForegroundColor(Color.red);
@@ -73,12 +73,13 @@ public class PauseMenu extends UiImage
         GamePanel.getInstance().addElement(pokTab);
 	}
 
-	private void closeAll() 
+    private void closeAll()
 	{
 		for (var tab : tabs.values()) tab.setVisible(false);
 		closeTabBtn.setVisible(false);
 	}
 
+    public static Map<PauseTabType, PauseTab> getTabs() { return tabs; }
     @Override protected void onEnableVisible() { closeAll(); }
 	@Override protected void onDisableVisible() { closeAll(); }
 

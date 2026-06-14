@@ -2,7 +2,7 @@ package game.itemsystem.items;
 
 import game.battle.ActionResult;
 import game.creature.Pokemon;
-import game.creature.move.StatType;
+import game.creature.StatType;
 import java.awt.image.BufferedImage;
 
 public class HpHealItem extends HealingItem

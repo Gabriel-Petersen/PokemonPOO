@@ -1,7 +1,5 @@
 package game.creature;
 
-import game.creature.move.StatType;
-
 public class Stats {
     
     private Integer hp;

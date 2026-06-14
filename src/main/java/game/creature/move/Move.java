@@ -1,6 +1,7 @@
 package game.creature.move;
 
 import game.battle.BattleContext;
+import game.creature.ElementType;
 import game.creature.Pokemon;
 
 public abstract class Move {

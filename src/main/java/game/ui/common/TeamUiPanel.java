@@ -3,11 +3,13 @@ package game.ui.common;
 import engine.ui.core.UiTransform.Anchor;
 import engine.ui.elements.UiButton;
 import engine.ui.elements.UiImage;
+import engine.ui.elements.UiProgressBar;
 import engine.ui.elements.UiText;
 import game.battle.Team;
 import game.creature.Pokemon;
+import game.creature.PokemonClickAction;
 import game.creature.move.Move;
-import game.creature.move.StatType;
+import game.creature.StatType;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -16,12 +18,13 @@ public class TeamUiPanel extends UiImage
 {
     private final Team team;
     private Pokemon selectedPokemon;
+    private PokemonClickAction customClickAction;
+    private boolean needsListRebuild = false;
 
     private final UiImage listContainer;
     private final UiImage detailsContainer;
     private final UiButton[] memberButtons = new UiButton[6];
 
-    // Detalhes do Pokémon
     private final UiText nameTxt;
     private final UiText specieTypeTxt;
     private final UiText levelTxt;
@@ -29,14 +32,18 @@ public class TeamUiPanel extends UiImage
     private final UiText[] statLines = new UiText[5];
     private final UiImage pokemonSpriteView;
 
-    // Grid de Moves e Painel de Detalhes do Move selecionado
     private final UiButton[] moveButtons = new UiButton[4];
     private final MoveDetailsTooltip moveDetailsTooltip;
 
-    public TeamUiPanel(int sizeX, int sizeY, Color backgroundColor, Team team)
+    public TeamUiPanel(int sizeX, int sizeY, Color backgroundColor, Team team) {
+        this(sizeX, sizeY, backgroundColor, team, null);
+    }
+
+    public TeamUiPanel(int sizeX, int sizeY, Color backgroundColor, Team team, PokemonClickAction customClickAction)
     {
         super(sizeX, sizeY, backgroundColor);
         this.team = team;
+        this.customClickAction = customClickAction;
 
         getUiTransform().setAnchor(Anchor.CENTER);
         getUiTransform().setPosition(0, 0);
@@ -53,7 +60,7 @@ public class TeamUiPanel extends UiImage
         detailsContainer = new UiImage(detailsW, sizeY - 20, new Color(48, 54, 66));
         detailsContainer.getUiTransform().setAnchor(Anchor.CENTER_RIGHT);
         detailsContainer.getUiTransform().setPosition(-10, 0);
-        detailsContainer.setVisible(false); // Nasce oculto para evitar textos órfãos de "STATS" e "MOVESET"
+        detailsContainer.setVisible(false);
         addChild(detailsContainer);
 
         // Viewport do Sprite
@@ -70,7 +77,7 @@ public class TeamUiPanel extends UiImage
         nameTxt.getUiTransform().setPosition(130, 20);
         detailsContainer.addChild(nameTxt);
 
-        // Linha 2: Espécie + Elementos (Quebra de Linha Solicitada)
+        // Linha 2: Espécie + Elementos
         specieTypeTxt = new UiText("");
         specieTypeTxt.setFont("Arial", Font.ITALIC, 13);
         specieTypeTxt.setColor(new Color(180, 190, 210));
@@ -116,13 +123,12 @@ public class TeamUiPanel extends UiImage
         movesTitle.getUiTransform().setPosition(-130, 130);
         detailsContainer.addChild(movesTitle);
 
-        // Inicialização dos botões do Moveset
-
         moveDetailsTooltip = new MoveDetailsTooltip(detailsW - 30, 75);
 
         int moveBtnW = 125;
         int moveBtnH = 26;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++)
+        {
             final int index = i;
             moveButtons[i] = new UiButton("-", () -> {
                 if (selectedPokemon != null && index < selectedPokemon.getMoves().length) {
@@ -146,9 +152,27 @@ public class TeamUiPanel extends UiImage
         detailsContainer.addChild(moveDetailsTooltip);
 
         setupMembersList();
-        if (team.hasAvailableMember()) {
+        if (team.hasAvailableMember())
             updateSelection(team.getActiveMember());
+    }
+
+    @Override
+    public void update()
+    {
+        if (needsListRebuild) {
+            setupMembersList();
+            needsListRebuild = false;
         }
+
+        super.update();
+    }
+
+    private void handlePokemonSelection(Pokemon pokemon)
+    {
+        if (customClickAction == null)
+            updateSelection(pokemon);
+        else
+            customClickAction.execute(pokemon);
     }
 
     private void setupMembersList()
@@ -166,27 +190,33 @@ public class TeamUiPanel extends UiImage
                 Pokemon p = members.get(i);
                 String label = p.getNickname() + "  Lvl " + p.getCurrentLevel();
 
-                memberButtons[i] = new UiButton(label, () -> updateSelection(p));
+                memberButtons[i] = new UiButton(label, () -> handlePokemonSelection(p));
 
-                if (!p.isAlive()) {
+                if (!p.isAlive())
+                {
                     memberButtons[i].setBackgroundColor(new Color(70, 40, 40));
                     memberButtons[i].setForegroundColor(Color.GRAY);
-                } else if (i == team.getActiveIndex()) {
+                }
+                else if (i == team.getActiveIndex())
+                {
                     memberButtons[i].setBackgroundColor(new Color(43, 81, 120));
                     memberButtons[i].setForegroundColor(Color.WHITE);
-                } else {
+                }
+                else
+                {
                     memberButtons[i].setBackgroundColor(new Color(53, 62, 78));
                     memberButtons[i].setForegroundColor(Color.WHITE);
                 }
 
-                // Acoplamento da Barra de Vida no botão de seleção do Monstro
                 int maxHp = p.getCurrentStats().getValue(StatType.HP);
-                UiHpBar hpBar = new UiHpBar(listContainer.getTransform().getScale().x() - 40, 6, p.getCurrentHp(), maxHp);
-                hpBar.getUiTransform().setAnchor(Anchor.CENTER_BOTTOM);
-                hpBar.getUiTransform().setPosition(0, -4);
-                memberButtons[i].addChild(hpBar);
+                UiHpBar hpProgressBar = new UiHpBar((int) listContainer.getTransform().getScale().x() - 40, 6, p.getCurrentHp(), maxHp);
+                hpProgressBar.getUiTransform().setAnchor(Anchor.CENTER_BOTTOM);
+                hpProgressBar.getUiTransform().setPosition(0, -4);
+                memberButtons[i].addChild(hpProgressBar);
 
-            } else {
+            }
+            else
+            {
                 memberButtons[i] = new UiButton("[ VAZIO ]", () -> {});
                 memberButtons[i].setBackgroundColor(new Color(24, 26, 32));
                 memberButtons[i].setForegroundColor(new Color(80, 80, 80));
@@ -204,18 +234,18 @@ public class TeamUiPanel extends UiImage
     {
         if (pokemon == null) return;
         this.selectedPokemon = pokemon;
-        
-        // Torna visível o bloco agora que os dados existem de fato
+
         detailsContainer.setVisible(true);
 
         String specieName = pokemon.getSpecie().getName();
         String typesStr = pokemon.getSpecie().getTypes();
 
-        // Alterado para aplicar a quebra de linha visual solicitada
         nameTxt.setText(pokemon.getNickname());
         specieTypeTxt.setText("[" + specieName + "]  •  (" + typesStr + ")");
 
-        levelTxt.setText("Level: " + pokemon.getCurrentLevel() + "  |  Exp: " + (pokemon.getCurrentExperience() != null ? pokemon.getCurrentExperience() : 0));
+        levelTxt.setText(
+                "Level: " + pokemon.getCurrentLevel() + "  |  Exp: " + pokemon.getCurrentExperience()
+        );
 
         int maxHp = pokemon.getCurrentStats().getValue(StatType.HP);
         hpTxt.setText("HP: " + pokemon.getCurrentHp() + " / " + maxHp);
@@ -225,62 +255,67 @@ public class TeamUiPanel extends UiImage
         else if (hpRatio <= 0.5) hpTxt.setColor(Color.YELLOW);
         else hpTxt.setColor(new Color(105, 230, 105));
 
-        if (pokemon.getSpecie().getFrontSprite() != null) {
+        if (pokemon.getSpecie().getFrontSprite() != null)
             pokemonSpriteView.setImage(pokemon.getSpecie().getFrontSprite());
-        }
 
         var stats = pokemon.getCurrentStats();
         String[] prefix = {"ATK: ", "DEF: ", "SP. ATK: ", "SP. DEF: ", "SPEED: "};
-        for (var stat : StatType.values()) {
+        for (var stat : StatType.values())
+        {
             if (stat == StatType.HP) continue;
             statLines[stat.ordinal() - 1].setText(prefix[stat.ordinal() - 1] + stats.getValue(stat));
         }
 
-        // Popula o Grid de Botões de Movimento
         Move[] moves = pokemon.getMoves();
-        for (int i = 0; i < 4; i++) {
-            if (i < moves.length && moves[i] != null) {
+        for (int i = 0; i < 4; i++)
+        {
+            if (i < moves.length && moves[i] != null)
+            {
                 moveButtons[i].setVisible(true);
-                for (var text : moveButtons[i].getAllChildrenFromType(UiText.class)) {
+                for (var text : moveButtons[i].getAllChildrenFromType(UiText.class))
                     text.setText(moves[i].getName());
-                }
-            } else {
+            }
+            else
+            {
                 moveButtons[i].setVisible(true);
-                for (var text : moveButtons[i].getAllChildrenFromType(UiText.class)) {
+                for (var text : moveButtons[i].getAllChildrenFromType(UiText.class))
                     text.setText("-");
-                }
             }
         }
-        
+
         moveDetailsTooltip.clear();
     }
 
-    public void refresh() {
-        setupMembersList();
-        if (selectedPokemon != null) {
+    public void refresh()
+    {
+        needsListRebuild = true;
+        if (selectedPokemon != null)
             updateSelection(selectedPokemon);
-        }
     }
 
-    private static class UiHpBar extends UiImage 
-    {
-        public UiHpBar(double width, int height, int currentHp, int maxHp) 
-        {
-            super((int) width, height, new Color(35, 40, 50));
-            
-            double ratio = Math.max(0.0, Math.min(1.0, (double) currentHp / maxHp));
-            int fillWidth = (int) (width * ratio);
-            
-            if (fillWidth > 0) {
-                Color hpColor = new Color(105, 230, 105); // Verde
-                if (ratio <= 0.2) hpColor = Color.RED;
-                else if (ratio <= 0.5) hpColor = Color.YELLOW;
+    public void setCustomClickAction(PokemonClickAction customClickAction) {
+        this.customClickAction = customClickAction;
+    }
 
-                UiImage fill = new UiImage(fillWidth, height, hpColor);
-                fill.getUiTransform().setAnchor(Anchor.CENTER_LEFT);
-                fill.getUiTransform().setPosition(0, 0);
-                addChild(fill);
-            }
+    private static class UiHpBar extends UiProgressBar
+    {
+        public UiHpBar(int width, int height, int currentHp, int maxHp)
+        {
+            super(Direction.LEFT2RIGHT);
+            getUiTransform().setScale(width, height);
+
+            setBackgroundColor(new Color(35, 40, 50));
+
+            double ratio = Math.max(0.0, Math.min(1.0, (double) currentHp / maxHp));
+            setProgress(ratio);
+
+            Color hpColor = new Color(105, 230, 105);
+            if (ratio <= 0.2)
+                hpColor = Color.RED;
+            else if (ratio <= 0.5)
+                hpColor = Color.YELLOW;
+
+            setFillColor(hpColor);
         }
     }
 }

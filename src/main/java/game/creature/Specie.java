@@ -1,6 +1,5 @@
 package game.creature;
 
-import game.creature.move.ElementType;
 import game.creature.move.Move;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -99,12 +98,12 @@ public class Specie {
         return evolution;
     }
 
-    public void loadMovepool(Map<Integer, Move> pool) {
+    public void loadMovePool(Map<Integer, Move> pool) {
         movePool.clear();
         if (pool != null) movePool.putAll(pool);
     }
 
-    public Collection<Move> resolveMovessForLevel(Integer level){
+    public Collection<Move> resolveMovesForLevel(Integer level){
         return movePool.headMap(level + 1).values();
     }
 

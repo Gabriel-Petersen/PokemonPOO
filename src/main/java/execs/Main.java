@@ -43,7 +43,7 @@ public class Main
         player.getTransform().setScale(1.8, 1.8);
         player.setCurrentMap(tilemap);
         player.getTransform().setPosition(2806, 5522);
-        player.getTeam().addMember(new Pokemon("Meu Charmandinho", SpecieRegister.getSpecie(1), 3));
+        player.getTeam().addMember(new Pokemon("Meu Charmandinho", SpecieRegister.getSpecie(4), 5));
         player.getCurrent().setOwner(true);
         gamePanel.addElement(player);
 
@@ -67,7 +67,7 @@ public class Main
                 "npcs/ingame/npc_ingame05.png",
             "npcs/battle/npc_battle01.png"
         );
-        npc2.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 1));
+        npc2.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 5));
         npc2.getCurrent().setOwner(true);
         npc2.getTransform().setScale(3, 3);
         npc2.getTransform().setPosition(3000, 5522);

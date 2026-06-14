@@ -2,7 +2,6 @@ package game.creature;
 
 import game.battle.BattleContext;
 import game.creature.move.Move;
-import game.creature.move.StatType;
 import game.creature.move.status.StatusEffect;
 import game.creature.move.status.VolatileStatusEffect;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class Pokemon {
     private Specie specie;
     private Stats currentStats;
     private Integer currentLevel;
-    private Integer currentExperience;
+    private int currentExperience;
     private Boolean hasOwner = false;
     private final Move[] moves;
     private final List<StatusEffect> statusEffects = new ArrayList<>();
@@ -37,7 +36,7 @@ public class Pokemon {
     }
     
     public Pokemon(String nickname, Specie specie, Integer currentLevel) { 
-        this(nickname, specie, currentLevel, getLast4Moves(specie.resolveMovessForLevel(currentLevel)));
+        this(nickname, specie, currentLevel, getLast4Moves(specie.resolveMovesForLevel(currentLevel)));
     }
 
     public Pokemon(String nickname, Specie specie, Integer currentLevel, Move[] moves) {
@@ -45,6 +44,7 @@ public class Pokemon {
         this.specie = specie;
         this.currentLevel = currentLevel;
         this.moves = moves;
+        currentExperience = 0;
         currentStats = specie.getBaseStats().scaleForLevel(currentLevel);
         currentHp = currentStats.getValue(StatType.HP);
     }
@@ -69,7 +69,7 @@ public class Pokemon {
     public Integer getCurrentLevel() {
         return currentLevel;
     }
-    public Integer getCurrentExperience() {
+    public int getCurrentExperience() {
         return currentExperience;
     }
     public Move[] getMoves() {
@@ -80,7 +80,9 @@ public class Pokemon {
     }
     public Boolean hasOwner() { return hasOwner; }
     public void setOwner(Boolean hasOwner) { this.hasOwner = hasOwner; }
-    public void receiveDamage(Integer damage){ currentHp-=damage; }
+    public void receiveDamage(Integer damage){
+        currentHp = Integer.max(0, currentHp - damage);
+    }
 
     public void heal(Integer heal){
         if(currentHp+heal<=currentStats.getValue(StatType.HP)){
@@ -148,7 +150,6 @@ public class Pokemon {
             }
         }
     }
-    
 
     @Override
     public int hashCode() {
@@ -160,11 +161,15 @@ public class Pokemon {
         result = prime * result + ((specie == null) ? 0 : specie.hashCode());
         result = prime * result + ((currentStats == null) ? 0 : currentStats.hashCode());
         result = prime * result + ((currentLevel == null) ? 0 : currentLevel.hashCode());
-        result = prime * result + ((currentExperience == null) ? 0 : currentExperience.hashCode());
+        result = prime * result + Integer.hashCode(currentExperience);
         result = prime * result + ((hasOwner == null) ? 0 : hasOwner.hashCode());
         result = prime * result + Arrays.hashCode(moves);
-        result = prime * result + ((statusEffects == null) ? 0 : statusEffects.hashCode());
+        result = prime * result + statusEffects.hashCode();
         return result;
+    }
+
+    public List<StatusEffect> getStatusEffects() {
+        return statusEffects;
     }
 
     @Override
@@ -206,10 +211,7 @@ public class Pokemon {
                 return false;
         } else if (!currentLevel.equals(other.currentLevel))
             return false;
-        if (currentExperience == null) {
-            if (other.currentExperience != null)
-                return false;
-        } else if (!currentExperience.equals(other.currentExperience))
+        if (currentExperience != other.currentExperience)
             return false;
         if (hasOwner == null) {
             if (other.hasOwner != null)
@@ -218,15 +220,6 @@ public class Pokemon {
             return false;
         if (!Arrays.equals(moves, other.moves))
             return false;
-        if (statusEffects == null) {
-            if (other.statusEffects != null)
-                return false;
-        } else if (!statusEffects.equals(other.statusEffects))
-            return false;
-        return true;
-    }
-
-    public List<StatusEffect> getStatusEffects() {
-        return statusEffects;
+        return statusEffects.equals(other.statusEffects);
     }
 }
