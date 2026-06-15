@@ -21,4 +21,5 @@ public class Team{
         }
     }
     public boolean hasIndex(Integer index){return index>=0&&index<members.size();}
+    public void healAll() { for (var member : members) member.fullHeal(); }
 }

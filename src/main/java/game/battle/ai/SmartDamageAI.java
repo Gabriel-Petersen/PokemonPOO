@@ -16,8 +16,6 @@ public class SmartDamageAI implements BattleAI
     public CombatAction selectAction(BattleContext context, Trainer trainer)
     {
         Pokemon user = trainer.getCurrent();
-        Pokemon target = context.getPlayer().getCurrent();
-
         Move[] moves = user.getMoves();
         List<Move> usableMoves = new ArrayList<>();
 

@@ -2,15 +2,24 @@ package game.loader;
 
 import game.creature.move.DamageMove;
 import game.creature.ElementType;
+import game.creature.StatType;
 import game.creature.move.Move;
 import game.creature.move.MoveCategory;
+import game.creature.move.StatusMove;
+import game.creature.move.status.DamageOverTimeStatusEffect;
+import game.creature.move.status.PersistentStatusEffect;
+import game.creature.move.status.StatModifierRule;
+import game.creature.move.status.StatusEffect;
+import game.creature.move.status.VolatileStatusEffect;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MoveRegister 
@@ -95,12 +104,51 @@ public class MoveRegister
             throw GameLoadingException.moveError(name, id, "Categoria de movimento inválida: " + traits[MoveData.CATEGORY.id()]);
         }
 
-        if (category == MoveCategory.STATUS) {
-            throw GameLoadingException.moveError(
-                name, 
-                id, 
-                "Falha ao carregar: Movimentos de STATUS ainda não foram implementados no motor de batalha."
-            );
+        if (category == MoveCategory.STATUS) 
+        {
+            if (traits.length < 10) 
+                throw GameLoadingException.moveError(name, id, "Movimento de STATUS sem parâmetros de efeitos configurados");
+
+            boolean isSelfTarget = Boolean.parseBoolean(traits[7].trim());
+            String statusType = traits[8].trim().toUpperCase();
+            int durationTurns = Integer.parseInt(traits[9].trim());
+
+            List<StatModifierRule> rules = new ArrayList<>();
+
+            for (int i = 10; i < traits.length; i++)
+            {
+                String ruleStr = traits[i].trim();
+                if (ruleStr.isBlank()) continue;
+
+                String[] ruleTokens = ruleStr.split(":");
+                String statName = ruleTokens[0].toUpperCase();
+                double factor = Double.parseDouble(ruleTokens[1]);
+
+                if (!statName.equals("HP_DOT")) {
+                    StatType targetStat = StatType.valueOf(statName);
+                    rules.add(new StatModifierRule(targetStat, (baseValue, ctx) -> (int)(baseValue * factor)));
+                }
+            }
+
+            StatusEffect generatedEffect = switch (statusType) {
+                case "VOLATILE" -> new VolatileStatusEffect(name + "_EFF", durationTurns, rules);
+                case "PERSISTENT" -> new PersistentStatusEffect(name + "_EFF", rules);
+                case "PERSISTENT_DOT" -> {
+                    double dotFactor = 8.0; // Fallback para 1/8
+                    for (int i = 10; i < traits.length; i++)
+                        if (traits[i].trim().toUpperCase().startsWith("HP_DOT")) 
+                            dotFactor = Double.parseDouble(traits[i].split(":")[1].trim());
+                    
+                    final double finalDotFactor = dotFactor;
+                    yield new DamageOverTimeStatusEffect(
+                        name + "_EFF", rules, "foi afetado por " + name, "sofreu danos contínuos!",
+                        (maxHp, ctx) -> (int)(maxHp / finalDotFactor)
+                    );
+                }
+                default -> throw GameLoadingException.moveError(name, id, "Subtipo de efeito de status inválido: " + statusType);
+            };
+
+            return new StatusMove(id, name, accuracy, priority, isSelfTarget, generatedEffect);
         }
 
         return new DamageMove(id, name, power, accuracy, priority, elementType, category);

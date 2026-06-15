@@ -109,8 +109,8 @@ public class SpecieRegister {
         }
 
         Specie sp;
-        String frPath = "front_sprites\\front_pokemon_" + idToString(id) + ".png";
-        String bkPath = "back_sprites\\back_pokemon_" + idToString(id) + ".png";
+        String frPath = "front_sprites/front_pokemon_" + idToString(id) + ".png";
+        String bkPath = "back_sprites/back_pokemon_" + idToString(id) + ".png";
         if (t1 == null)
             throw GameLoadingException.specieError(name, id, "must have at least a valid primary type (Type1)");
         if (evolutionID == null)

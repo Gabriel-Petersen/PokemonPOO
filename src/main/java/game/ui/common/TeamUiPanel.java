@@ -10,8 +10,6 @@ import game.creature.Pokemon;
 import game.creature.PokemonClickAction;
 import game.creature.move.Move;
 import game.creature.StatType;
-import game.creature.move.status.StatusEffect;
-import game.creature.move.status.VolatileStatusEffect;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -300,7 +298,7 @@ public class TeamUiPanel extends UiImage
         String[] prefix = {"ATK: ", "DEF: ", "SP. ATK: ", "SP. DEF: ", "SPEED: "};
         for (var stat : StatType.values())
         {
-            if (stat == StatType.HP) continue;
+            if (stat == StatType.HP || stat == StatType.ACCURACY) continue;
             statLines[stat.ordinal() - 1].setText(prefix[stat.ordinal() - 1] + stats.getValue(stat));
         }
 

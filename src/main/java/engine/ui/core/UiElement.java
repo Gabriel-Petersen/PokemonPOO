@@ -25,6 +25,10 @@ public abstract class UiElement extends GameObject
 
     private final Rectangle2D bounds = new Rectangle2D.Double();
 
+    private final List<UiElement> toAdd = new ArrayList<>();
+    private final List<UiElement> toRemove = new ArrayList<>();
+    private boolean isPendingClear = false;
+
     protected UiElement() { transform = new UiTransform(); }
 
     protected Rectangle2D getBounds()
@@ -41,14 +45,29 @@ public abstract class UiElement extends GameObject
         return bounds;
     }
 
+    @Override protected final Renderer createSwingRenderer() { return null; }
     public UiTransform getUiTransform() { return (UiTransform) transform; }
-
-    @Override
-    protected final Renderer createSwingRenderer() {
-        return null;
-    }
-
     public boolean isMouseOver() { return isMouseOver; }
+    protected void beforeDraw(Graphics2D g2d) { }
+    protected abstract void drawSelf(Graphics2D g2d);
+
+    private void applyPendingModifications() 
+    {
+        if (isPendingClear) {
+            child.clear();
+            isPendingClear = false;
+        }
+
+        if (!toRemove.isEmpty()) {
+            child.removeAll(toRemove);
+            toRemove.clear();
+        }
+
+        if (!toAdd.isEmpty()) {
+            child.addAll(toAdd);
+            toAdd.clear();
+        }
+    }
 
     @Override
     public void setLayer(int layer)
@@ -66,6 +85,7 @@ public abstract class UiElement extends GameObject
     @Override
     protected void onDraw(Graphics2D g2d)
     {
+        applyPendingModifications();
         AffineTransform oldTransform = g2d.getTransform();
 
         beforeDraw(g2d);
@@ -90,10 +110,6 @@ public abstract class UiElement extends GameObject
         g2d.setTransform(oldTransform);
     }
 
-    protected void beforeDraw(Graphics2D g2d) { }
-
-    protected abstract void drawSelf(Graphics2D g2d);
-
     public Vec2d getLocalAnchoredPosition()
     {
         Vec2d parentSize = (getParent() == null)
@@ -116,10 +132,11 @@ public abstract class UiElement extends GameObject
         return new MutableVec2d(pPos.x() + localPos.x(), pPos.y() + localPos.y());
     }
 
-    public void removeChild(UiElement element) { child.remove(element); }
-    public void addChild(UiElement element) { child.add(element); element.parent = this; }
+    public void removeChild(UiElement element) { toRemove.add(element); }
+    public void addChild(UiElement element) { toAdd.add(element); element.parent = this; }
     public <T extends UiElement> List<T> getAllChildrenFromType(Class<? extends T> type)
     {
+        applyPendingModifications();
         List<T> out = new ArrayList<>();
         for (var el : child)
             if (type.isInstance(el))
@@ -128,14 +145,12 @@ public abstract class UiElement extends GameObject
         return out;
     }
 
-    @Override
-    public void setup() {
-        for (var el : child) { el.setup(); renderer = null; }
-    }
+    @Override public void setup() { applyPendingModifications(); for (var el : child) { el.setup(); renderer = null; } }
 
     @Override
     public void update()
     {
+        applyPendingModifications();
         Vec2d mousePos = Input.getMousePos();
         boolean nowOver = getBounds().contains(mousePos.x(), mousePos.y());
 
@@ -157,19 +172,24 @@ public abstract class UiElement extends GameObject
             for (var el : child) el.update();
     }
 
-    public List<UiElement> getAllChildren() { return new ArrayList<>(child); }
-    public Set<UiElement> getAllChildrenSet() { return child; }
-
+    public List<UiElement> getAllChildren() { applyPendingModifications(); return new ArrayList<>(child); }
+    public Set<UiElement> getAllChildrenSet() { applyPendingModifications(); return child; }
     public UiElement getParent() { return parent; }
+
+    public void removeAllChildren() 
+    {
+        isPendingClear = true;
+        toAdd.clear();
+        toRemove.clear();
+    }
 
     public UiElement getChild(int index)
     {
+        applyPendingModifications();
         int i = 0;
         for (var el : child)
             if (i++ == index) return el;
 
         throw new IndexOutOfBoundsException(this + " does not has " + index + " children");
     }
-
-    public void removeAllChildren() { child.clear(); }
 }

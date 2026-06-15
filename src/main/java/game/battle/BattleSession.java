@@ -4,6 +4,7 @@ import engine.core.GamePanel;
 import engine.events.EventScheduler;
 import engine.events.LambdaEvent;
 import engine.events.TypewriterEvent;
+import engine.input.Input;
 import engine.lifecycle.Updatable;
 import engine.ui.elements.UiText;
 import game.battle.actions.CombatAction;
@@ -16,6 +17,7 @@ import game.ui.battle.BattleHud;
 import game.ui.battle.NicknameOverlay;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 public class BattleSession implements Updatable
@@ -76,6 +78,15 @@ public class BattleSession implements Updatable
                     p.getMetadata().addMoney(NpcTrainer.MONEY_PRIZE * t.getTeam().getMembers().size());
             }
             return;
+        }
+
+        if (Input.getKeyDown(KeyEvent.VK_P))
+        {
+            System.out.println("Player Stats:");
+            System.out.println(player.getCurrent().getEffectiveStats(battle.getContext()));
+            System.out.println("\n--------------------------------------------------------------\n");
+            System.out.println("Opponent Stats:");
+            System.out.println(opponent.getCurrent().getEffectiveStats(battle.getContext()));
         }
 
         if (opponentAction == null && playerAction != null) 
