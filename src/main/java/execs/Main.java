@@ -15,14 +15,14 @@ import game.loader.ItemRegistry;
 import game.loader.SpecieRegister;
 import game.player.Player;
 import game.scenario.GameMap;
-
+import game.ui.common.MainMenu;
 import java.awt.Color;
 import java.util.Objects;
 import javax.swing.JFrame;
 
 public class Main
 {
-    private static void buildMap()
+    public static void buildMap()
     {
         GamePanel gamePanel = GamePanel.getInstance();
 
@@ -120,7 +120,12 @@ public class Main
         frame.pack();
         frame.setVisible(true);
 
-        buildMap();
+        MainMenu menu = MainMenu.getInstance();
+        menu.setOnStart(() -> {
+            buildMap();
+            menu.hide();
+        });
+        menu.show();
 
         new Thread(() -> {
             long lastTime = System.nanoTime();
