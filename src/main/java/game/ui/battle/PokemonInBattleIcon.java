@@ -6,7 +6,7 @@ import engine.ui.elements.UiProgressBar;
 import engine.ui.elements.UiProgressBar.Direction;
 import engine.ui.elements.UiText;
 import game.creature.Pokemon;
-import game.creature.move.StatType;
+import game.creature.StatType;
 import java.awt.Color;
 import java.awt.Font;
 

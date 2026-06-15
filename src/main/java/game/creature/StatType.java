@@ -1,4 +1,4 @@
-package game.creature.move;
+package game.creature;
 
 public enum StatType {
     HP,

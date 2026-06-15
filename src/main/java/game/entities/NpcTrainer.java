@@ -63,10 +63,13 @@ public class NpcTrainer extends Npc implements Trainer
         db.setVisible(true);
         db.getEventQueue().clear();
 
-        if (getMessage() != null && getMessage().length > 0 && getMessage()[0] != null)
-            for (String s : getMessage()) db.showText(s);
-        else
-            db.showText(getDisplayName() + " quer batalhar!");
+        if (team.hasAvailableMember()) {
+            if (getMessage() != null && getMessage().length > 0 && getMessage()[0] != null)
+                for (String s : getMessage()) db.showText(s);
+            else
+                db.showText(getDisplayName() + " quer batalhar!");
+        }
+        else db.showText("Você já me derrotou...");
 
         db.getEventQueue().setOnEndResolving(() -> {
             player.setTalking(false);

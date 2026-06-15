@@ -11,8 +11,6 @@ public class Battle
     private final Trainer opponent;
     private BattleContext context;
 
-    private Trainer winner = null;
-
     public Battle(BattleHud hud, Trainer player, Trainer opponent) {
         this.player = player;
         this.opponent = opponent;
@@ -22,7 +20,6 @@ public class Battle
     public Trainer getPlayer() { return player; }
     public Trainer getOpponent() { return opponent; }
     public BattleContext getContext() { return context; }
-    public Trainer getWinner() { return winner; }
 
     public List<CombatAction> determineOrder(CombatAction playerAction, CombatAction opponentAction) 
     {
@@ -41,10 +38,6 @@ public class Battle
 
     public void setContext(BattleContext context) {
         this.context = context;
-    }
-
-    public void setWinner(Trainer winner) {
-        this.winner = winner;
     }
 
     public Boolean isFinished() {

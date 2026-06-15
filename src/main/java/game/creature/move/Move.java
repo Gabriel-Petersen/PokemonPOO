@@ -1,6 +1,7 @@
 package game.creature.move;
 
 import game.battle.BattleContext;
+import game.creature.ElementType;
 import game.creature.Pokemon;
 
 public abstract class Move {
@@ -12,9 +13,12 @@ public abstract class Move {
     private Integer priority;
     protected ElementType elementType;
     private Integer pp;
-    protected MoveCategory category;    
+    protected MoveCategory category;
+    protected Boolean isSelfTarget;
 
-    public Move(int id, String name, Integer power, Double accuracy, Integer priority, ElementType elementType, MoveCategory category) 
+    public Move(
+        int id, String name, Integer power, Double accuracy, Integer priority, ElementType elementType, MoveCategory category, boolean isSelfTarget
+    ) 
     {
         if (elementType == null)
             throw new NullPointerException("Element type of move: " + name + " [id = " + id + "] is null. It may be ElementType.NONE");
@@ -25,6 +29,7 @@ public abstract class Move {
         this.priority = priority;
         this.elementType = elementType;
         this.category = category;
+        this.isSelfTarget = isSelfTarget;
         restorePP();
     }
 
@@ -34,7 +39,7 @@ public abstract class Move {
 
     public abstract MoveResult execute(Pokemon attacker,Pokemon target,BattleContext context);
 
-    public void restorePP() { pp=MAX_PP; }
+    public final void restorePP() { pp=MAX_PP; }
     public int getId() { return id; }
 
     public String getName() { return name; }
@@ -57,4 +62,8 @@ public abstract class Move {
 
     public MoveCategory getCategory() { return category; }
     public void setCategory(MoveCategory category) { this.category = category; }
+
+    public Boolean isSelfTarget() { return isSelfTarget; }
+
+    public static int getMaxPp() { return MAX_PP; }
 }

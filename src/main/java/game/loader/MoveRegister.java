@@ -1,7 +1,7 @@
 package game.loader;
 
 import game.creature.move.DamageMove;
-import game.creature.move.ElementType;
+import game.creature.ElementType;
 import game.creature.move.Move;
 import game.creature.move.MoveCategory;
 
@@ -110,7 +110,9 @@ public class MoveRegister
     {
         int remainingElements = originalTraits.length - currI;
         if (remainingElements % 2 != 0)
-            throw new GameLoadingException("Erro ao carregar a movepool. Nem todo move está pareado a um level (quantidade ímpar de dados)");
+            throw new GameLoadingException(
+                    "Erro ao carregar a move pool. Nem todo move está pareado a um level (quantidade ímpar de dados)"
+            );
         
         while (currI < originalTraits.length - 1) 
         {
@@ -118,22 +120,22 @@ public class MoveRegister
             int level = Integer.parseInt(originalTraits[currI + 1].trim());
 
             int id = -1;
-            try { id = Integer.parseInt(t1); } catch (NumberFormatException e) { }
+            try { id = Integer.parseInt(t1); } catch (NumberFormatException ignored) { }
 
+            Move mv;
             if (id == -1)
             {
-                Move mv = getMove(t1);
+                mv = getMove(t1);
                 if (forceLoad && mv == FALLBACK_MOVE) 
                     throw GameLoadingException.moveError(t1, id, "Move com nome=" + t1 + " não foi carregado previamente e tentou ser usado na MovePool");
-                pool.put(level, mv);
             }
             else
             {
-                Move mv = getMove(id);
+                mv = getMove(id);
                 if (forceLoad && mv == FALLBACK_MOVE) 
                     throw GameLoadingException.moveError("no-name-found", id, "Move com id=" + id + " não foi carregado previamente e tentou ser usado na MovePool");
-                pool.put(level, mv);
             }
+            pool.put(level, mv);
 
             currI += 2;
         }

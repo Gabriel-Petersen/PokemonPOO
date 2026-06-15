@@ -25,7 +25,7 @@ public class SwitchAction extends CombatAction{
         team.switchActive(targetIndex);
         scheduler.enqueue(new TypewriterEvent(
             context.getHud().getConsole(), 
-            "Changing to " + team.getActiveMember().getNickname(), 
+            "Trocando para " + team.getActiveMember().getNickname(),
             0.1, 
             1.5
         ));
@@ -37,6 +37,7 @@ public class SwitchAction extends CombatAction{
                 hud.getPlayerPokemonIcon().setSource(newActive);
             else
                 hud.getOpponentPokemonIcon().setSource(newActive);
+            hud.updateActivePokemonSprites();
         }));
         newActive.setupForBattle();
         return ActionResult.SUCCESS;

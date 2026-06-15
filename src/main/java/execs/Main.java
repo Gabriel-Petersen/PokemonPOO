@@ -3,9 +3,9 @@ package execs;
 import engine.assets.AssetManager;
 import engine.core.GamePanel;
 import engine.input.Input;
-import engine.tilemap.ImageTilemap;
-import engine.tilemap.Tilemap;
 import game.battle.Team;
+import game.capturing.ETRegistry;
+import game.capturing.WildEncounterUpdater;
 import game.creature.Pokemon;
 import game.entities.Npc;
 import game.entities.NpcSeller;
@@ -14,6 +14,8 @@ import game.itemsystem.Inventory;
 import game.loader.ItemRegistry;
 import game.loader.SpecieRegister;
 import game.player.Player;
+import game.scenario.GameMap;
+
 import java.awt.Color;
 import java.util.Objects;
 import javax.swing.JFrame;
@@ -24,32 +26,16 @@ public class Main
     {
         GamePanel gamePanel = GamePanel.getInstance();
 
-        Tilemap tilemap = new ImageTilemap(
-                Objects.requireNonNull(AssetManager.getSprite("scenario/mapa_limited.png")),
-                AssetManager.getSprite("scenario/collision_matrix_map.png"),
-                16
-        );
+        GameMap tilemap = getTilemap(gamePanel);
 
-        tilemap.setLayer(-1);
-        tilemap.getTransform().setScale(3, 3);
-        tilemap.getTransform().setPosition(
-                -4 * tilemap.getSizeX(),
-                -4 * tilemap.getSizeY()
-        );
+        WildEncounterUpdater encounterUpdater = new WildEncounterUpdater();
+        encounterUpdater.setGameMap(tilemap);
+        gamePanel.addElement(encounterUpdater);
+        encounterUpdater.registerEncounterArea(3098, 5049, 3149, 4860, ETRegistry.TABLE_0);
 
-        gamePanel.addElement(tilemap);
+        Player player = getPlayer(tilemap, gamePanel);
 
-        Player player = new Player();
-        player.getTransform().setScale(1.8, 1.8);
-        player.setCurrentMap(tilemap);
-        player.getTransform().setPosition(2806, 5522);
-        player.getTeam().addMember(new Pokemon("Meu Charmandinho", SpecieRegister.getSpecie(1), 3));
-        player.getCurrent().setOwner(true);
-        gamePanel.addElement(player);
-
-        var inv = player.getInventory();
-        inv.add(ItemRegistry.smallPotion, 1);
-        inv.add(ItemRegistry.mediumPotion, 10);
+        encounterUpdater.registerPlayer(player);
 
         Npc npc1 = new Npc("Certinho", "npcs/ingame/npc_ingame01.png");
         npc1.getTransform().setScale(3, 3);
@@ -67,7 +53,7 @@ public class Main
                 "npcs/ingame/npc_ingame05.png",
             "npcs/battle/npc_battle01.png"
         );
-        npc2.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 1));
+        npc2.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(1), 5));
         npc2.getCurrent().setOwner(true);
         npc2.getTransform().setScale(3, 3);
         npc2.getTransform().setPosition(3000, 5522);
@@ -77,16 +63,48 @@ public class Main
         npc2.setMessage(npc2Message);
         gamePanel.addElement(npc2);
 
-        System.out.println("DEBUG");
-        for (var item : player.getCurrent().getMoves())
-            System.out.println(item == null ? "null" : item.getName());
-
         NpcSeller shopkeeper = new NpcSeller("Vendedor", "npcs/ingame/npc_ingame03.png");
         shopkeeper.getTransform().setScale(3, 3);
         shopkeeper.getTransform().setPosition(3100, 5522);
         shopkeeper.getInventory().add(ItemRegistry.smallPotion, 5);
         shopkeeper.getInventory().add(ItemRegistry.mediumPotion, 2);
         gamePanel.addElement(shopkeeper);
+    }
+
+    private static GameMap getTilemap(GamePanel gamePanel)
+    {
+        GameMap tilemap = new GameMap(
+                Objects.requireNonNull(AssetManager.getSprite("scenario/mapa_limited.png")),
+                AssetManager.getSprite("scenario/collision_matrix_map.png"),
+                AssetManager.getSprite("scenario/grass_matrix_map.png"),
+                16
+        );
+
+        tilemap.setLayer(-1);
+        tilemap.getTransform().setScale(3, 3);
+        tilemap.getTransform().setPosition(
+                -4 * tilemap.getSizeX(),
+                -4 * tilemap.getSizeY()
+        );
+
+        gamePanel.addElement(tilemap);
+        return tilemap;
+    }
+
+    private static Player getPlayer(GameMap tilemap, GamePanel gamePanel) {
+        Player player = new Player();
+        player.getTransform().setScale(1.8, 1.8);
+        player.setCurrentMap(tilemap);
+        player.getTransform().setPosition(2806, 5522);
+        player.getTeam().addMember(new Pokemon("Meu Charmander", SpecieRegister.getSpecie(4), 5));
+        player.getTeam().addMember(new Pokemon("Meu Bulbassauro", SpecieRegister.getSpecie(1), 5));
+        player.getCurrent().setOwner(true);
+        gamePanel.addElement(player);
+        var inv = player.getInventory();
+        inv.add(ItemRegistry.smallPotion, 1);
+        inv.add(ItemRegistry.mediumPotion, 10);
+        inv.add(ItemRegistry.pokeBall, 10);
+        return player;
     }
 
     public static void main(String[] args)

@@ -71,6 +71,17 @@ public abstract class Tilemap extends GameObject
         g2d.setTransform(backup);
     }
 
+    public int[] worldToTileCords(double worldX, double worldY)
+    {
+        double localX = worldX - transform.getPosition().x();
+        double localY = worldY - transform.getPosition().y();
+
+        int tileX = (int) (localX / (tileSize * transform.getScale().x()));
+        int tileY = (int) (localY / (tileSize * transform.getScale().y()));
+
+        return new int[] { tileX, tileY };
+    }
+
     protected abstract void drawTilemap(Graphics2D g2d);
 
     public double getTileSize() { return tileSize; }

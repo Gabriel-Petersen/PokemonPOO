@@ -9,16 +9,13 @@ import game.creature.move.Move;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class SmartDamageAI implements BattleAI
 {
-    private final Random random = new Random();
-
     @Override
-    public CombatAction selectAction(BattleContext context, Trainer npc)
+    public CombatAction selectAction(BattleContext context, Trainer trainer)
     {
-        Pokemon user = npc.getCurrent();
+        Pokemon user = trainer.getCurrent();
         Pokemon target = context.getPlayer().getCurrent();
 
         Move[] moves = user.getMoves();
@@ -31,7 +28,7 @@ public class SmartDamageAI implements BattleAI
         }
 
         if (usableMoves.isEmpty()) {
-            return new MoveAction(moves[0], target, user, npc);
+            return new MoveAction(moves[0], trainer);
         }
 
         Move bestMove = null;
@@ -40,6 +37,6 @@ public class SmartDamageAI implements BattleAI
                 bestMove = move;
         }
 
-        return new MoveAction(bestMove, target, user, npc);
+        return new MoveAction(bestMove, trainer);
     }
 }

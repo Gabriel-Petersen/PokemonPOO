@@ -1,6 +1,5 @@
 package game.creature;
 
-import game.creature.move.ElementType;
 import game.creature.move.Move;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -33,16 +32,8 @@ public class Specie {
 
     public Specie (
         Integer dexNumber, String name, Stats baseStats, ElementType primaryType, ElementType secondaryType, BufferedImage frontSprite, BufferedImage backSprite
-    ) 
-    {
-        this.dexNumber = dexNumber;
-        this.name = name;
-        this.baseStats = baseStats;
-        this.primaryType = primaryType;
-        this.secondaryType = secondaryType;
-        this.frontSprite = frontSprite;
-        this.backSprite = backSprite;
-        this.evolution = null;
+    ) {
+        this(dexNumber, name, baseStats, primaryType, secondaryType, null, frontSprite, backSprite);
     }
 
     public Specie (
@@ -99,17 +90,16 @@ public class Specie {
         return evolution;
     }
 
-    public void loadMovepool(Map<Integer, Move> pool) {
+    public void loadMovePool(Map<Integer, Move> pool) {
         movePool.clear();
         if (pool != null) movePool.putAll(pool);
     }
 
-    public Collection<Move> resolveMovessForLevel(Integer level){
+    public Collection<Move> resolveMovesForLevel(Integer level){
         return movePool.headMap(level + 1).values();
     }
 
-    @Override
-    public int hashCode() { return dexNumber.hashCode(); }
+    @Override public int hashCode() { return dexNumber.hashCode(); }
 
     @Override
     public boolean equals(Object obj) {
@@ -123,9 +113,5 @@ public class Specie {
         if (dexNumber == null) {
             return other.dexNumber == null;
         } else return dexNumber.equals(other.dexNumber);
-    }
-
-    public String getTypes() {
-        return primaryType + " / " + secondaryType;
     }
 }

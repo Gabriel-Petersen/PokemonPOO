@@ -3,11 +3,15 @@ package game.ui.common;
 import engine.ui.core.UiTransform.Anchor;
 import engine.ui.elements.UiButton;
 import engine.ui.elements.UiImage;
+import engine.ui.elements.UiProgressBar;
 import engine.ui.elements.UiText;
 import game.battle.Team;
 import game.creature.Pokemon;
+import game.creature.PokemonClickAction;
 import game.creature.move.Move;
-import game.creature.move.StatType;
+import game.creature.StatType;
+import game.creature.move.status.StatusEffect;
+import game.creature.move.status.VolatileStatusEffect;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -16,104 +20,183 @@ public class TeamUiPanel extends UiImage
 {
     private final Team team;
     private Pokemon selectedPokemon;
+    private PokemonClickAction customClickAction;
+    private boolean needsListRebuild = false;
 
     private final UiImage listContainer;
+    private final UiImage detailsContainer;
     private final UiButton[] memberButtons = new UiButton[6];
 
     private final UiText nameTxt;
+    private final UiText specieTypeTxt;
     private final UiText levelTxt;
     private final UiText hpTxt;
+    private final UiText type1Txt;
+    private final UiText type2Txt;
     private final UiText[] statLines = new UiText[5];
-    private final UiText[] moveLines = new UiText[4];
     private final UiImage pokemonSpriteView;
 
-    public TeamUiPanel(int sizeX, int sizeY, Color backgroundColor, Team team)
+    private final UiButton[] moveButtons = new UiButton[4];
+    private final MoveDetailsTooltip moveDetailsTooltip;
+
+    public TeamUiPanel(int sizeX, int sizeY, Color backgroundColor, Team team) {
+        this(sizeX, sizeY, backgroundColor, team, null);
+    }
+
+    public TeamUiPanel(int sizeX, int sizeY, Color backgroundColor, Team team, PokemonClickAction customClickAction)
     {
         super(sizeX, sizeY, backgroundColor);
         this.team = team;
+        this.customClickAction = customClickAction;
 
         getUiTransform().setAnchor(Anchor.CENTER);
         getUiTransform().setPosition(0, 0);
 
+        // CONTAINER ESQUERDO: Lista de Membros
         int listW = (int) (sizeX * 0.4);
         listContainer = new UiImage(listW, sizeY - 20, new Color(32, 36, 45));
         listContainer.getUiTransform().setAnchor(Anchor.CENTER_LEFT);
         listContainer.getUiTransform().setPosition(10, 0);
         addChild(listContainer);
 
+        // CONTAINER DIREITO: Detalhes gerais do monstro
         int detailsW = (int) (sizeX * 0.56);
-        UiImage detailsContainer = new UiImage(detailsW, sizeY - 20, new Color(48, 54, 66));
+        detailsContainer = new UiImage(detailsW, sizeY - 20, new Color(48, 54, 66));
         detailsContainer.getUiTransform().setAnchor(Anchor.CENTER_RIGHT);
         detailsContainer.getUiTransform().setPosition(-10, 0);
+        detailsContainer.setVisible(false);
         addChild(detailsContainer);
 
-        pokemonSpriteView = new UiImage(120, 120, new Color(0, 0, 0, 0));
+        // Viewport do Sprite
+        pokemonSpriteView = new UiImage(100, 100, new Color(0, 0, 0, 0));
         pokemonSpriteView.getUiTransform().setAnchor(Anchor.TOP_LEFT);
-        pokemonSpriteView.getUiTransform().setPosition(20, 20);
+        pokemonSpriteView.getUiTransform().setPosition(15, 15);
         detailsContainer.addChild(pokemonSpriteView);
 
+        // Linha 1: Apenas Nickname
         nameTxt = new UiText("");
         nameTxt.setFont("Arial", Font.BOLD, 18);
         nameTxt.setColor(Color.WHITE);
         nameTxt.getUiTransform().setAnchor(Anchor.TOP_LEFT);
-        nameTxt.getUiTransform().setPosition(160, 25);
+        nameTxt.getUiTransform().setPosition(130, 20);
         detailsContainer.addChild(nameTxt);
 
+        // Linha 2: Espécie + Elementos
+        specieTypeTxt = new UiText("");
+        specieTypeTxt.setFont("Arial", Font.ITALIC, 13);
+        specieTypeTxt.setColor(new Color(180, 190, 210));
+        specieTypeTxt.getUiTransform().setAnchor(Anchor.TOP_LEFT);
+        specieTypeTxt.getUiTransform().setPosition(130, 43);
+        detailsContainer.addChild(specieTypeTxt);
+
+        type1Txt = new UiText("");
+        type1Txt.setFont("Arial", Font.BOLD, 12);
+        type1Txt.getUiTransform().setAnchor(Anchor.TOP_LEFT);
+        type1Txt.getUiTransform().setPosition(225, 44);
+        detailsContainer.addChild(type1Txt);
+
+        type2Txt = new UiText("");
+        type2Txt.setFont("Arial", Font.BOLD, 12);
+        type2Txt.getUiTransform().setAnchor(Anchor.TOP_LEFT);
+        type2Txt.getUiTransform().setPosition(285, 44);
+        detailsContainer.addChild(type2Txt);
+
         levelTxt = new UiText("");
-        levelTxt.setFont("Arial", Font.PLAIN, 14);
+        levelTxt.setFont("Arial", Font.PLAIN, 13);
         levelTxt.setColor(new Color(200, 200, 200));
         levelTxt.getUiTransform().setAnchor(Anchor.TOP_LEFT);
-        levelTxt.getUiTransform().setPosition(160, 50);
+        levelTxt.getUiTransform().setPosition(130, 64);
         detailsContainer.addChild(levelTxt);
 
         hpTxt = new UiText("");
-        hpTxt.setFont("Arial", Font.BOLD, 14);
-        hpTxt.setColor(new Color(105, 230, 105));
+        hpTxt.setFont("Arial", Font.BOLD, 13);
         hpTxt.getUiTransform().setAnchor(Anchor.TOP_LEFT);
-        hpTxt.getUiTransform().setPosition(160, 75);
+        hpTxt.getUiTransform().setPosition(130, 83);
         detailsContainer.addChild(hpTxt);
 
+        // Bloco de Atributos (Stats)
         UiText statsTitleTxt = new UiText("STATS");
-        statsTitleTxt.setFont("Arial", Font.BOLD, 14);
+        statsTitleTxt.setFont("Arial", Font.BOLD, 13);
         statsTitleTxt.setColor(new Color(241, 196, 15));
         statsTitleTxt.getUiTransform().setAnchor(Anchor.TOP_LEFT);
-        statsTitleTxt.getUiTransform().setPosition(20, 155);
+        statsTitleTxt.getUiTransform().setPosition(20, 130);
         detailsContainer.addChild(statsTitleTxt);
 
         for (int i = 0; i < statLines.length; i++) {
             statLines[i] = new UiText("");
-            statLines[i].setFont("Consolas", Font.PLAIN, 13);
+            statLines[i].setFont("Consolas", Font.PLAIN, 12);
             statLines[i].setColor(Color.WHITE);
             statLines[i].getUiTransform().setAnchor(Anchor.TOP_LEFT);
-            statLines[i].getUiTransform().setPosition(20, 180 + (i * 20));
+            statLines[i].getUiTransform().setPosition(20, 150 + (i * 18));
             detailsContainer.addChild(statLines[i]);
         }
 
+        // Bloco do Moveset
         UiText movesTitle = new UiText("MOVESET");
-        movesTitle.setFont("Arial", Font.BOLD, 14);
+        movesTitle.setFont("Arial", Font.BOLD, 13);
         movesTitle.setColor(new Color(52, 152, 219));
         movesTitle.getUiTransform().setAnchor(Anchor.TOP_RIGHT);
-        movesTitle.getUiTransform().setPosition(-120, 155);
+        movesTitle.getUiTransform().setPosition(-130, 130);
         detailsContainer.addChild(movesTitle);
 
-        for (int i = 0; i < moveLines.length; i++) {
-            moveLines[i] = new UiText("");
-            moveLines[i].setFont("Arial", Font.PLAIN, 13);
-            moveLines[i].setColor(Color.WHITE);
-            moveLines[i].getUiTransform().setAnchor(Anchor.TOP_RIGHT);
-            moveLines[i].getUiTransform().setPosition(-120, 180 + (i * 22));
-            detailsContainer.addChild(moveLines[i]);
+        moveDetailsTooltip = new MoveDetailsTooltip(detailsW - 30, 75);
+
+        int moveBtnW = 125;
+        int moveBtnH = 26;
+        for (int i = 0; i < 4; i++)
+        {
+            final int index = i;
+            moveButtons[i] = new UiButton("-", () -> {
+                if (selectedPokemon != null && index < selectedPokemon.getMoves().length) {
+                    Move move = selectedPokemon.getMoves()[index];
+                    if (move != null) moveDetailsTooltip.displayMove(move);
+                }
+            });
+            moveButtons[i].getTransform().setScale(moveBtnW, moveBtnH);
+            moveButtons[i].getUiTransform().setAnchor(Anchor.TOP_RIGHT);
+            moveButtons[i].getUiTransform().setPosition(-15, 150 + (i * 30));
+            moveButtons[i].setBackgroundColor(new Color(40, 45, 55));
+            moveButtons[i].setForegroundColor(Color.WHITE);
+            for (var text : moveButtons[i].getAllChildrenFromType(UiText.class)) {
+                text.setFont("Arial", Font.PLAIN, 12);
+            }
+            detailsContainer.addChild(moveButtons[i]);
         }
 
+        moveDetailsTooltip.getUiTransform().setAnchor(Anchor.CENTER_BOTTOM);
+        moveDetailsTooltip.getUiTransform().setPosition(0, -15);
+        detailsContainer.addChild(moveDetailsTooltip);
+
         setupMembersList();
-        updateSelection(team.getActiveMember());
+        if (team.hasAvailableMember())
+            updateSelection(team.getActiveMember());
+    }
+
+    @Override
+    public void update()
+    {
+        if (needsListRebuild) {
+            setupMembersList();
+            needsListRebuild = false;
+        }
+
+        super.update();
+    }
+
+    private void handlePokemonSelection(Pokemon pokemon)
+    {
+        if (customClickAction == null)
+            updateSelection(pokemon);
+        else
+            customClickAction.execute(pokemon);
     }
 
     private void setupMembersList()
     {
         listContainer.removeAllChildren();
 
-        int btnH = (int) ((listContainer.getTransform().getScale().y() - 30) / 6);
+        int containerH = (int) listContainer.getTransform().getScale().y();
+        int btnH = (containerH - 30) / 6;
         var members = team.getMembers();
 
         for (int i = 0; i < 6; i++)
@@ -123,19 +206,33 @@ public class TeamUiPanel extends UiImage
                 Pokemon p = members.get(i);
                 String label = p.getNickname() + "  Lvl " + p.getCurrentLevel();
 
-                memberButtons[i] = new UiButton(label, () -> updateSelection(p));
+                memberButtons[i] = new UiButton(label, () -> handlePokemonSelection(p));
 
-                if (!p.isAlive()) {
+                if (!p.isAlive())
+                {
                     memberButtons[i].setBackgroundColor(new Color(70, 40, 40));
                     memberButtons[i].setForegroundColor(Color.GRAY);
-                } else if (i == team.getActiveIndex()) {
+                }
+                else if (i == team.getActiveIndex())
+                {
                     memberButtons[i].setBackgroundColor(new Color(43, 81, 120));
                     memberButtons[i].setForegroundColor(Color.WHITE);
-                } else {
-                    memberButtons[i].setBackgroundColor(new Color(45, 52, 66));
+                }
+                else
+                {
+                    memberButtons[i].setBackgroundColor(new Color(53, 62, 78));
                     memberButtons[i].setForegroundColor(Color.WHITE);
                 }
-            } else {
+
+                int maxHp = p.getCurrentStats().getValue(StatType.HP);
+                UiHpBar hpProgressBar = new UiHpBar((int) listContainer.getTransform().getScale().x() - 40, 6, p.getCurrentHp(), maxHp);
+                hpProgressBar.getUiTransform().setAnchor(Anchor.CENTER_BOTTOM);
+                hpProgressBar.getUiTransform().setPosition(0, -4);
+                memberButtons[i].addChild(hpProgressBar);
+
+            }
+            else
+            {
                 memberButtons[i] = new UiButton("[ VAZIO ]", () -> {});
                 memberButtons[i].setBackgroundColor(new Color(24, 26, 32));
                 memberButtons[i].setForegroundColor(new Color(80, 80, 80));
@@ -154,16 +251,39 @@ public class TeamUiPanel extends UiImage
         if (pokemon == null) return;
         this.selectedPokemon = pokemon;
 
-        String specieName = pokemon.getSpecie().getName();
-        String typesStr = pokemon.getSpecie().getTypes();
+        detailsContainer.setVisible(true);
 
-        if (pokemon.getNickname().equals(specieName)) {
-            nameTxt.setText(pokemon.getNickname() + " (" + typesStr + ")");
-        } else {
-            nameTxt.setText(pokemon.getNickname() + " [" + specieName + "] (" + typesStr + ")");
+        String specieName = pokemon.getSpecie().getName();
+
+        nameTxt.setText(pokemon.getNickname());
+        specieTypeTxt.setText("[" + specieName + "]  • ");
+
+        var primary = pokemon.getSpecie().getPrimaryType();
+        var secondary = pokemon.getSpecie().getSecondaryType();
+
+        if (primary != null && primary != game.creature.ElementType.NONE)
+        {
+            type1Txt.setText(primary.name());
+            type1Txt.setColor(primary.getDisplayColor());
+            type1Txt.setVisible(true);
+        }
+        else {
+            type1Txt.setVisible(false);
         }
 
-        levelTxt.setText("Level: " + pokemon.getCurrentLevel() + "  |  Exp: " + (pokemon.getCurrentExperience() != null ? pokemon.getCurrentExperience() : 0));
+        if (secondary != null && secondary != game.creature.ElementType.NONE)
+        {
+            type2Txt.setText("/ " + secondary.name());
+            type2Txt.setColor(secondary.getDisplayColor());
+            type2Txt.setVisible(true);
+        }
+        else {
+            type2Txt.setVisible(false);
+        }
+
+        levelTxt.setText(
+                "Level: " + pokemon.getCurrentLevel() + "  |  Exp: " + pokemon.getCurrentExperience()
+        );
 
         int maxHp = pokemon.getCurrentStats().getValue(StatType.HP);
         hpTxt.setText("HP: " + pokemon.getCurrentHp() + " / " + maxHp);
@@ -173,13 +293,13 @@ public class TeamUiPanel extends UiImage
         else if (hpRatio <= 0.5) hpTxt.setColor(Color.YELLOW);
         else hpTxt.setColor(new Color(105, 230, 105));
 
-        if (pokemon.getSpecie().getFrontSprite() != null) {
+        if (pokemon.getSpecie().getFrontSprite() != null)
             pokemonSpriteView.setImage(pokemon.getSpecie().getFrontSprite());
-        }
 
         var stats = pokemon.getCurrentStats();
         String[] prefix = {"ATK: ", "DEF: ", "SP. ATK: ", "SP. DEF: ", "SPEED: "};
-        for (var stat : StatType.values()) {
+        for (var stat : StatType.values())
+        {
             if (stat == StatType.HP) continue;
             statLines[stat.ordinal() - 1].setText(prefix[stat.ordinal() - 1] + stats.getValue(stat));
         }
@@ -187,18 +307,53 @@ public class TeamUiPanel extends UiImage
         Move[] moves = pokemon.getMoves();
         for (int i = 0; i < 4; i++)
         {
-            if (i < moves.length && moves[i] != null) {
-                moveLines[i].setText("» " + moves[i].getName() + " [" + moves[i].getPp() + " PP]");
-            } else {
-                moveLines[i].setText("» -");
+            if (i < moves.length && moves[i] != null)
+            {
+                moveButtons[i].setVisible(true);
+                for (var text : moveButtons[i].getAllChildrenFromType(UiText.class))
+                    text.setText(moves[i].getName());
+            }
+            else
+            {
+                moveButtons[i].setVisible(true);
+                for (var text : moveButtons[i].getAllChildrenFromType(UiText.class))
+                    text.setText("-");
             }
         }
+
+        moveDetailsTooltip.clear();
     }
 
-    public void refresh() {
-        setupMembersList();
-        if (selectedPokemon != null) {
+    public void refresh()
+    {
+        needsListRebuild = true;
+        if (selectedPokemon != null)
             updateSelection(selectedPokemon);
+    }
+
+    public void setCustomClickAction(PokemonClickAction customClickAction) {
+        this.customClickAction = customClickAction;
+    }
+
+    private static class UiHpBar extends UiProgressBar
+    {
+        public UiHpBar(int width, int height, int currentHp, int maxHp)
+        {
+            super(Direction.LEFT2RIGHT);
+            getUiTransform().setScale(width, height);
+
+            setBackgroundColor(new Color(35, 40, 50));
+
+            double ratio = Math.max(0.0, Math.min(1.0, (double) currentHp / maxHp));
+            setProgress(ratio);
+
+            Color hpColor = new Color(105, 230, 105);
+            if (ratio <= 0.2)
+                hpColor = Color.RED;
+            else if (ratio <= 0.5)
+                hpColor = Color.YELLOW;
+
+            setFillColor(hpColor);
         }
     }
 }

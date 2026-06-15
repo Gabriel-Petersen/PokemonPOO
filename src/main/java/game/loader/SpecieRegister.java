@@ -3,7 +3,7 @@ package game.loader;
 import engine.assets.AssetManager;
 import game.creature.Specie;
 import game.creature.Stats;
-import game.creature.move.ElementType;
+import game.creature.ElementType;
 import game.creature.move.Move;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +26,7 @@ public class SpecieRegister {
     static {
         InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream(SPECIE_TXT_PATH);
         try {
+            assert stream != null;
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line;
             while ((line = reader.readLine()) != null) 
@@ -54,16 +55,16 @@ public class SpecieRegister {
             stream.close();
         }
         catch (NumberFormatException e) {
-            System.err.println("Erro ao parsear o stat de espécies em: " + SPECIE_TXT_PATH + "\nO erro é: " + e);
+            System.err.println("Erro no parser do stat de espécies em: " + SPECIE_TXT_PATH + "\nO erro é: " + e);
         }
         catch (IOException e) {
-            System.err.println("Erro ao carregar o registro de espécies em: " + SPECIE_TXT_PATH + "\nO erro é: " + e);
+            System.err.println("Erro ao carregar o registry de espécies em: " + SPECIE_TXT_PATH + "\nO erro é: " + e);
         } 
         catch (ParseException e) {
-            System.err.println("Erro ao parsear duas espécies de mesmo ID em: " + SPECIE_TXT_PATH + "\nO erro é: " + e);
+            System.err.println("Erro no parser de duas espécies de mesmo ID em: " + SPECIE_TXT_PATH + "\nO erro é: " + e);
         }
         catch (GameLoadingException e) {
-            System.err.println("Erro ao parsear as espécies em: " + SPECIE_TXT_PATH + "\nO erro é: " + e);
+            System.err.println("Erro no parser com as espécies em: " + SPECIE_TXT_PATH + "\nO erro é: " + e);
         }
     }
 
@@ -72,17 +73,16 @@ public class SpecieRegister {
         Stats stats = null;
         int id = -1;
         Integer evolutionID = null;
-        String name, frPath, bkPath;
-        name = frPath = bkPath = "";
+        String name = "";
         Map<Integer, Move> movePool = null;
         ElementType t1 = null, t2 = null;
-        for (Integer i = 0; i < traits.length; i++)
+        for (int i = 0; i < traits.length; i++)
         {
             if (i == SpecieData.HP.id()) {
                 stats = parseStats(traits);
                 i = SpecieData.SPEED.id();
             }
-            else if (i == SpecieData.MOVEPOOL.id()) {
+            else if (i == SpecieData.MOVE_POOL.id()) {
                 movePool = new HashMap<>();
                 i = MoveRegister.loadMovePool(traits, i, movePool, FORCE_LOAD);
             }
@@ -99,8 +99,6 @@ public class SpecieRegister {
                         try { t2 = ElementType.valueOf(traits[i]); } 
                         catch (IllegalArgumentException | NullPointerException e) { t2 = null; }
                     }
-                    case FR_SPRITE_PATH -> frPath = traits[i];
-                    case BK_SPRITE_PATH -> bkPath = traits[i];
                     case EVOLUTION_ID -> {
                         try { evolutionID = Integer.valueOf(traits[i]); if (evolutionID == -1) evolutionID = null; } 
                         catch (NumberFormatException e) { evolutionID = null; }
@@ -111,6 +109,8 @@ public class SpecieRegister {
         }
 
         Specie sp;
+        String frPath = "front_sprites\\front_pokemon_" + idToString(id) + ".png";
+        String bkPath = "back_sprites\\back_pokemon_" + idToString(id) + ".png";
         if (t1 == null)
             throw GameLoadingException.specieError(name, id, "must have at least a valid primary type (Type1)");
         if (evolutionID == null)
@@ -123,8 +123,14 @@ public class SpecieRegister {
             sp = new Specie(id, name, stats, t1, t2, evo, AssetManager.getSprite(frPath), AssetManager.getSprite(bkPath));
         }
             
-        sp.loadMovepool(movePool);
+        sp.loadMovePool(movePool);
         return sp;
+    }
+
+    private static String idToString(int id) throws GameLoadingException {
+        if (id <= 0 || id > 1000)
+            throw new GameLoadingException("Número do ID do pokemon deve estar entre 1 e 1000");
+        return String.format("%03d", (id - 1));
     }
 
     private static Stats parseStats(String[] traits) throws NumberFormatException
@@ -137,8 +143,8 @@ public class SpecieRegister {
         return new Stats(stats[0], stats[1], stats[2], stats[3], stats[4], stats[5]);
     }
 
-    private static enum SpecieData {
-        ID, NAME, TYPE1, TYPE2, HP, ATK, DEF, SPATK, SPDEF, SPEED, FR_SPRITE_PATH, BK_SPRITE_PATH, EVOLUTION_ID, MOVEPOOL;
+    private enum SpecieData {
+        ID, NAME, TYPE1, TYPE2, HP, ATK, DEF, SP_ATK, SP_DEF, SPEED, EVOLUTION_ID, MOVE_POOL;
         public int id() { return this.ordinal(); }
     }
 }

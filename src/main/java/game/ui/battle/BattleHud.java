@@ -6,22 +6,27 @@ import engine.ui.elements.UiImage;
 import engine.ui.elements.UiText;
 
 import game.battle.BattleSession;
+import game.battle.Team;
 import game.battle.Trainer;
 import game.battle.actions.FleeAction;
 import game.battle.actions.ItemAction;
 import game.battle.actions.MoveAction;
+import game.battle.actions.SwitchAction;
 import game.creature.Pokemon;
 import game.creature.move.Move;
 import game.itemsystem.Inventory;
 import game.itemsystem.items.CaptureItem;
 import game.ui.common.InventoryUiPanel;
+import game.ui.common.TeamUiPanel;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.List;
 
 public class BattleHud extends UiImage 
 {
     private final BattleSession session;
+    private final TeamUiPanel battleTeamPanel;
 
     private PokemonInBattleIcon playerPokemonIcon;
     private PokemonInBattleIcon opponentPokemonIcon;
@@ -53,6 +58,10 @@ public class BattleHud extends UiImage
         setupArena(player, opponent);
         setupBottomBar(opponent);
         setupInventory(player.getInventory());
+
+        this.battleTeamPanel = new TeamUiPanel(sizeX, sizeY, new Color(103, 120, 154), player.getTeam());
+        this.battleTeamPanel.setVisible(false);
+        addChild(this.battleTeamPanel);
     }
 
     private void setupArena(Trainer player, Trainer opponent) 
@@ -252,17 +261,22 @@ public class BattleHud extends UiImage
 
     public void updateActivePokemonSprites() 
     {
-        removeChild(playerPokemonIcon);
-        removeChild(opponentPokemonIcon);
+        boolean statusPlayer = playerPokemonIcon.isVisible();
+        boolean statusOpponent = opponentPokemonIcon.isVisible();
+        var activeIcons = getAllChildrenFromType(PokemonInBattleIcon.class);
+        for (var icon : activeIcons)
+            removeChild(icon);
 
         playerPokemonIcon = PokemonInBattleIcon.buildPlayerIcon(playerIcon.getSource().getCurrent());
         opponentPokemonIcon = PokemonInBattleIcon.buildNpcIcon(opponentIcon.getSource().getCurrent());
 
         opponentPokemonIcon.getUiTransform().setAnchor(Anchor.TOP_RIGHT);
         opponentPokemonIcon.getUiTransform().setPosition(-200, 50);
+        opponentPokemonIcon.setVisible(statusOpponent);
 
         playerPokemonIcon.getUiTransform().setAnchor(Anchor.BOTTOM_LEFT);
         playerPokemonIcon.getUiTransform().setPosition(240, -220);
+        playerPokemonIcon.setVisible(statusPlayer);
 
         addChild(playerPokemonIcon);
         addChild(opponentPokemonIcon);
@@ -320,7 +334,7 @@ public class BattleHud extends UiImage
         Pokemon target = opponentIcon.getSource().getCurrent();
         Move move = moves[slot];
 
-        MoveAction action = new MoveAction(move, target, user, playerIcon.getSource());
+        MoveAction action = new MoveAction(move, playerIcon.getSource());
 
         moveMenu.setVisible(false);
         cancelMoveBtn.setVisible(false); // Esconde o botão pequeno
@@ -341,6 +355,8 @@ public class BattleHud extends UiImage
         battleInventoryPanel.setVisible(true);
         
         battleInventoryPanel.setupContext(true, (item) -> {
+            if (!item.isBattleUsable()) return false;
+            
             Pokemon target = item instanceof CaptureItem ? 
                 opponentIcon.getSource().getCurrent() :
                 playerIcon.getSource().getCurrent();
@@ -360,9 +376,54 @@ public class BattleHud extends UiImage
         
     }
 
-    private void onPokemonClick() {
-        System.out.println("Pokemon Clicked");
-        if(battleInventoryPanel.isVisible()) battleInventoryPanel.setVisible(false);
+    private void onPokemonClick()
+    {
+        System.out.println("Abrindo menu de troca de Pokémon na batalha.");
+        if (battleInventoryPanel.isVisible()) battleInventoryPanel.setVisible(false);
+
+        battleTeamPanel.refresh();
+        battleTeamPanel.setVisible(true);
+
+        UiButton backBtn = new UiButton("VOLTAR", null);
+        backBtn.getTransform().setScale(100, 35);
+        backBtn.getUiTransform().setAnchor(Anchor.BOTTOM_RIGHT);
+        backBtn.getUiTransform().setPosition(-30, -30);
+        configureButtonTheme(backBtn, Color.RED, Color.WHITE);
+
+        battleTeamPanel.addChild(backBtn);
+
+        backBtn.setAction(() -> {
+            battleTeamPanel.setVisible(false);
+            battleTeamPanel.setCustomClickAction(null);
+            battleTeamPanel.removeChild(backBtn);
+            updateConsoleMessage("O que " + playerPokemonIcon.getSource().getSpecie().getName() + " fará?");
+        });
+
+        battleTeamPanel.setCustomClickAction((targetPokemon) -> {
+            Team playerTeam = playerIcon.getSource().getTeam();
+            List<Pokemon> members = playerTeam.getMembers();
+            int targetIndex = members.indexOf(targetPokemon);
+
+            if (targetIndex == playerTeam.getActiveIndex())
+            {
+                System.out.println("Este Pokémon já está em combate!");
+                updateConsoleMessage(targetPokemon.getNickname() + " já está em campo!");
+                return;
+            }
+
+            if (!targetPokemon.isAlive()) {
+                System.out.println("Não é possível enviar um Pokémon desmaiado!");
+                updateConsoleMessage(targetPokemon.getNickname() + " não tem energia para lutar!");
+                return;
+            }
+
+            battleTeamPanel.setVisible(false);
+            battleTeamPanel.setCustomClickAction(null);
+            battleTeamPanel.removeChild(backBtn);
+
+            SwitchAction switchAction = new SwitchAction(targetIndex, playerIcon.getSource());
+            session.submitPlayerAction(switchAction);
+        });
     }
     
     private void onRunClick() 
@@ -374,4 +435,5 @@ public class BattleHud extends UiImage
     }
 
     public UiText getConsole() { return consoleTxt; }
+    public TeamUiPanel getBattleTeamPanel() { return battleTeamPanel; }
 }
