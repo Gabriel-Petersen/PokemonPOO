@@ -36,6 +36,7 @@ public class TeamUiPanel extends UiImage
 
     private final UiButton[] moveButtons = new UiButton[4];
     private final MoveDetailsTooltip moveDetailsTooltip;
+    private final MoveSelectionListPanel moveSelectionListPanel;
 
     public TeamUiPanel(int sizeX, int sizeY, Color backgroundColor, Team team) {
         this(sizeX, sizeY, backgroundColor, team, null);
@@ -139,15 +140,20 @@ public class TeamUiPanel extends UiImage
 
         moveDetailsTooltip = new MoveDetailsTooltip(detailsW - 30, 75);
 
+        moveSelectionListPanel = new MoveSelectionListPanel(detailsW - 20, sizeY - 40, this);
+        detailsContainer.addChild(moveSelectionListPanel);
+
         int moveBtnW = 125;
         int moveBtnH = 26;
         for (int i = 0; i < 4; i++)
         {
             final int index = i;
             moveButtons[i] = new UiButton("-", () -> {
-                if (selectedPokemon != null && index < selectedPokemon.getMoves().length) {
+                if (selectedPokemon != null) {
                     Move move = selectedPokemon.getMoves()[index];
                     if (move != null) moveDetailsTooltip.displayMove(move);
+                    if (customClickAction == null) 
+                        moveSelectionListPanel.openForSlot(selectedPokemon, index);
                 }
             });
             moveButtons[i].getTransform().setScale(moveBtnW, moveBtnH);
@@ -354,4 +360,6 @@ public class TeamUiPanel extends UiImage
             setFillColor(hpColor);
         }
     }
+
+    public MoveDetailsTooltip getTooltip() { return moveDetailsTooltip; }
 }
