@@ -75,7 +75,10 @@ public class BattleSession implements Updatable
             {
                 p.setBattling(false);
                 if (opponent instanceof NpcTrainer t)
+                {
                     p.getMetadata().addMoney(NpcTrainer.MONEY_PRIZE * t.getTeam().getMembers().size());
+                    p.getMetadata().addNewWin();
+                }
             }
             return;
         }

@@ -10,6 +10,10 @@ import java.text.SimpleDateFormat;
 
 public class InfoPauseTab extends PauseTab 
 {
+    private UiText nameLabel;
+    private UiText moneyLabel;
+    private UiText winsLabel;
+
     public InfoPauseTab(int sizeX, int sizeY, Color color, Player player) 
     {
         super(PauseTabType.INFO, sizeX, sizeY, color, player);
@@ -40,19 +44,19 @@ public class InfoPauseTab extends PauseTab
         addChild(infoBox);
 
         String playerName = playerMeta.getName() != null ? playerMeta.getName() : "Unnamed";
-        UiText nameLabel = new UiText("Name: " + playerName);
+        nameLabel = new UiText("Name: " + playerName);
         nameLabel.setFont("Arial", Font.PLAIN, 16);
         nameLabel.setColor(Color.WHITE);
         nameLabel.getUiTransform().setPosition(20, 20);
         infoBox.addChild(nameLabel);
 
-        UiText moneyLabel = new UiText("Money: $" + playerMeta.getMoney());
+        moneyLabel = new UiText("Money: $" + playerMeta.getMoney());
         moneyLabel.setFont("Arial", Font.PLAIN, 16);
         moneyLabel.setColor(Color.WHITE);
         moneyLabel.getUiTransform().setPosition(20, 60);
         infoBox.addChild(moneyLabel);
 
-        UiText winsLabel = new UiText("Enemies Defeated: " + playerMeta.getEnemiesWinned());
+        winsLabel = new UiText("Enemies Defeated: " + playerMeta.getEnemiesWinned());
         winsLabel.setFont("Arial", Font.PLAIN, 16);
         winsLabel.setColor(Color.WHITE);
         winsLabel.getUiTransform().setPosition(20, 100);
@@ -65,5 +69,19 @@ public class InfoPauseTab extends PauseTab
         saveCreatedLabel.setColor(Color.WHITE);
         saveCreatedLabel.getUiTransform().setPosition(20, 140);
         infoBox.addChild(saveCreatedLabel);
+    }
+
+    private void updateVisuals()
+    {
+        var playerMeta = player.getMetadata();
+        String playerName = playerMeta.getName() != null ? playerMeta.getName() : "Unnamed";
+        nameLabel.setText(playerName);
+        moneyLabel.setText("Money: $" + playerMeta.getMoney());
+        winsLabel.setText("Enemies Defeated: " + playerMeta.getEnemiesWinned());
+    }
+
+    @Override
+    protected void onEnableVisible() {
+        updateVisuals();
     }
 }
