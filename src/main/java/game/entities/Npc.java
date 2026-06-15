@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 public class Npc extends GameObject implements Interactable 
 {
     private final BufferedImage sprite;
-    private String[] message;
+    protected String[] message;
     protected String name;
     protected int pending = 0;
 
@@ -61,7 +61,6 @@ public class Npc extends GameObject implements Interactable
         db.getEventQueue().setOnEndResolving(() -> {
             player.setTalking(false);
             db.setVisible(false);
-            System.out.println("Queue ended");
         });
         pending = 1;
     }

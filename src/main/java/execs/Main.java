@@ -8,6 +8,7 @@ import game.capturing.ETRegistry;
 import game.capturing.WildEncounterUpdater;
 import game.creature.Pokemon;
 import game.entities.Npc;
+import game.entities.NpcHealer;
 import game.entities.NpcSeller;
 import game.entities.NpcTrainer;
 import game.itemsystem.Inventory;
@@ -37,7 +38,7 @@ public class Main
 
         encounterUpdater.registerPlayer(player);
 
-        Npc npc1 = new Npc("Certinho", "npcs/ingame/npc_ingame01.png");
+        Npc npc1 = new NpcHealer("Certinho", "npcs/ingame/npc_ingame01.png");
         npc1.getTransform().setScale(3, 3);
         npc1.getTransform().setPosition(2856, 5522);
         String[] npc1Message = {
@@ -45,7 +46,7 @@ public class Main
             "Vamos abrir o Eclipse para fazer nosso programinha em Java?",
             "E o Grêmio?"
         };
-        npc1.setMessage(npc1Message);
+        //npc1.setMessage(npc1Message);
         gamePanel.addElement(npc1);
 
         NpcTrainer npc2 = new NpcTrainer(

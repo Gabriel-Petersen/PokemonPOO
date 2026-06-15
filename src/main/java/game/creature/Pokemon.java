@@ -203,4 +203,6 @@ public class Pokemon {
     public int hashCode() {
         return Objects.hash(nickname, specie, currentStats, currentLevel, hasOwner, Arrays.hashCode(moves));
     }
+
+    public void fullHeal() { statusEffects.clear(); currentAccuracy = 100; currentHp = getCurrentStats().getValue(StatType.HP); }
 }
