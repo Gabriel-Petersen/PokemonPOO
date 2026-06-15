@@ -32,16 +32,8 @@ public class Specie {
 
     public Specie (
         Integer dexNumber, String name, Stats baseStats, ElementType primaryType, ElementType secondaryType, BufferedImage frontSprite, BufferedImage backSprite
-    ) 
-    {
-        this.dexNumber = dexNumber;
-        this.name = name;
-        this.baseStats = baseStats;
-        this.primaryType = primaryType;
-        this.secondaryType = secondaryType;
-        this.frontSprite = frontSprite;
-        this.backSprite = backSprite;
-        this.evolution = null;
+    ) {
+        this(dexNumber, name, baseStats, primaryType, secondaryType, null, frontSprite, backSprite);
     }
 
     public Specie (
@@ -107,8 +99,7 @@ public class Specie {
         return movePool.headMap(level + 1).values();
     }
 
-    @Override
-    public int hashCode() { return dexNumber.hashCode(); }
+    @Override public int hashCode() { return dexNumber.hashCode(); }
 
     @Override
     public boolean equals(Object obj) {
@@ -122,9 +113,5 @@ public class Specie {
         if (dexNumber == null) {
             return other.dexNumber == null;
         } else return dexNumber.equals(other.dexNumber);
-    }
-
-    public String getTypes() {
-        return primaryType + " / " + secondaryType;
     }
 }

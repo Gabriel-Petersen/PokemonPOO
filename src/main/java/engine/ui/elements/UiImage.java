@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 public class UiImage extends UiElement
 {
     private BufferedImage image;
-    private Color color;
+    private Color color = null;
 
     public UiImage(BufferedImage sprite) {
         image = sprite;
@@ -27,7 +27,7 @@ public class UiImage extends UiElement
     @Override
     protected void drawSelf(Graphics2D g2d)
     {
-        if (image == null)
+        if (image == null && color != null)
         {
             g2d.setColor(color);
             g2d.fillRect(

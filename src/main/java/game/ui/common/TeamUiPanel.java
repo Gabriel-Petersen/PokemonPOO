@@ -10,6 +10,8 @@ import game.creature.Pokemon;
 import game.creature.PokemonClickAction;
 import game.creature.move.Move;
 import game.creature.StatType;
+import game.creature.move.status.StatusEffect;
+import game.creature.move.status.VolatileStatusEffect;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -29,6 +31,8 @@ public class TeamUiPanel extends UiImage
     private final UiText specieTypeTxt;
     private final UiText levelTxt;
     private final UiText hpTxt;
+    private final UiText type1Txt;
+    private final UiText type2Txt;
     private final UiText[] statLines = new UiText[5];
     private final UiImage pokemonSpriteView;
 
@@ -84,6 +88,18 @@ public class TeamUiPanel extends UiImage
         specieTypeTxt.getUiTransform().setAnchor(Anchor.TOP_LEFT);
         specieTypeTxt.getUiTransform().setPosition(130, 43);
         detailsContainer.addChild(specieTypeTxt);
+
+        type1Txt = new UiText("");
+        type1Txt.setFont("Arial", Font.BOLD, 12);
+        type1Txt.getUiTransform().setAnchor(Anchor.TOP_LEFT);
+        type1Txt.getUiTransform().setPosition(225, 44);
+        detailsContainer.addChild(type1Txt);
+
+        type2Txt = new UiText("");
+        type2Txt.setFont("Arial", Font.BOLD, 12);
+        type2Txt.getUiTransform().setAnchor(Anchor.TOP_LEFT);
+        type2Txt.getUiTransform().setPosition(285, 44);
+        detailsContainer.addChild(type2Txt);
 
         levelTxt = new UiText("");
         levelTxt.setFont("Arial", Font.PLAIN, 13);
@@ -238,10 +254,32 @@ public class TeamUiPanel extends UiImage
         detailsContainer.setVisible(true);
 
         String specieName = pokemon.getSpecie().getName();
-        String typesStr = pokemon.getSpecie().getTypes();
 
         nameTxt.setText(pokemon.getNickname());
-        specieTypeTxt.setText("[" + specieName + "]  •  (" + typesStr + ")");
+        specieTypeTxt.setText("[" + specieName + "]  • ");
+
+        var primary = pokemon.getSpecie().getPrimaryType();
+        var secondary = pokemon.getSpecie().getSecondaryType();
+
+        if (primary != null && primary != game.creature.ElementType.NONE)
+        {
+            type1Txt.setText(primary.name());
+            type1Txt.setColor(primary.getDisplayColor());
+            type1Txt.setVisible(true);
+        }
+        else {
+            type1Txt.setVisible(false);
+        }
+
+        if (secondary != null && secondary != game.creature.ElementType.NONE)
+        {
+            type2Txt.setText("/ " + secondary.name());
+            type2Txt.setColor(secondary.getDisplayColor());
+            type2Txt.setVisible(true);
+        }
+        else {
+            type2Txt.setVisible(false);
+        }
 
         levelTxt.setText(
                 "Level: " + pokemon.getCurrentLevel() + "  |  Exp: " + pokemon.getCurrentExperience()

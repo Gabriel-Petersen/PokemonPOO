@@ -9,12 +9,12 @@ import engine.math.vectors.MutableVec2d;
 import engine.primitives.Square;
 import engine.rendering.Renderer;
 import engine.rendering.SpriteRenderer;
-import engine.tilemap.Tilemap;
 import game.battle.BattleContext;
 import game.battle.Team;
 import game.battle.Trainer;
 import game.battle.actions.CombatAction;
 import game.itemsystem.Inventory;
+import game.scenario.GameMap;
 import game.ui.player.PauseMenu;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -41,7 +41,7 @@ public class Player extends GameObject implements Trainer
     private final Inventory inventory = new Inventory();
     private final Team team = new Team();
 	private final PauseMenu pauseMenu = new PauseMenu(110, 190, Color.lightGray, this);
-    private Tilemap currentMap;
+    private GameMap currentMap;
     private LastLookDir lastLookDir = LastLookDir.DOWN;
 	private Animator animator;
     private boolean isUiOpen = false;
@@ -120,7 +120,7 @@ public class Player extends GameObject implements Trainer
                         var p1 = interactable.getPosition();
                         var p2 = new MutableVec2d(transform.getPosition()).sub(p1);
                         //System.out.println("Distance to NPC: " + p2);
-                        if (p2.magnitude() <= INTERACTION_RADIUS) 
+                        if (p2.magnitude() <= INTERACTION_RADIUS)
                             interactable.onInteract(this);
                     }
                         
@@ -132,12 +132,12 @@ public class Player extends GameObject implements Trainer
 
     private void moveLogic()
     {
-        int inputh = Input.getAxisRaw("Horizontal");
-        int inputv = Input.getAxisRaw("Vertical");
-        if (inputh != 0)
-            speedVec.set(inputh, 0);
+        int inputH = Input.getAxisRaw("Horizontal");
+        int inputV = Input.getAxisRaw("Vertical");
+        if (inputH != 0)
+            speedVec.set(inputH, 0);
         else
-            speedVec.set(0, inputv);
+            speedVec.set(0, inputV);
 
         if (speedVec.magnitudeSqrt() > 0)
         {
@@ -185,7 +185,7 @@ public class Player extends GameObject implements Trainer
         animator.play(prefix + lastLookDir.c());
     }
 
-    public void setCurrentMap(Tilemap currentMap) { this.currentMap = currentMap; }
+    public void setCurrentMap(GameMap currentMap) { this.currentMap = currentMap; }
     
     public PlayerMetadata getMetadata() { return metadata; }
     
@@ -205,6 +205,13 @@ public class Player extends GameObject implements Trainer
     	return !isUiOpen && !isTalking && !isBattling;
     }
 
+    public double[] getFootPosition() {
+        return new double[] {
+                footPos.getTransform().getPosition().x(),
+                footPos.getTransform().getPosition().y()
+        };
+    }
+
     @Override
 	protected Renderer createSwingRenderer() {
 		return new SpriteRenderer("player_sheet/walk_down/sprite_01.png");
@@ -214,5 +221,10 @@ public class Player extends GameObject implements Trainer
     {
         if (Input.getKeyDown(KeyEvent.VK_P))
             System.out.println(transform.getPosition());
+
+        if (Input.getKeyDown(KeyEvent.VK_L))
+        {
+            for (var pk : team.getMembers()) pk.gainExperience(800);
+        }
     }
 }

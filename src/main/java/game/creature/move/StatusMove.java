@@ -1,6 +1,7 @@
 package game.creature.move;
 
 import game.battle.BattleContext;
+import game.creature.ElementType;
 import game.creature.Pokemon;
 import game.creature.move.status.StatusEffect;
 
@@ -8,9 +9,8 @@ public class StatusMove extends Move {
 
     private StatusEffect effect;
 
-    public StatusMove(String name, Integer power, Double accuracy, Integer priority, ElementType elementType,
-            MoveCategory category) {
-        super(name, power, accuracy, priority, elementType, category);
+    public StatusMove(int id, String name, Integer power, Double accuracy, Integer priority, boolean isSelfTarget) {
+        super(id, name, power, accuracy, priority, ElementType.NONE, MoveCategory.STATUS, isSelfTarget);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class StatusMove extends Move {
         if (Math.random() <= getAccuracy() * (double) attacker.getCurrentAccuracy() / 100.0) {
             result.setHit(true);
             result.setStatusApplied(true);
-            effect.onApply(target, context);
+            target.applyStatus(this.effect, context);
         } else {
             result.addMessage("Errou!!!");
         }

@@ -20,7 +20,8 @@ public class InventoryTab extends PauseTab
         addChild(inventoryUiPanel);
     }
 
-    @Override protected void onEnableVisible()
+    @Override
+    protected void onEnableVisible()
     {
         inventoryUiPanel.setupContext(false, (item) -> {
             if (item == null)

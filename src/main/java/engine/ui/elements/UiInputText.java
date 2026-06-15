@@ -48,7 +48,7 @@ public class UiInputText extends UiElement implements OnMouseClickListener
     }
 
     @Override
-    protected void drawSelf(Graphics2D g2d)
+    public void drawSelf(Graphics2D g2d)
     {
         g2d.setColor(isFocused ? Color.LIGHT_GRAY : Color.WHITE);
         g2d.fillRect(0, 0, (int)transform.getScale().x(), (int)transform.getScale().y());
@@ -59,19 +59,8 @@ public class UiInputText extends UiElement implements OnMouseClickListener
         g2d.drawString(content + (isFocused ? "|" : ""), 5, 20);
     }
 
-    protected void onConfirm(String text) {
-        onTextSubmit.submitText(text);
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public Color getBoxColor() {
-        return boxColor;
-    }
-
-    public void setBoxColor(Color boxColor) {
-        this.boxColor = boxColor;
-    }
+    protected void onConfirm(String text) { onTextSubmit.submitText(text); }
+    public String getContent() { return content; }
+    public Color getBoxColor() { return boxColor; }
+    public void setBoxColor(Color boxColor) { this.boxColor = boxColor; }
 }

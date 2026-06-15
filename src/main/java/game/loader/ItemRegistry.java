@@ -2,11 +2,13 @@ package game.loader;
 
 import engine.assets.AssetManager;
 import game.itemsystem.Item;
+import game.itemsystem.items.CaptureItem;
 import game.itemsystem.items.HpHealItem;
 
 public class ItemRegistry {
     public static final Item smallPotion;
     public static final Item mediumPotion;
+    public static final Item pokeBall;
 
     static {
         smallPotion = new HpHealItem(
@@ -25,6 +27,16 @@ public class ItemRegistry {
             75,
             AssetManager.getSprite("player_sheet/run_down/running_00.png"), 
             30
+        );
+
+        pokeBall = new CaptureItem(
+                60.0,
+                "PokeBola",
+                "Uma esfera para capturar monstros",
+                "PokeBola, VAI!",
+                true,
+                20,
+                AssetManager.getSprite("player_sheet/run_down/running_00.png")
         );
     }
 }

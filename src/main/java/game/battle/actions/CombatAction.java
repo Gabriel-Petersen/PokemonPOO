@@ -10,4 +10,8 @@ public abstract class CombatAction{
     public void setActor(Trainer actor){this.actor=actor;}
     public abstract Integer getPriority();
     public abstract ActionResult execute(BattleContext context, EventScheduler scheduler);
+    public Trainer getOtherTrainer(BattleContext context) {
+        if (actor.equals(context.getPlayer())) return context.getOpponent();
+        return context.getPlayer();
+    }
 }

@@ -8,26 +8,34 @@ import game.creature.StatType;
 public class DamageMove extends Move 
 {
     public DamageMove(int id, String name, Integer power, Double accuracy, Integer priority, ElementType elementType, MoveCategory category) {
-        super(id, name, power, accuracy, priority, elementType, category);
+        super(id, name, power, accuracy, priority, elementType, category, false);
     }
 
     public int calculateDamage(Pokemon attacker, Pokemon target, BattleContext context)
     {
-        int attackStat = category == MoveCategory.PHYSICAL ?
-                attacker.getEffectiveStat(StatType.ATTACK, context) :
-                attacker.getEffectiveStat(StatType.SPECIAL_ATTACK, context);
+        int attackStat = category == MoveCategory.PHYSICAL
+                ? attacker.getEffectiveStat(StatType.ATTACK, context)
+                : attacker.getEffectiveStat(StatType.SPECIAL_ATTACK, context);
 
-        int defenseStat = category == MoveCategory.PHYSICAL ?
-                target.getEffectiveStat(StatType.DEFENSE, context) :
-                target.getEffectiveStat(StatType.SPECIAL_DEFENSE, context);
+        int defenseStat = category == MoveCategory.PHYSICAL
+                ? target.getEffectiveStat(StatType.DEFENSE, context)
+                : target.getEffectiveStat(StatType.SPECIAL_DEFENSE, context);
 
-        if (defenseStat <= 0) defenseStat = 1;
+        attackStat = Math.max(1, attackStat);
+        defenseStat = Math.max(1, defenseStat);
 
-        int baseDamage = getPower() * target.getSpecie().weaknessTo(elementType);
-        double rand = 1 + Math.random() / 2.0;
-        double exactDamage = rand * (double)(baseDamage + attackStat - defenseStat);
-        int finalDamage = (int) Math.round(exactDamage);
-        return Math.max(0, finalDamage);
+        double base = (((2.0 * attacker.getCurrentLevel() / 5.0) + 2.0)
+                * getPower()
+                * ((double) attackStat / defenseStat)) / 30.0;
+
+        double stab = attacker.getSpecie().hasType(elementType) ? 1.5 : 1.0;
+
+        double type = target.getSpecie().weaknessTo(elementType);
+        double rand = 0.85 + Math.random() * 0.15;
+
+        double damage = (base * stab * type * rand) + 2;
+
+        return Math.max(1, (int) Math.round(damage));
     }
 
     @Override

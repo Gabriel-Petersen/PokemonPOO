@@ -1,5 +1,7 @@
 package engine.math.vectors;
 
+import java.util.Objects;
+
 public class MutableVec2d implements Vec2d
 {
     public double x;
@@ -71,6 +73,17 @@ public class MutableVec2d implements Vec2d
     }
 
     public void normalize() { normalized(); }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof MutableVec2d that)) return false;
+        return Double.compare(x, that.x) == 0 && Double.compare(y, that.y) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
+    }
 
     @Override
     public String toString() { return "(" + x + ", " + y + ")"; }

@@ -3,75 +3,93 @@ package game.capturing;
 import game.creature.Pokemon;
 import game.creature.Specie;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 public class EncounterTable
 {
     private record ProbabilityEntry (
-        double probability,
-        int minLevel,
-        int maxLevel
+            Specie specie,
+            double minProb,
+            double maxProb,
+            int minLevel,
+            int maxLevel
     ) { }
 
-    private static class EncounterTableBuilder {
-        private record Entry (Specie pokemon, int minLevel, int maxLevel) {}
-        private final Map<Integer, Entry> map = new TreeMap<>();
+    public static class Builder
+    {
+        private record RawEntry (Specie pokemon, int rarity, int minLevel, int maxLevel) {}
+        private final List<RawEntry> entries = new ArrayList<>();
         private int raritySum = 0;
-        public EncounterTableBuilder addSpecie(
-                Specie pokemon, int rarity, int minLevel, int maxLevel
-        )
+
+        public static Builder create() { return new Builder(); }
+
+        public Builder addSpecie(Specie pokemon, int rarity, int minLevel, int maxLevel)
         {
-            if (rarity < 0) throw new IllegalArgumentException("Rarity must be greater than 0");
+            if (rarity <= 0) throw new IllegalArgumentException("Rarity must be greater than 0");
             if (minLevel > maxLevel) {
                 int aux = minLevel;
                 minLevel = maxLevel;
                 maxLevel = aux;
             }
-            map.put(-rarity, new Entry(pokemon, minLevel, maxLevel));
+
+            entries.add(new RawEntry(pokemon, rarity, minLevel, maxLevel));
             raritySum += rarity;
             return this;
         }
 
         public EncounterTable build()
         {
-            var ans = new HashMap<Specie, ProbabilityEntry>();
-            double ant = 0;
-            for (var item : map.entrySet())
+            if (entries.isEmpty()) throw new IllegalStateException("Cannot build an empty encounter table");
+
+            List<ProbabilityEntry> probabilityTable = new ArrayList<>();
+            double currentOffset = 0.0;
+
+            for (var entry : entries)
             {
-                double prob = ant + (double)item.getKey()/raritySum;
-                ans.put(
-                        item.getValue().pokemon(),
-                        new ProbabilityEntry(
-                                prob,
-                                item.getValue().minLevel(),
-                                item.getValue().maxLevel()
-                        )
-                );
-                ant = prob;
+                double step = (double) entry.rarity() / raritySum;
+                double nextOffset = currentOffset + step;
+
+                probabilityTable.add(new ProbabilityEntry(
+                        entry.pokemon(),
+                        currentOffset,
+                        nextOffset,
+                        entry.minLevel(),
+                        entry.maxLevel()
+                ));
+
+                currentOffset = nextOffset;
             }
-            return new EncounterTable(ans);
+
+            return new EncounterTable(probabilityTable);
         }
     }
 
-    private final Map<Specie, ProbabilityEntry> table;
-    private EncounterTable(Map<Specie, ProbabilityEntry> map) { table = map; }
+    private final List<ProbabilityEntry> table;
+    private final Random random = new Random();
+
+    private EncounterTable(List<ProbabilityEntry> table) {
+        this.table = table;
+    }
 
     public Pokemon sortSpecie()
     {
-        double prob = Math.random();
-        for (var item : table.entrySet())
+        double roll = random.nextDouble();
+
+        for (var entry : table)
         {
-            if (item.getValue().probability() >= prob)
+            if (roll >= entry.minProb() && roll < entry.maxProb())
             {
-                int deltaLevel = item.getValue().maxLevel() - item.getValue().minLevel();
-                var r = new Random();
-                int level = item.getValue().minLevel() + r.nextInt(deltaLevel);
-                return new Pokemon(null, item.getKey(), level);
+                int range = (entry.maxLevel() - entry.minLevel()) + 1;
+                int selectedLevel = entry.minLevel() + random.nextInt(range);
+
+                return new Pokemon(null, entry.specie(), selectedLevel);
             }
         }
-        throw new IllegalStateException("Probabilities do not sum 1");
+
+        var lastEntry = table.getLast();
+        int range = (lastEntry.maxLevel() - lastEntry.minLevel()) + 1;
+        return new Pokemon(
+                null, lastEntry.specie(), lastEntry.minLevel() + random.nextInt(range)
+        );
     }
 }

@@ -27,15 +27,18 @@ public class Stats {
         this.speed = speed;
     }
 
-    public Stats scaleForLevel(Integer level) {
-        Stats scaledStats = new Stats(this);
-        scaledStats.hp = (int) (this.hp * (1 + level * 0.05));
-        scaledStats.attack = (int) (this.attack * (1 + level * 0.1));
-        scaledStats.defense = (int) (this.defense * (1 + level * 0.1));
-        scaledStats.specialAttack = (int) (this.specialAttack * (1 + level * 0.1));
-        scaledStats.specialDefense = (int) (this.specialDefense * (1 + level * 0.1));
-        scaledStats.speed = (int) (this.speed * (1 + level * 0.1));
-        return scaledStats;
+    public Stats scaleForLevel(int level)
+    {
+        Stats scaled = new Stats(this);
+
+        scaled.hp = ((this.hp * 2 * level) / 80) + level + 10;
+        scaled.attack = ((this.attack * 2 * level) / 80) + 5;
+        scaled.defense = ((this.defense * 2 * level) / 80) + 5;
+        scaled.specialAttack = ((this.specialAttack * 2 * level) / 80) + 5;
+        scaled.specialDefense = ((this.specialDefense * 2 * level) / 80) + 5;
+        scaled.speed = ((this.speed * 2 * level) / 80) + 5;
+
+        return scaled;
     }
     
     public Integer getValue(StatType statType){

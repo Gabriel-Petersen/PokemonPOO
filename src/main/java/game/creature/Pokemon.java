@@ -4,10 +4,8 @@ import game.battle.BattleContext;
 import game.creature.move.Move;
 import game.creature.move.status.StatusEffect;
 import game.creature.move.status.VolatileStatusEffect;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+
+import java.util.*;
 
 public class Pokemon {
     private Integer currentAccuracy = 100;
@@ -80,9 +78,8 @@ public class Pokemon {
     }
     public Boolean hasOwner() { return hasOwner; }
     public void setOwner(Boolean hasOwner) { this.hasOwner = hasOwner; }
-    public void receiveDamage(Integer damage){
-        currentHp = Integer.max(0, currentHp - damage);
-    }
+    public void receiveDamage(Integer damage){ currentHp = Integer.max(0, currentHp - damage); }
+    public void setNickname(String nickname) { this.nickname = nickname; }
 
     public void heal(Integer heal){
         if(currentHp+heal<=currentStats.getValue(StatType.HP)){
@@ -90,6 +87,32 @@ public class Pokemon {
         }else{
             currentHp=currentStats.getValue(StatType.HP);
         }
+    }
+
+    public boolean gainExperience(int amount)
+    {
+        this.currentExperience += amount;
+        int expNeeded = getRequiredExperienceForNextLevel();
+        boolean leveledUp = false;
+
+        while (this.currentExperience >= expNeeded)
+        {
+            this.currentExperience -= expNeeded;
+            levelUp();
+            leveledUp = true;
+            expNeeded = getRequiredExperienceForNextLevel();
+        }
+
+        return leveledUp;
+    }
+
+    public int getRequiredExperienceForNextLevel() { return this.currentLevel * 30; }
+
+    private void checkEvolution()
+    {
+        if (specie.getEvolution() != null)
+            if (currentLevel >= 20 || (currentLevel >= 10 && specie.getEvolution().getEvolution() != null))
+                specie = specie.getEvolution();
     }
 
     public Boolean applyStatus(StatusEffect statusEffect, BattleContext context){
@@ -142,7 +165,8 @@ public class Pokemon {
     
     public void levelUp(){
         currentLevel++;
-        currentStats = currentStats.scaleForLevel(currentLevel);
+        checkEvolution();
+        currentStats = specie.getBaseStats().scaleForLevel(currentLevel);
         currentHp = currentStats.getValue(StatType.HP);
         for(var mv:moves){
             if(mv!=null){
@@ -151,75 +175,23 @@ public class Pokemon {
         }
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((currentAccuracy == null) ? 0 : currentAccuracy.hashCode());
-        result = prime * result + ((nickname == null) ? 0 : nickname.hashCode());
-        result = prime * result + ((currentHp == null) ? 0 : currentHp.hashCode());
-        result = prime * result + ((specie == null) ? 0 : specie.hashCode());
-        result = prime * result + ((currentStats == null) ? 0 : currentStats.hashCode());
-        result = prime * result + ((currentLevel == null) ? 0 : currentLevel.hashCode());
-        result = prime * result + Integer.hashCode(currentExperience);
-        result = prime * result + ((hasOwner == null) ? 0 : hasOwner.hashCode());
-        result = prime * result + Arrays.hashCode(moves);
-        result = prime * result + statusEffects.hashCode();
-        return result;
-    }
-
     public List<StatusEffect> getStatusEffects() {
         return statusEffects;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Pokemon other = (Pokemon) obj;
-        if (currentAccuracy == null) {
-            if (other.currentAccuracy != null)
-                return false;
-        } else if (!currentAccuracy.equals(other.currentAccuracy))
-            return false;
-        if (nickname == null) {
-            if (other.nickname != null)
-                return false;
-        } else if (!nickname.equals(other.nickname))
-            return false;
-        if (currentHp == null) {
-            if (other.currentHp != null)
-                return false;
-        } else if (!currentHp.equals(other.currentHp))
-            return false;
-        if (specie == null) {
-            if (other.specie != null)
-                return false;
-        } else if (!specie.equals(other.specie))
-            return false;
-        if (currentStats == null) {
-            if (other.currentStats != null)
-                return false;
-        } else if (!currentStats.equals(other.currentStats))
-            return false;
-        if (currentLevel == null) {
-            if (other.currentLevel != null)
-                return false;
-        } else if (!currentLevel.equals(other.currentLevel))
-            return false;
-        if (currentExperience != other.currentExperience)
-            return false;
-        if (hasOwner == null) {
-            if (other.hasOwner != null)
-                return false;
-        } else if (!hasOwner.equals(other.hasOwner))
-            return false;
-        if (!Arrays.equals(moves, other.moves))
-            return false;
-        return statusEffects.equals(other.statusEffects);
+    public boolean equals(Object o) {
+        if (!(o instanceof Pokemon pokemon)) return false;
+        return Objects.equals(nickname, pokemon.nickname) &&
+                Objects.equals(specie, pokemon.specie) &&
+                Objects.equals(currentStats, pokemon.currentStats) &&
+                Objects.equals(currentLevel, pokemon.currentLevel) &&
+                Objects.equals(hasOwner, pokemon.hasOwner) &&
+                Objects.deepEquals(moves, pokemon.moves);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nickname, specie, currentStats, currentLevel, hasOwner, Arrays.hashCode(moves));
     }
 }

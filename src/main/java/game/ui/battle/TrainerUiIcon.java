@@ -6,10 +6,10 @@ import engine.ui.elements.UiImage;
 import engine.ui.elements.UiText;
 import game.battle.Trainer;
 
-public class TrainerUiIcon extends UiImage 
+public class TrainerUiIcon extends UiImage
 {
-    private UiText nameText;
-    private Trainer source;
+    private final UiText nameText;
+    private final Trainer source;
 
     public TrainerUiIcon(Trainer source) {
         super(source.getOnBattleSprite());
