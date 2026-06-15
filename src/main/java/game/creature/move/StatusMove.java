@@ -7,10 +7,11 @@ import game.creature.move.status.StatusEffect;
 
 public class StatusMove extends Move {
 
-    private StatusEffect effect;
+    private final StatusEffect effect;
 
-    public StatusMove(int id, String name, Integer power, Double accuracy, Integer priority, boolean isSelfTarget) {
-        super(id, name, power, accuracy, priority, ElementType.NONE, MoveCategory.STATUS, isSelfTarget);
+    public StatusMove(int id, String name, Double accuracy, Integer priority, boolean isSelfTarget, StatusEffect effect) {
+        super(id, name, 0, accuracy, priority, ElementType.NONE, MoveCategory.STATUS, isSelfTarget);
+        this.effect = effect;
     }
 
     @Override
@@ -21,7 +22,7 @@ public class StatusMove extends Move {
         }
 
         MoveResult result = new MoveResult(attacker.getNickname() + " utilizou " + getName() + "!", false, 0, false);
-        if (Math.random() <= getAccuracy() * (double) attacker.getCurrentAccuracy() / 100.0) {
+        if (mayAttack(attacker, context)) {
             result.setHit(true);
             result.setStatusApplied(true);
             target.applyStatus(this.effect, context);
@@ -32,4 +33,5 @@ public class StatusMove extends Move {
         return result;
     }
 
+    public StatusEffect getEffect() { return effect; }
 }

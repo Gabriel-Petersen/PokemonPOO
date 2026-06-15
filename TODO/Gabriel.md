@@ -8,11 +8,11 @@ Finalizar a camada física de movimentação e animação do jogador, implementa
 
 * `src/game/player/Player.java` (Finalizar animação de corrida) -> OK
 * `src/game/entities/Npc.java` (Classe base de NPC físico e interativo)  -> OK
-* `src/game/entities/NpcSeller.java` (Especialização de comércio) 
-* `src/game/entities/NpcTrainer.java` (Especialização de batalha) -> 60% OK
-* `src/game/integration/BattleSession.java` (Esqueleto estrutural) 
-* `src/game/ui/*/BattleHud.java` e `ShopHud.java` (Camadas visuais da engine) 
-* `src/game/loader/SpecieRegister.java` (carregamento de espécies do disco) -> 70% OK
+* `src/game/entities/NpcSeller.java` (Especialização de comércio) -> OK
+* `src/game/entities/NpcTrainer.java` (Especialização de batalha) -> OK
+* `src/game/integration/BattleSession.java` (Esqueleto estrutural) -> 80% OK
+* `src/game/ui/*/BattleHud.java` e `ShopHud.java` (Camadas visuais da engine) -> OK 
+* `src/game/loader/SpecieRegister.java` (carregamento de espécies do disco) -> OK
 
 ### O que Implementar
 

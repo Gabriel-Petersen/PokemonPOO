@@ -46,7 +46,7 @@ public class DamageMove extends Move
         
         MoveResult result = new MoveResult(attacker.getNickname() + " utilizou " + getName() + "!", false, 0, false);
 
-        if(Math.random()<=getAccuracy() * (double)attacker.getCurrentAccuracy()/100.0)
+        if(mayAttack(attacker, context))
         {
             result.setDamageApplied(calculateDamage(attacker, target, context));
             result.setHit(true);

@@ -63,6 +63,18 @@ public class Main
         npc2.setMessage(npc2Message);
         gamePanel.addElement(npc2);
 
+        NpcTrainer npc3 = new NpcTrainer(
+            new Inventory(), new Team(), "sei la",
+                "npcs/ingame/npc_ingame05.png",
+            "npcs/battle/npc_battle01.png"
+        );
+        npc3.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie("DEBUG"), 10));
+        npc3.getCurrent().setOwner(true);
+        npc3.getTransform().setScale(3, 3);
+        npc3.getTransform().setPosition(3300, 5522);
+        npc3.setMessage(null);
+        gamePanel.addElement(npc3);
+
         NpcSeller shopkeeper = new NpcSeller("Vendedor", "npcs/ingame/npc_ingame03.png");
         shopkeeper.getTransform().setScale(3, 3);
         shopkeeper.getTransform().setPosition(3100, 5522);

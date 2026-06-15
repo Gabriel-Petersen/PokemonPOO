@@ -49,6 +49,7 @@ public class Stats {
             case SPECIAL_ATTACK -> specialAttack;
             case SPECIAL_DEFENSE -> specialDefense;
             case SPEED -> speed;
+            case ACCURACY -> 100;
         };
     }
 
@@ -61,7 +62,22 @@ public class Stats {
             case SPECIAL_ATTACK -> copy.specialAttack = value;
             case SPECIAL_DEFENSE -> copy.specialDefense = value;
             case SPEED -> copy.speed = value;
+            default -> throw new IllegalArgumentException("Unexpected value: " + statType);
         }
         return copy;
-    }    
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+            .append("Stats {")
+            .append("\n\tHP: ").append(hp)
+            .append("\n\tATK: ").append(attack)
+            .append("\n\tDEF: ").append(defense)
+            .append("\n\tSP_ATK: ").append(specialAttack)
+            .append("\n\tSP_DEF: ").append(specialDefense)
+            .append("\n\tSPEED: ").append(speed)
+            .append("\n}")
+            .toString();
+    }
 }

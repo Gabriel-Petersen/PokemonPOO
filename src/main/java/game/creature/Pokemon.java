@@ -124,13 +124,11 @@ public class Pokemon {
     public Stats getEffectiveStats(BattleContext context){
         Stats effectiveStats = new Stats(currentStats);
         for(var ef:statusEffects){
-            if(ef!=null){
-                var statModifierRules = ef.getStatModifierRules();
-                if(statModifierRules!=null){
-                    for(var rule:statModifierRules){
+            if (ef != null && ef.getStatModifierRules() != null) 
+            {
+                for (var rule : ef.getStatModifierRules())
+                    if (rule.targetStat() != StatType.ACCURACY)
                         effectiveStats = rule.applyOn(effectiveStats, context);
-                    }
-                }
             }
         }
         return effectiveStats;
@@ -155,8 +153,19 @@ public class Pokemon {
         return oldMove==null;
     }
 
-    public Integer getCurrentAccuracy() {
-        return currentAccuracy;
+    public Integer getCurrentAccuracy(BattleContext context) 
+    {
+        int effectiveAcc = this.currentAccuracy;
+    
+        for (var ef : statusEffects)
+            if (ef != null && ef.getStatModifierRules() != null) 
+            {
+                for (var rule : ef.getStatModifierRules()) 
+                    if (rule.targetStat() == StatType.ACCURACY)
+                        effectiveAcc = rule.modifier().modify(effectiveAcc, context);
+            }
+        
+        return Integer.max(0, effectiveAcc);
     }
 
     public void setCurrentAccuracy(Integer currentAccuracy) {

@@ -6,5 +6,5 @@ public enum StatType {
     DEFENSE,
     SPECIAL_ATTACK,
     SPECIAL_DEFENSE,
-    SPEED;
+    SPEED, ACCURACY;
 }

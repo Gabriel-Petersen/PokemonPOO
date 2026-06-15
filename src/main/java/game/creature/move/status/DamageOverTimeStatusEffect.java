@@ -6,26 +6,39 @@ import game.creature.StatType;
 
 import java.util.List;
 
-public class DamageOverTimeStatusEffect extends PersistentStatusEffect
+public class DamageOverTimeStatusEffect extends PersistentStatusEffect 
 {
-    public DamageOverTimeStatusEffect(String name, List<StatModifierRule> modifiers) {
+    private final String applyMessage;
+    private final String turnEndMessage;
+    private final StatModifier damageFormula;
+
+    public DamageOverTimeStatusEffect(
+        String name, 
+        List<StatModifierRule> modifiers, 
+        String applyMessage, 
+        String turnEndMessage,
+        StatModifier damageFormula
+    ) {
         super(name, modifiers);
+        this.applyMessage = applyMessage;
+        this.turnEndMessage = turnEndMessage;
+        this.damageFormula = damageFormula != null ? damageFormula : (hpMax, ctx) -> hpMax / 8;
     }
 
     @Override
     public void onApply(Pokemon target, BattleContext context) {
-        System.out.println("LOG: " + target.getNickname() + " foi envenenado!");
+        if (applyMessage != null) context.getHud().updateConsoleMessage(target.getNickname() + " " + applyMessage);
     }
 
-    @Override public void onTurnStart(Pokemon target, BattleContext context) { }
-
     @Override
-    public void onTurnEnd(Pokemon target, BattleContext context)
+    public void onTurnEnd(Pokemon target, BattleContext context) 
     {
         int maxHp = target.getCurrentStats().getValue(StatType.HP);
-        int damage = Integer.max(1, maxHp / 8);
+        int damage = Integer.max(1, damageFormula.modify(maxHp, context));
 
         target.receiveDamage(damage);
-        context.getHud().updateConsoleMessage(target.getNickname() + " sofreu com o veneno!");
+        
+        if (turnEndMessage != null)
+            context.getHud().updateConsoleMessage(target.getNickname() + " " + turnEndMessage);
     }
 }

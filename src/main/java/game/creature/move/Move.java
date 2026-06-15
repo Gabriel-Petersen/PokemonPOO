@@ -65,5 +65,7 @@ public abstract class Move {
 
     public Boolean isSelfTarget() { return isSelfTarget; }
 
+    protected boolean mayAttack(Pokemon attacker, BattleContext context) { return Math.random()<=getAccuracy() * (double)attacker.getCurrentAccuracy(context)/100.0; }
+
     public static int getMaxPp() { return MAX_PP; }
 }

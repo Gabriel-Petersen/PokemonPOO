@@ -331,7 +331,6 @@ public class BattleHud extends UiImage
 
         if (slot >= moves.length || moves[slot] == null) return;
 
-        Pokemon target = opponentIcon.getSource().getCurrent();
         Move move = moves[slot];
 
         MoveAction action = new MoveAction(move, playerIcon.getSource());
