@@ -93,11 +93,13 @@ public class Main
         shopkeeper2.getTransform().setPosition(3672, 2196);
         shopkeeper2.getInventory().add(ItemRegistry.smallPotion, 5);
         shopkeeper2.getInventory().add(ItemRegistry.mediumPotion, 2);
+        shopkeeper2.getInventory().add(ItemRegistry.pokeBall, 2);
         gamePanel.addElement(shopkeeper2);
 
         NpcTrainer npctrainer1 = new NpcTrainer(new Inventory(), new Team(), "Luiz Gustavo", "npcs/ingame/npc_ingame09.png", "npcs/battle/npc_battle09.png");
         npctrainer1.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(25), 8));
-        npctrainer1.getCurrent().setOwner(true);
+        for (var poke : npctrainer1.getTeam().getMembers())
+            poke.setOwner(true);
         npctrainer1.getTransform().setScale(3, 3);
         npctrainer1.getTransform().setPosition(2928, 4452);
         String[] npctrainer1Message = {"Vamos lutar!"};
@@ -107,7 +109,8 @@ public class Main
         NpcTrainer npctrainer2 = new NpcTrainer(new Inventory(), new Team(), "Mateus", "npcs/ingame/npc_ingame09.png", "npcs/battle/npc_battle24.png");
         npctrainer2.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(74), 9));
         npctrainer2.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(66), 10));
-        npctrainer2.getCurrent().setOwner(true);
+        for (var poke : npctrainer2.getTeam().getMembers())
+            poke.setOwner(true);
         npctrainer2.getTransform().setScale(3, 3);
         npctrainer2.getTransform().setPosition(3117, 3971);
         npctrainer2.setMessage(null);
@@ -116,7 +119,8 @@ public class Main
         NpcTrainer npctrainer3 = new NpcTrainer(new Inventory(), new Team(), "Pedro Luz", "npcs/ingame/npc_ingame08.png", "npcs/battle/npc_battle40.png");
         npctrainer3.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(20), 11));
         npctrainer3.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(35), 13));
-        npctrainer3.getCurrent().setOwner(true);
+        for (var poke : npctrainer3.getTeam().getMembers())
+            poke.setOwner(true);
         npctrainer3.getTransform().setScale(3, 3);
         npctrainer3.getTransform().setPosition(3211, 3253);
         npctrainer3.setMessage(null);
@@ -126,7 +130,8 @@ public class Main
         gymleader.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(20), 13));
         gymleader.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(75), 14));
         gymleader.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(5), 16));
-        gymleader.getCurrent().setOwner(true);
+        for (var poke : gymleader.getTeam().getMembers())
+            poke.setOwner(true);
         gymleader.getTransform().setScale(3, 3);
         gymleader.getTransform().setPosition(3667, 1764);
         gymleader.setMessage(null);
@@ -136,7 +141,8 @@ public class Main
         npctrainer4.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(67), 19));
         npctrainer4.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(26), 20));
         npctrainer4.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(8), 22));
-        npctrainer4.getCurrent().setOwner(true);
+        for (var poke : npctrainer4.getTeam().getMembers())
+            poke.setOwner(true);
         npctrainer4.getTransform().setScale(3, 3);
         npctrainer4.getTransform().setPosition(923, 1922);
         npctrainer4.setMessage(null);
@@ -147,12 +153,12 @@ public class Main
         champion.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(26), 24));
         champion.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(36), 25));
         champion.getTeam().addMember(new Pokemon(null, SpecieRegister.getSpecie(6), 26));
-        champion.getCurrent().setOwner(true);
+        for (var poke : champion.getTeam().getMembers())
+            poke.setOwner(true);
         champion.getTransform().setScale(3, 3);
         champion.getTransform().setPosition(21, 2053);
         champion.setMessage(null);
         gamePanel.addElement(champion);
-
     }
 
     private static GameMap getTilemap(GamePanel gamePanel)

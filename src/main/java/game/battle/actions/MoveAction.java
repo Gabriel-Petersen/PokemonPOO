@@ -37,15 +37,6 @@ public class MoveAction extends CombatAction{
             1
             ));
             scheduler.enqueue(new LambdaEvent(() -> barTarget.getHpBar().setFillColor(Color.green)));
-
-            var opponent = context.getOpponent().getCurrent();
-            if (!opponent.isAlive())
-                scheduler.enqueue(new TypewriterEvent(
-                        context.getHud().getConsole(),
-                        opponent.getNickname() + " foi derrotado!!",
-                        0.1,
-                        2
-                ));
         }
         return result.getHit() ? ActionResult.SUCCESS : ActionResult.MISSED;
     }
