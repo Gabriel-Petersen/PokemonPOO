@@ -74,11 +74,12 @@ public class BattleSession implements Updatable
             if (player instanceof Player p)
             {
                 p.setBattling(false);
-                if (opponent instanceof NpcTrainer t)
+                if (!opponent.getTeam().hasAvailableMember() && !opponent.isWild())
                 {
-                    p.getMetadata().addMoney(NpcTrainer.MONEY_PRIZE * t.getTeam().getMembers().size());
+                    p.getMetadata().addMoney(NpcTrainer.MONEY_PRIZE * opponent.getTeam().getMembers().size());
                     p.getMetadata().addNewWin();
                 }
+                else opponent.getTeam().healAll();
             }
             return;
         }
@@ -132,45 +133,47 @@ public class BattleSession implements Updatable
 
                 if (other.equals(opponent))
                 {
-                    Pokemon playerPokemon = player.getCurrent();
                     Pokemon defeatedOpponent = opponent.getCurrent();
 
                     int xpGained = defeatedOpponent.getCurrentLevel() * 25;
 
-                    scheduler.enqueue(new TypewriterEvent(
-                            battleHud.getConsole(),
-                            playerPokemon.getNickname() + " ganhou " + xpGained + " pontos de EXP!",
-                            0.01,
-                            1.2
-                    ));
+                    for (var member : player.getTeam().getMembers())
+                    {
+                        scheduler.enqueue(new TypewriterEvent(
+                                battleHud.getConsole(),
+                                member.getNickname() + " ganhou " + xpGained + " pontos de EXP!",
+                                0.01,
+                                1.2
+                        ));
 
-                    scheduler.enqueue(new LambdaEvent(() -> {
-                        String oldName = playerPokemon.getNickname();
-                        Specie oldSpecie = playerPokemon.getSpecie();
+                        scheduler.enqueue(new LambdaEvent(() -> {
+                            String oldName = member.getNickname();
+                            Specie oldSpecie = member.getSpecie();
 
-                        boolean leveled = playerPokemon.gainExperience(xpGained);
+                            boolean leveled = member.gainExperience(xpGained);
 
-                        if (leveled)
-                        {
-                            scheduler.enqueue(new TypewriterEvent(
-                                    battleHud.getConsole(),
-                                    playerPokemon.getNickname() + " subiu para o Nível " + playerPokemon.getCurrentLevel() + "!",
-                                    0.01,
-                                    1.5
-                            ));
-
-                            if (!playerPokemon.getSpecie().equals(oldSpecie)) {
+                            if (leveled)
+                            {
                                 scheduler.enqueue(new TypewriterEvent(
                                         battleHud.getConsole(),
-                                        "Parabéns! Seu " + oldName + " evoluiu para " + playerPokemon.getSpecie().getName() + "!",
+                                        member.getNickname() + " subiu para o Nível " + member.getCurrentLevel() + "!",
                                         0.01,
-                                        2.0
+                                        1.5
                                 ));
-                            }
 
-                            battleHud.updateActivePokemonSprites();
-                        }
-                    }));
+                                if (!member.getSpecie().equals(oldSpecie)) {
+                                    scheduler.enqueue(new TypewriterEvent(
+                                            battleHud.getConsole(),
+                                            "Parabéns! Seu " + oldName + " evoluiu para " + member.getSpecie().getName() + "!",
+                                            0.01,
+                                            2.0
+                                    ));
+                                }
+
+                                battleHud.updateActivePokemonSprites();
+                            }
+                        }));
+                    }
                 }
 
                 if (battle.isFinished())
@@ -205,6 +208,35 @@ public class BattleSession implements Updatable
             scheduler.enqueue(new LambdaEvent(() -> {
                 if (!battle.isFinished() && !isEnding)
                 {
+                    if (!opponent.getCurrent().isAlive())
+                    {
+                        if (opponent.getTeam().hasAvailableMember())
+                        {
+                            var members = opponent.getTeam().getMembers();
+                            int nextAliveIndex = -1;
+                            for (int i = 0; i < members.size(); i++)
+                                if (members.get(i).isAlive()) {
+                                    nextAliveIndex = i;
+                                    break;
+                                }
+
+                            if (nextAliveIndex != -1)
+                            {
+                                SwitchAction opponentSwitch = new SwitchAction(nextAliveIndex, opponent);
+                                opponentSwitch.execute(battle.getContext(), scheduler);
+
+                                scheduler.enqueue(new TypewriterEvent(
+                                        battleHud.getConsole(),
+                                        opponent.getDisplayName() + " enviou " + members.get(nextAliveIndex).getNickname() + "!",
+                                        0.05,
+                                        1.2
+                                ));
+
+                                scheduler.enqueue(new LambdaEvent(battleHud::updateActivePokemonSprites));
+                            }
+                        }
+                    }
+
                     if (!player.getCurrent().isAlive())
                     {
                         if (player.getTeam().hasAvailableMember())
@@ -222,7 +254,7 @@ public class BattleSession implements Updatable
                             enqueueBattleOverVisuals();
                         }
                     }
-                    else
+                    else if (opponent.getCurrent().isAlive())
                     {
                         battleHud.setActionButtonsEnabled(true);
                         battleHud.updateConsoleMessage("O que você fará a seguir?");
