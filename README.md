@@ -77,7 +77,3 @@ Ou seja, se entradas tiverem rarities `1, 3, 5`, as probabilidades aproximadas s
 
 - Classe principal: `execs.Main` (ponto de entrada)
 - Arquivos de assets (sprites, tilemaps) em `src/main/resources/assets/...` — carregados via `engine.assets.AssetManager`.
-
----
-
-Se quiser, eu faço: validação automática dos `species.txt` (mapeando linhas removidas), adicionar instruções de debug, ou criar um script de build (Maven/Gradle).
